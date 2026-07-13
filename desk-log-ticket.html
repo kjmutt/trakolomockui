@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — log a ticket</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a class="active" href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a class="active" href="desk-log-ticket.html">Log a ticket</a>
+  <a href="desk.html">Service desk</a>
+</div>
+
+<div class="wrap split">
+  <div>
+    <div class="page-title">Log a ticket</div>
+    <div class="page-desc" style="margin-bottom:22px;">Tell us what's going on. We'll route it to the right team and give you a response estimate.</div>
+
+    <div class="card">
+      <div class="section-label">What's this about</div>
+      <div class="cat-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+        <div class="cat selected" data-cat="hardware" style="border:1px solid var(--border);border-radius:10px;padding:14px 12px;cursor:pointer;">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" style="margin-bottom:8px;color:var(--indigo-text)"><rect x="2" y="3" width="14" height="9" rx="1"/><path d="M7 15h4M9 12v3"/></svg>
+          <div style="font-size:12.5px;font-weight:600;color:var(--indigo-text)">Hardware</div>
+        </div>
+        <div class="cat" data-cat="access" style="border:1px solid var(--border);border-radius:10px;padding:14px 12px;cursor:pointer;">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" style="margin-bottom:8px;color:var(--ink-2)"><rect x="4" y="8" width="10" height="7" rx="1.5"/><path d="M6.5 8V5.5a2.5 2.5 0 015 0V8"/></svg>
+          <div style="font-size:12.5px;font-weight:500">Software &amp; access</div>
+        </div>
+        <div class="cat" data-cat="network" style="border:1px solid var(--border);border-radius:10px;padding:14px 12px;cursor:pointer;">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" style="margin-bottom:8px;color:var(--ink-2)"><path d="M3 7a8 8 0 0112 0M5.5 9.5a4.5 4.5 0 017 0"/><circle cx="9" cy="13" r="1.3" fill="currentColor" stroke="none"/></svg>
+          <div style="font-size:12.5px;font-weight:500">Network &amp; wifi</div>
+        </div>
+        <div class="cat" data-cat="security" style="border:1px solid var(--border);border-radius:10px;padding:14px 12px;cursor:pointer;">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" style="margin-bottom:8px;color:var(--ink-2)"><path d="M9 2l6 2.5v4c0 4-2.6 6.7-6 7.5-3.4-.8-6-3.5-6-7.5v-4L9 2z"/></svg>
+          <div style="font-size:12.5px;font-weight:500">Account security</div>
+        </div>
+        <div class="cat" data-cat="facilities" style="border:1px solid var(--border);border-radius:10px;padding:14px 12px;cursor:pointer;">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" style="margin-bottom:8px;color:var(--ink-2)"><path d="M3 16V7l6-4 6 4v9"/><path d="M7 16v-5h4v5"/></svg>
+          <div style="font-size:12.5px;font-weight:500">Facilities</div>
+        </div>
+        <div class="cat" data-cat="other" style="border:1px solid var(--border);border-radius:10px;padding:14px 12px;cursor:pointer;">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.4" style="margin-bottom:8px;color:var(--ink-2)"><circle cx="9" cy="9" r="7"/><path d="M9 12v.01M9 6.2c1.4 0 2.2.8 2.2 1.9 0 1.5-2.2 1.5-2.2 3.1"/></svg>
+          <div style="font-size:12.5px;font-weight:500">Something else</div>
+        </div>
+      </div>
+
+      <label for="subj">Subject</label>
+      <input id="subj" type="text" placeholder="Short summary, e.g. Laptop won't connect to office wifi">
+
+      <label for="desc">Description</label>
+      <textarea id="desc" placeholder="What happened, what you expected, and any error messages you saw."></textarea>
+
+      <label>Priority</label>
+      <div class="seg">
+        <div class="seg-opt sel-low" data-eta="within 2 business days">Low</div>
+        <div class="seg-opt sel-medium selected" data-eta="within 4 business hours">Medium</div>
+        <div class="seg-opt sel-high" data-eta="within 1 business hour">High</div>
+        <div class="seg-opt sel-urgent" data-eta="within 15 minutes, on-call paged">Urgent</div>
+      </div>
+      <div class="hint">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" style="flex-shrink:0"><circle cx="7" cy="7" r="6"/><path d="M7 4v3.2l2.2 1.3"/></svg>
+        <span>Estimated first response: <b id="eta">within 4 business hours</b></span>
+      </div>
+
+      <div style="margin-top:18px;border:1.5px dashed var(--border-strong);border-radius:10px;padding:20px;text-align:center;color:var(--ink-muted);font-size:12.5px;">
+        <b style="color:var(--indigo-text);font-weight:600;">Attach a file</b> or drag one here — screenshots help us diagnose faster.
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px;">
+        <button class="btn">Save as draft</button>
+        <button class="btn primary">Log ticket</button>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <div style="font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:2px;">Your recent tickets</div>
+      <div style="font-size:12px;color:var(--ink-muted);margin-bottom:16px;">Live status on what you've already logged.</div>
+
+      <div style="padding:13px 0;border-bottom:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;margin-bottom:9px;"><div><div class="id-mono">TK-8841</div><div style="font-size:13px;font-weight:500;margin-top:2px;">VPN disconnects every 10 minutes</div></div><div style="font-size:11px;color:var(--ink-muted);white-space:nowrap;">2h ago</div></div>
+        <div class="track"><div class="dot done"></div><div class="seg-line done"></div><div class="dot done"></div><div class="seg-line done"></div><div class="dot current"></div><div class="seg-line"></div><div class="dot"></div></div>
+        <div class="track-labels"><span>Logged</span><span>Triaged</span><span class="current">In progress</span><span>Resolved</span></div>
+      </div>
+      <div style="padding:13px 0;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:9px;"><div><div class="id-mono">TK-8827</div><div style="font-size:13px;font-weight:500;margin-top:2px;">Request: Figma seat for new designer</div></div><div style="font-size:11px;color:var(--ink-muted);white-space:nowrap;">1d ago</div></div>
+        <div class="track"><div class="dot done"></div><div class="seg-line done"></div><div class="dot done"></div><div class="seg-line done"></div><div class="dot done"></div><div class="seg-line done"></div><div class="dot done"></div></div>
+        <div class="track-labels"><span>Logged</span><span>Triaged</span><span>In progress</span><span class="current">Resolved</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:12px;">What happens next</div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;gap:11px;"><div style="width:22px;height:22px;border-radius:50%;background:var(--indigo-bg);color:var(--indigo-text);font-family:var(--font-mono);font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;">1</div><div style="font-size:12.5px;color:var(--ink-2);line-height:1.5;"><b style="color:var(--ink);font-weight:600;">Routed automatically</b> to the right team based on category.</div></div>
+        <div style="display:flex;gap:11px;"><div style="width:22px;height:22px;border-radius:50%;background:var(--indigo-bg);color:var(--indigo-text);font-family:var(--font-mono);font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;">2</div><div style="font-size:12.5px;color:var(--ink-2);line-height:1.5;"><b style="color:var(--ink);font-weight:600;">Triaged</b> against your priority and current queue load.</div></div>
+        <div style="display:flex;gap:11px;"><div style="width:22px;height:22px;border-radius:50%;background:var(--indigo-bg);color:var(--indigo-text);font-family:var(--font-mono);font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:700;">3</div><div style="font-size:12.5px;color:var(--ink-2);line-height:1.5;"><b style="color:var(--ink);font-weight:600;">You're notified</b> at each stage — no need to check back manually.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.cat').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      document.querySelectorAll('.cat').forEach(c=>{c.classList.remove('selected');c.style.borderColor='var(--border)';c.style.background='transparent';c.querySelector('div').style.color='var(--ink)';c.querySelector('div').style.fontWeight='500';c.querySelector('svg').style.color='var(--ink-2)';});
+      el.classList.add('selected'); el.style.borderColor='var(--indigo)'; el.style.background='var(--indigo-bg)';
+      el.querySelector('div').style.color='var(--indigo-text)'; el.querySelector('div').style.fontWeight='600';
+      el.querySelector('svg').style.color='var(--indigo-text)';
+    });
+  });
+  document.querySelectorAll('.seg-opt').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      document.querySelectorAll('.seg-opt').forEach(c=>c.classList.remove('selected'));
+      el.classList.add('selected');
+      document.getElementById('eta').textContent = el.dataset.eta;
+    });
+  });
+</script>
+</body>
+</html>

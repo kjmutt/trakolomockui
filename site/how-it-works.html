@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How it works — Trakolo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .stage-block { display: grid; grid-template-columns: 60px 1fr; gap: 24px; padding-bottom: 48px; position: relative; }
+  .stage-block:last-child { padding-bottom: 0; }
+  .stage-rail { position: relative; display: flex; flex-direction: column; align-items: center; }
+  .stage-rail .marker { width: 44px; height: 44px; border-radius: 12px; background: var(--teal-50); border: 1.5px solid var(--teal-200); display: flex; align-items: center; justify-content: center; font-family: 'Sora', sans-serif; font-weight: 600; color: var(--teal-800); z-index: 1; }
+  .stage-rail .line { flex: 1; width: 1.5px; background: repeating-linear-gradient(180deg, var(--teal-200) 0 6px, transparent 6px 12px); margin-top: 8px; }
+  .stage-block:last-child .stage-rail .line { display: none; }
+  .stage-content h3 { font-size: 21px; margin-bottom: 8px; }
+  .stage-content p.desc { color: var(--ink-soft); font-size: 15.5px; margin-bottom: 16px; max-width: 560px; }
+  .stage-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .stage-tag { font-size: 12.5px; font-weight: 500; background: var(--panel); border: 1px solid var(--line); color: var(--ink-soft); padding: 5px 11px; border-radius: 999px; }
+
+  .persona-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .persona-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+  .persona-card h4 { font-size: 16px; margin-bottom: 8px; }
+  .persona-card p { font-size: 14px; color: var(--ink-soft); }
+
+  @media (max-width: 860px) {
+    .persona-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a href="index.html" class="logo">
+      <svg width="30" height="30" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+      trakolo
+    </a>
+    <div class="nav-links">
+      <a href="how-it-works.html" class="current">How it works</a>
+      <a href="features.html">Features</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="docs.html">Docs</a>
+    </div>
+    <div class="nav-actions">
+      <a href="../login.html" class="btn btn-ghost">Sign in</a>
+      <a href="../login.html" class="btn btn-primary">Start free</a>
+    </div>
+  </nav>
+</div>
+
+<div class="page-header">
+  <div class="wrap">
+    <h1>How Trakolo works</h1>
+    <p>One system, one path. Every ticket, asset, and dev task moves through the same clear stages — so nothing sits forgotten in an inbox or a spreadsheet.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">The four stages</span>
+    </div>
+
+    <div class="stage-block">
+      <div class="stage-rail"><div class="marker">1</div><div class="line"></div></div>
+      <div class="stage-content">
+        <h3>Log it</h3>
+        <p class="desc">Every request starts here — a broken laptop, a new software license, a bug report, or a new hire's access needs. Capture it from wherever your team already works, and Trakolo turns it into a structured record automatically.</p>
+        <div class="stage-tags">
+          <span class="stage-tag">Email-to-ticket</span>
+          <span class="stage-tag">Slack &amp; Teams integration</span>
+          <span class="stage-tag">Self-service portal</span>
+          <span class="stage-tag">API &amp; webhooks</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage-block">
+      <div class="stage-rail"><div class="marker">2</div><div class="line"></div></div>
+      <div class="stage-content">
+        <h3>Assign &amp; track it</h3>
+        <p class="desc">Every item gets an owner, a priority, and an SLA clock. Managers see exactly where things stand across IT, assets, and dev work — in one board, not four separate tools.</p>
+        <div class="stage-tags">
+          <span class="stage-tag">Auto-routing rules</span>
+          <span class="stage-tag">SLA timers</span>
+          <span class="stage-tag">Kanban &amp; list views</span>
+          <span class="stage-tag">Linked assets</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage-block">
+      <div class="stage-rail"><div class="marker">3</div><div class="line"></div></div>
+      <div class="stage-content">
+        <h3>Resolve it</h3>
+        <p class="desc">Close the loop with a clear resolution note, linked changes, and automatic notification to whoever raised it. Nothing closes silently — and nothing reopens without a trace.</p>
+        <div class="stage-tags">
+          <span class="stage-tag">Resolution notes</span>
+          <span class="stage-tag">Automatic notifications</span>
+          <span class="stage-tag">Linked changes &amp; commits</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage-block">
+      <div class="stage-rail"><div class="marker">4</div></div>
+      <div class="stage-content">
+        <h3>Report on it</h3>
+        <p class="desc">Every resolved item feeds straight into audit-ready reporting — SLA compliance, license utilization, asset lifecycle, and team performance, exportable in one click.</p>
+        <div class="stage-tags">
+          <span class="stage-tag">Audit trails</span>
+          <span class="stage-tag">Compliance exports</span>
+          <span class="stage-tag">Custom dashboards</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">Built for how different teams work</span>
+    </div>
+    <h2>The same path, three points of view</h2>
+    <p class="lead">Trakolo adapts the same underlying flow to how each team actually thinks about their work.</p>
+
+    <div class="persona-grid">
+      <div class="persona-card">
+        <h4>IT &amp; service desk</h4>
+        <p>Tickets route by category and SLA automatically. Recurring issues surface as trends, not just individual tickets.</p>
+      </div>
+      <div class="persona-card">
+        <h4>Asset &amp; procurement teams</h4>
+        <p>Every license and device is linked to an owner and a renewal date, so nothing quietly auto-renews or goes unused.</p>
+      </div>
+      <div class="persona-card">
+        <h4>Engineering &amp; dev teams</h4>
+        <p>The same tickets can live on a sprint board, linked to commits and pull requests, without leaving the same system.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="text-align:center;">
+  <div class="wrap">
+    <h2>See it running on your own data</h2>
+    <p class="lead" style="margin-left:auto; margin-right:auto;">Set up your first board in under five minutes — no credit card required.</p>
+    <a href="../login.html" class="btn btn-primary">Start free →</a>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer>
+    <span>© 2026 Trakolo. Never lose track.</span>
+    <span>Privacy · Terms · Contact</span>
+  </footer>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — platform console</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .plat-wrap{max-width:1080px;margin:0 auto;padding:32px 40px 60px;}
+  .plat-card{background:#151F1B;border:1px solid #26362F;border-radius:14px;}
+  .plat-card table{width:100%;border-collapse:collapse;}
+  .plat-card th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:#7C948A;font-family:var(--font-mono);font-weight:500;padding:12px 18px;border-bottom:1px solid #26362F;}
+  .plat-card td{padding:14px 18px;border-bottom:1px solid #26362F;font-size:13px;color:#D6E4DE;}
+  .plat-card tbody tr:hover{background:#1B2620;}
+  .plat-mcard{background:#151F1B;border:1px solid #26362F;border-radius:12px;padding:16px 18px;}
+  .plat-mcard .mlabel{font-size:11px;color:#7C948A;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.5px;}
+  .plat-mcard .mval{font-family:var(--font-display);font-size:23px;font-weight:700;margin-top:6px;color:#fff;}
+</style>
+</head>
+<body class="platform-body">
+<div class="platform-header">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#1B2E27" stroke="#5DCAA5" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#5DCAA5" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5"/><circle cx="100" cy="100" r="16" fill="#5DCAA5"/><circle cx="150" cy="50" r="21" fill="#5DCAA5"/></svg>
+    <span class="brand-name">Trakolo</span>
+    <span class="plat-tag">Platform</span>
+  </a>
+  <div class="top-right"><a href="saas-admin-login.html">Sign out</a></div>
+</div>
+
+<div class="plat-wrap">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:22px;">
+    <div>
+      <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;">Tenant workspaces</div>
+      <div style="font-size:13px;color:#8FA79C;margin-top:4px;">Every org running on Trakolo cloud. DB-per-tenant, isolated at the infra layer.</div>
+    </div>
+    <button class="btn primary" style="background:#1D9E75;border-color:#1D9E75;">+ New tenant</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;">
+    <div class="plat-mcard"><div class="mlabel">Active tenants</div><div class="mval">312</div></div>
+    <div class="plat-mcard"><div class="mlabel">Total seats</div><div class="mval">18,940</div></div>
+    <div class="plat-mcard"><div class="mlabel">On-prem installs</div><div class="mval">14</div></div>
+    <div class="plat-mcard"><div class="mlabel">Platform uptime</div><div class="mval">99.97%</div></div>
+  </div>
+
+  <div class="plat-card">
+    <table>
+      <thead><tr><th>Org</th><th>Plan</th><th>Seats</th><th>Region</th><th>Health</th><th>Deployment</th><th></th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b style="color:#fff;">Org1 — Acme Corp</b></td><td>Team</td><td>84</td><td>us-east</td>
+          <td><span class="tenant-health"><span class="hdot" style="background:#5DCAA5;"></span>Healthy</span></td>
+          <td>Cloud</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
+        </tr>
+        <tr>
+          <td><b style="color:#fff;">Org2 — Northwind Traders</b></td><td>Enterprise</td><td>412</td><td>eu-west</td>
+          <td><span class="tenant-health"><span class="hdot" style="background:#5DCAA5;"></span>Healthy</span></td>
+          <td>Cloud</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
+        </tr>
+        <tr>
+          <td><b style="color:#fff;">Org3 — Globex Industries</b></td><td>Enterprise</td><td>1,204</td><td>on-prem</td>
+          <td><span class="tenant-health"><span class="hdot" style="background:#DDA234;"></span>Degraded — sync delayed</span></td>
+          <td>On-premise</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
+        </tr>
+        <tr>
+          <td><b style="color:#fff;">Initech</b></td><td>Starter</td><td>18</td><td>us-east</td>
+          <td><span class="tenant-health"><span class="hdot" style="background:#5DCAA5;"></span>Healthy</span></td>
+          <td>Cloud</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
+        </tr>
+        <tr>
+          <td><b style="color:#fff;">Umbrella Group</b></td><td>Enterprise</td><td>2,880</td><td>ap-south</td>
+          <td><span class="tenant-health"><span class="hdot" style="background:#D85A30;"></span>License expiring in 6 days</span></td>
+          <td>On-premise</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

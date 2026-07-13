@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docs — Trakolo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .docs-layout { display: grid; grid-template-columns: 220px 1fr; gap: 48px; }
+  .docs-nav { position: sticky; top: 32px; align-self: start; }
+  .docs-nav .group { margin-bottom: 24px; }
+  .docs-nav .group-title { font-size: 11.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); margin-bottom: 10px; }
+  .docs-nav a { display: block; font-size: 14px; color: var(--ink-soft); padding: 6px 0; }
+  .docs-nav a.current { color: var(--teal-800); font-weight: 600; }
+
+  .doc-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 24px; margin-bottom: 16px; }
+  .doc-card h3 { font-size: 17px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+  .doc-card .time { font-size: 12px; font-weight: 500; color: var(--teal-800); background: var(--teal-50); padding: 3px 9px; border-radius: 999px; }
+  .doc-card p { font-size: 14px; color: var(--ink-soft); margin-bottom: 14px; }
+  .doc-card code { background: var(--teal-50); color: var(--teal-800); padding: 2px 7px; border-radius: 5px; font-size: 13px; }
+  .doc-card pre { background: var(--teal-900); color: #DFF3EA; padding: 16px 18px; border-radius: 10px; font-size: 13px; overflow-x: auto; margin-top: 10px; }
+
+  @media (max-width: 860px) {
+    .docs-layout { grid-template-columns: 1fr; }
+    .docs-nav { position: static; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a href="index.html" class="logo">
+      <svg width="30" height="30" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+      trakolo
+    </a>
+    <div class="nav-links">
+      <a href="how-it-works.html">How it works</a>
+      <a href="features.html">Features</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="docs.html" class="current">Docs</a>
+    </div>
+    <div class="nav-actions">
+      <a href="../login.html" class="btn btn-ghost">Sign in</a>
+      <a href="../login.html" class="btn btn-primary">Start free</a>
+    </div>
+  </nav>
+</div>
+
+<div class="page-header">
+  <div class="wrap">
+    <h1>Documentation</h1>
+    <p>Everything you need to get your team up and running — from your first ticket to a full API integration.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap docs-layout">
+    <div class="docs-nav">
+      <div class="group">
+        <div class="group-title">Getting started</div>
+        <a href="#quickstart" class="current">Quickstart</a>
+        <a href="#workspace">Setting up your workspace</a>
+        <a href="#import">Importing assets</a>
+      </div>
+      <div class="group">
+        <div class="group-title">Core concepts</div>
+        <a href="#tickets">Tickets &amp; SLAs</a>
+        <a href="#assets">Assets &amp; licenses</a>
+        <a href="#boards">Boards &amp; sprints</a>
+      </div>
+      <div class="group">
+        <div class="group-title">Integrations</div>
+        <a href="#slack">Slack &amp; Teams</a>
+        <a href="#git">Git integration</a>
+        <a href="#api">API reference</a>
+      </div>
+    </div>
+
+    <div>
+      <div class="doc-card" id="quickstart">
+        <h3>Quickstart <span class="time">5 min</span></h3>
+        <p>Create your workspace, invite your team, and log your first ticket.</p>
+        <p>1. Sign up and create a workspace name.<br>2. Invite teammates by email or a shared link.<br>3. Create your first board — Tickets, Assets, or Dev.<br>4. Log a test ticket to see routing and SLAs in action.</p>
+      </div>
+
+      <div class="doc-card" id="workspace">
+        <h3>Setting up your workspace</h3>
+        <p>Configure teams, categories, and SLA rules before rolling out to the whole company.</p>
+        <p>Go to <code>Settings → Workspace</code> to define ticket categories (e.g. Hardware, Access, Software) and assign default owners and SLA targets for each.</p>
+      </div>
+
+      <div class="doc-card" id="import">
+        <h3>Importing assets</h3>
+        <p>Bring your existing asset spreadsheet in with a guided CSV import.</p>
+        <pre>POST /v1/assets/import
+Content-Type: text/csv
+
+name,type,owner,license_expiry
+MacBook Pro 14",hardware,jane@company.com,
+Figma Team License,software,design-team@company.com,2027-03-01</pre>
+      </div>
+
+      <div class="doc-card" id="tickets">
+        <h3>Tickets &amp; SLAs</h3>
+        <p>Every ticket has a category, priority, and SLA clock that starts the moment it's logged. Escalation rules can reassign or notify a manager automatically if a ticket is close to breaching.</p>
+      </div>
+
+      <div class="doc-card" id="assets">
+        <h3>Assets &amp; licenses</h3>
+        <p>Assets can be linked directly to tickets — so when someone reports a laptop issue, its full history, warranty status, and current owner are visible in the same view.</p>
+      </div>
+
+      <div class="doc-card" id="boards">
+        <h3>Boards &amp; sprints</h3>
+        <p>Dev teams can convert any ticket into a sprint item, estimate it, and track it on a kanban or sprint board — while IT still sees its SLA status in the original ticket view.</p>
+      </div>
+
+      <div class="doc-card" id="slack">
+        <h3>Slack &amp; Teams integration</h3>
+        <p>Install the Trakolo app to create tickets with <code>/trakolo new</code> and get status updates posted directly to a channel.</p>
+      </div>
+
+      <div class="doc-card" id="git">
+        <h3>Git integration</h3>
+        <p>Connect a GitHub or GitLab repo to link commits and pull requests to tickets automatically when a branch name includes the ticket ID.</p>
+      </div>
+
+      <div class="doc-card" id="api">
+        <h3>API reference</h3>
+        <p>Full REST API for tickets, assets, and boards. Authenticate with a workspace API key.</p>
+        <pre>GET /v1/tickets?status=open
+Authorization: Bearer YOUR_API_KEY</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer>
+    <span>© 2026 Trakolo. Never lose track.</span>
+    <span>Privacy · Terms · Contact</span>
+  </footer>
+</div>
+
+</body>
+</html>

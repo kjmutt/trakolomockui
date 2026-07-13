@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — sprint board</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a class="active" href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a class="active" href="dev.html">Sprint board</a>
+  <a href="dev-backlog.html">Backlog &amp; planning</a>
+</div>
+
+<div class="wrap">
+  <div class="page-head">
+    <div><div class="page-title">Sprint 34</div><div class="page-desc">Platform reliability workstream · Jul 7 – Jul 18 · click a card for its full detail.</div></div>
+    <button class="btn primary">Add card</button>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-2);margin-bottom:8px;">
+    <span>5 days remaining</span><span>32 / 47 points complete</span>
+  </div>
+  <div style="height:7px;border-radius:4px;overflow:hidden;display:flex;margin-bottom:24px;border:1px solid var(--border);">
+    <div style="width:68%;background:var(--indigo);"></div><div style="width:14%;background:var(--amber);"></div><div style="width:18%;background:var(--surface-2);"></div>
+  </div>
+
+  <div class="board" id="board"></div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeSO()"></div>
+<div class="slideover" id="slideover">
+  <div class="so-head">
+    <div>
+      <div class="id-mono" id="so-id" style="margin-bottom:4px;"></div>
+      <div style="font-family:var(--font-display);font-size:18px;font-weight:700;" id="so-subject"></div>
+    </div>
+    <button class="so-close" onclick="closeSO()">✕</button>
+  </div>
+  <div class="so-body" id="so-body"></div>
+</div>
+
+<script>
+const columns = [
+  {name:"Backlog", cards:["DEV-1042","DEV-1039"]},
+  {name:"In progress", cards:["DEV-1031","DEV-1028"]},
+  {name:"In review", cards:["DEV-1019","DEV-1014"]},
+  {name:"Done", cards:["DEV-1002","DEV-0997"]}
+];
+
+const cards = {
+  "DEV-1042":{title:"Rate-limit the assets sync webhook", tags:["backend","P2"], av:"TK", pts:3,
+    desc:"Add rate limiting to the outbound webhook that syncs asset changes, so a burst of updates can't overload downstream systems.",
+    subtasks:[["Define rate limit thresholds",false],["Add retry with backoff",false]], comments:[]},
+  "DEV-1039":{title:"Design SLA beam component states", tags:["design"], av:"NP", pts:2,
+    desc:"Cover empty, warning, and breached states for the SLA beam used across ticket, asset, and sprint views.",
+    subtasks:[["Draft states in Figma",true],["Review with eng",false]], comments:[]},
+  "DEV-1031":{title:"Escalation routing for L2 → L3 handoff", tags:["backend","P1"], av:"RK", pts:5,
+    desc:"Build the auto-escalation rule that moves a ticket from L2 to L3 on-call once its SLA window closes without an assignment change. Should reuse the same beam/track components already used on the ticket detail page.",
+    subtasks:[["Define escalation trigger rules",true],["Add on-call paging integration",true],["Surface escalation path on ticket detail",false],["Write tests for edge cases",false]],
+    comments:[{av:"RK",name:"Raj K.",time:"yesterday",text:"Paging integration is live in staging — testing against the payroll SSO scenario from TS-4816 now."}]},
+  "DEV-1028":{title:"Asset renewal digest email job", tags:["backend"], av:"SM", pts:3,
+    desc:"Weekly digest email summarizing upcoming renewals, sent to the address configured in Admin → Reporting.",
+    subtasks:[["Build digest template",true],["Schedule weekly job",false]], comments:[]},
+  "DEV-1019":{title:"Compliance report CSV export", tags:["frontend"], av:"TK", pts:2,
+    desc:"Add CSV export to the compliance audit page, matching the format already used for SLA reports.",
+    subtasks:[["Build export button",true],["Match existing CSV schema",true]], comments:[]},
+  "DEV-1014":{title:"Kanban drag reorder + keyboard support", tags:["frontend","a11y"], av:"NP", pts:3,
+    desc:"Cards should be reorderable via drag, and via keyboard (arrow keys + enter) for accessibility.",
+    subtasks:[["Drag reorder",true],["Keyboard support",false],["Screen reader labels",false]], comments:[]},
+  "DEV-1002":{title:"Ticket priority auto-scoring", tags:["backend"], av:"RK", pts:5,
+    desc:"Score incoming tickets on category, requester role, and keyword signals to suggest a starting priority.",
+    subtasks:[["Build scoring model",true],["Wire into ticket creation",true]], comments:[]},
+  "DEV-0997":{title:"Unassigned license nightly scan", tags:["backend"], av:"SM", pts:3,
+    desc:"Nightly job that flags software licenses with no login activity for 14+ days, feeding the Assets idle-license badge.",
+    subtasks:[["Build scan job",true],["Wire into asset status",true]], comments:[]}
+};
+
+function renderBoard(){
+  document.getElementById('board').innerHTML = columns.map(col => `
+    <div>
+      <div class="col-head"><span class="name">${col.name}</span><span class="count">${col.cards.length}</span></div>
+      ${col.cards.map(id => { const c = cards[id]; return `
+        <div class="kcard clickable" onclick="openCard('${id}')">
+          <div class="cid">${id}</div>
+          <div class="ctitle">${c.title}</div>
+          <div class="ctags">${c.tags.map(t=>`<span class="tag-pill">${t}</span>`).join('')}</div>
+          <div class="cfoot"><div class="who"><div class="av">${c.av}</div></div><div class="pts">${c.pts}</div></div>
+        </div>`; }).join('')}
+    </div>`).join('');
+}
+
+function openCard(id){
+  const c = cards[id];
+  const done = c.subtasks.filter(s=>s[1]).length;
+  document.getElementById('so-id').textContent = id;
+  document.getElementById('so-subject').textContent = c.title;
+  document.getElementById('so-body').innerHTML = `
+    <div class="section-label">Description</div>
+    <p style="font-size:13px;color:var(--ink-2);line-height:1.6;margin:0;">${c.desc}</p>
+
+    <div class="section-label" style="margin-top:20px;">Subtasks</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      ${c.subtasks.map(s => `<div style="display:flex;align-items:center;gap:10px;font-size:13px;"><input type="checkbox" ${s[1]?'checked':''} style="width:auto;"><span style="${s[1]?'text-decoration:line-through;color:var(--ink-muted);':''}">${s[0]}</span></div>`).join('')}
+    </div>
+
+    <div class="section-label" style="margin-top:20px;">Progress</div>
+    <div class="beam" style="width:100%;height:7px;"><i style="width:${Math.round(done/c.subtasks.length*100)}%;background:var(--indigo)"></i></div>
+    <div class="beam-label" style="margin-top:6px;">${done} of ${c.subtasks.length} subtasks complete</div>
+
+    <div class="section-label" style="margin-top:20px;">Details</div>
+    <table style="width:100%;font-size:13px;">
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Points</td><td style="text-align:right;">${c.pts}</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Tags</td><td style="text-align:right;">${c.tags.join(', ')}</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Sprint</td><td style="text-align:right;">Sprint 34</td></tr>
+    </table>
+
+    <div class="section-label" style="margin-top:20px;">Comments</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      ${c.comments.map(m => `<div style="display:flex;gap:11px;"><div class="who"><div class="av">${m.av}</div></div><div style="font-size:13px;"><b>${m.name}</b> <span style="color:var(--ink-muted);font-size:12px;">· ${m.time}</span><div style="color:var(--ink-2);margin-top:2px;">${m.text}</div></div></div>`).join('') || '<div style="font-size:12.5px;color:var(--ink-muted);">No comments yet.</div>'}
+    </div>
+    <textarea placeholder="Add a comment…" style="margin-top:16px;"></textarea>
+    <div style="display:flex;justify-content:flex-end;margin-top:12px;"><button class="btn primary">Comment</button></div>`;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('slideover').classList.add('open');
+}
+function closeSO(){
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('slideover').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSO(); });
+renderBoard();
+</script>
+</body>
+</html>

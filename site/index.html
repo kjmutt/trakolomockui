@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trakolo — Never lose track</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ink: #16211D;
+    --ink-soft: #5B6B65;
+    --ink-faint: #8B9A94;
+    --paper: #FAFBF9;
+    --panel: #FFFFFF;
+    --line: #E3E8E4;
+    --teal-900: #04342C;
+    --teal-800: #085041;
+    --teal-600: #0F6E56;
+    --teal-400: #1D9E75;
+    --teal-200: #5DCAA5;
+    --teal-100: #9FE1CB;
+    --teal-50: #E1F5EE;
+    --coral: #D85A30;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { animation: none !important; transition: none !important; }
+  }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.6;
+  }
+  a { color: inherit; text-decoration: none; }
+  :focus-visible { outline: 2px solid var(--teal-600); outline-offset: 3px; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+  h1, h2, h3 { font-family: 'Sora', sans-serif; font-weight: 600; letter-spacing: -0.02em; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 22px; border-radius: 8px; font-weight: 600; font-size: 15px;
+    border: 1.5px solid transparent; cursor: pointer;
+  }
+  .btn-primary { background: var(--teal-600); color: #fff; }
+  .btn-primary:hover { background: var(--teal-800); }
+  .btn-ghost { border-color: var(--line); color: var(--ink); background: transparent; }
+  .btn-ghost:hover { border-color: var(--teal-600); color: var(--teal-600); }
+
+  /* Nav */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 0;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 19px; color: var(--teal-800); font-family: 'Sora', sans-serif; }
+  .nav-links { display: flex; gap: 32px; font-size: 15px; color: var(--ink-soft); font-weight: 500; }
+  .nav-actions { display: flex; align-items: center; gap: 16px; }
+
+  /* Hero */
+  .hero {
+    padding: 72px 0 96px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-inner {
+    display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 56px; align-items: center;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 600; color: var(--teal-800);
+    background: var(--teal-50); border: 1px solid var(--teal-100);
+    padding: 6px 14px; border-radius: 999px; margin-bottom: 24px;
+  }
+  .hero h1 { font-size: 50px; line-height: 1.08; margin-bottom: 20px; }
+  .hero h1 span { color: var(--teal-600); }
+  .hero p.lead { font-size: 18px; color: var(--ink-soft); max-width: 480px; margin-bottom: 32px; }
+  .hero-actions { display: flex; gap: 14px; margin-bottom: 16px; }
+  .hero-note { font-size: 13px; color: var(--ink-faint); }
+
+  /* Hero visual: dashboard mock */
+  .hero-visual {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+    box-shadow: 0 24px 60px -20px rgba(15, 110, 86, 0.18);
+    overflow: hidden;
+  }
+  .mock-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px; border-bottom: 1px solid var(--line); background: #FCFDFC;
+  }
+  .mock-header .dots { display: flex; gap: 6px; }
+  .mock-header .dots span { width: 9px; height: 9px; border-radius: 50%; background: var(--line); }
+  .mock-tabs { display: flex; gap: 18px; padding: 12px 18px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--ink-soft); }
+  .mock-tabs .active { color: var(--teal-800); font-weight: 600; border-bottom: 2px solid var(--teal-600); padding-bottom: 8px; margin-bottom: -13px; }
+  .mock-body { padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+  .mock-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px;
+  }
+  .mock-row .badge {
+    font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 6px;
+  }
+  .badge-open { background: var(--teal-50); color: var(--teal-800); }
+  .badge-progress { background: #FAEEDA; color: #854F0B; }
+  .badge-done { background: #EAF3DE; color: #3B6D11; }
+  .mock-row .title { flex: 1; color: var(--ink); font-weight: 500; }
+  .mock-row .meta { color: var(--ink-faint); font-size: 12px; }
+
+  /* Path signature divider */
+  .path-track {
+    display: flex; align-items: center; gap: 10px; margin: 0 0 20px;
+  }
+  .path-track .node { width: 8px; height: 8px; border-radius: 50%; background: var(--teal-400); }
+  .path-track .node.end { width: 11px; height: 11px; background: var(--teal-600); }
+  .path-track .rule { flex: 1; height: 1px; background: var(--line); }
+  .path-track .tag { font-size: 13px; font-weight: 600; color: var(--teal-800); letter-spacing: 0.02em; }
+
+  /* How it works */
+  .how {
+    padding: 88px 0; background: var(--panel); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  }
+  .how h2 { font-size: 34px; margin-bottom: 12px; }
+  .how > .wrap > p { color: var(--ink-soft); font-size: 16px; max-width: 520px; margin-bottom: 56px; }
+  .stages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; position: relative; }
+  .stage { position: relative; padding: 0 28px 0 0; }
+  .stage-icon {
+    width: 52px; height: 52px; border-radius: 14px; background: var(--teal-50); border: 1.5px solid var(--teal-200);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 20px; position: relative; z-index: 1;
+  }
+  .stage-icon .dot { width: 14px; height: 14px; border-radius: 50%; background: var(--teal-600); }
+  .stage h3 { font-size: 19px; margin-bottom: 8px; }
+  .stage p { font-size: 14.5px; color: var(--ink-soft); }
+  .stage-connector {
+    position: absolute; top: 26px; left: 52px; right: -28px; height: 1.5px;
+    background: repeating-linear-gradient(90deg, var(--teal-200) 0 6px, transparent 6px 12px);
+  }
+  .stage:last-child .stage-connector { display: none; }
+
+  /* Features */
+  .features { padding: 88px 0; }
+  .features h2 { font-size: 34px; margin-bottom: 12px; }
+  .features > .wrap > p { color: var(--ink-soft); font-size: 16px; max-width: 520px; margin-bottom: 48px; }
+  .feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .feature-card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 26px 22px;
+  }
+  .feature-card .fi {
+    width: 38px; height: 38px; border-radius: 10px; margin-bottom: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Sora', sans-serif; font-weight: 600; font-size: 15px;
+  }
+  .fi-teal { background: var(--teal-50); color: var(--teal-800); }
+  .fi-coral { background: #FAECE7; color: #993C1D; }
+  .fi-purple { background: #EEEDFE; color: #534AB7; }
+  .fi-blue { background: #E6F1FB; color: #185FA5; }
+  .feature-card h3 { font-size: 17px; margin-bottom: 8px; }
+  .feature-card p { font-size: 14px; color: var(--ink-soft); }
+
+  /* Quote band */
+  .quote-band {
+    background: var(--teal-900); color: #fff; padding: 72px 0;
+  }
+  .quote-band .wrap { max-width: 760px; text-align: center; }
+  .quote-band blockquote { font-family: 'Sora', sans-serif; font-size: 26px; font-weight: 500; line-height: 1.45; margin-bottom: 22px; }
+  .quote-band .attrib { color: var(--teal-100); font-size: 14px; }
+
+  /* Final CTA */
+  .cta-final { padding: 96px 0; text-align: center; }
+  .cta-final h2 { font-size: 36px; margin-bottom: 16px; }
+  .cta-final p { color: var(--ink-soft); font-size: 16px; margin-bottom: 32px; }
+  .cta-final .hero-actions { justify-content: center; }
+
+  footer {
+    border-top: 1px solid var(--line); padding: 32px 0; 
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px; color: var(--ink-faint);
+  }
+
+  @media (max-width: 860px) {
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 36px; }
+    .stages, .feature-grid { grid-template-columns: 1fr; gap: 32px; }
+    .stage-connector { display: none; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a href="index.html" class="logo">
+      <svg width="30" height="30" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+      trakolo
+    </a>
+    <div class="nav-links">
+      <a href="how-it-works.html">How it works</a>
+      <a href="features.html">Features</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="docs.html">Docs</a>
+    </div>
+    <div class="nav-actions">
+      <a href="../login.html" class="btn btn-ghost">Sign in</a>
+      <a href="../login.html" class="btn btn-primary">Start free</a>
+    </div>
+  </nav>
+</div>
+
+<section class="hero">
+  <div class="wrap hero-inner">
+    <div>
+      <div class="eyebrow">
+        <svg width="14" height="14" viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="none" stroke="#085041" stroke-width="14"/><path d="M60,100 L90,130 L145,65" fill="none" stroke="#085041" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Now supporting unlimited assets on every plan
+      </div>
+      <h1>Every ticket.<br>Every asset.<br><span>Tracked to the end.</span></h1>
+      <p class="lead">Trakolo brings IT service management, software asset tracking, and dev team workflows into one calm, connected system. No spreadsheets. No blind spots.</p>
+      <div class="hero-actions">
+        <a href="../login.html" class="btn btn-primary">Start free →</a>
+        <a href="how-it-works.html" class="btn btn-ghost">See how it works</a>
+      </div>
+      <p class="hero-note">Free for teams up to 10. No credit card required.</p>
+    </div>
+
+    <div class="hero-visual">
+      <div class="mock-header">
+        <span style="font-size:13px; font-weight:600; color:var(--ink-soft);">Tickets</span>
+        <div class="dots"><span></span><span></span><span></span></div>
+      </div>
+      <div class="mock-tabs">
+        <span class="active">All tickets</span>
+        <span>Assets</span>
+        <span>Boards</span>
+        <span>Reports</span>
+      </div>
+      <div class="mock-body">
+        <div class="mock-row"><span class="badge badge-open">Open</span><span class="title">VPN access request — finance team</span><span class="meta">2m ago</span></div>
+        <div class="mock-row"><span class="badge badge-progress">In progress</span><span class="title">Laptop reassignment — new hire onboarding</span><span class="meta">18m ago</span></div>
+        <div class="mock-row"><span class="badge badge-progress">In progress</span><span class="title">Slack integration bug — notifications delayed</span><span class="meta">1h ago</span></div>
+        <div class="mock-row"><span class="badge badge-done">Resolved</span><span class="title">Software license renewal — design team</span><span class="meta">3h ago</span></div>
+        <div class="mock-row"><span class="badge badge-done">Resolved</span><span class="title">Server access audit — Q3 compliance</span><span class="meta">Yesterday</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">How it works</span>
+    </div>
+    <h2>One path, from report to resolution</h2>
+    <p>Every ticket and asset moves through the same clear stages — so nothing sits forgotten in an inbox or a spreadsheet tab.</p>
+
+    <div class="stages">
+      <div class="stage">
+        <div class="stage-connector"></div>
+        <div class="stage-icon"><div class="dot"></div></div>
+        <h3>Log it</h3>
+        <p>Raise a ticket, register an asset, or open a dev task — from Slack, email, or the app.</p>
+      </div>
+      <div class="stage">
+        <div class="stage-connector"></div>
+        <div class="stage-icon"><div class="dot"></div></div>
+        <h3>Track it</h3>
+        <p>See status, owner, and history in one board. Nothing moves without a visible trail.</p>
+      </div>
+      <div class="stage">
+        <div class="stage-icon"><div class="dot"></div></div>
+        <h3>Resolve it</h3>
+        <p>Close the loop with an audit-ready record — for compliance, for reporting, for peace of mind.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">Features</span>
+    </div>
+    <h2>Built for IT, asset, and dev teams alike</h2>
+    <p>One system, three teams. Trakolo replaces the spreadsheet-and-ticket-tool patchwork most IT departments run on.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="fi fi-teal">IT</div>
+        <h3>Service desk</h3>
+        <p>Ticket routing, SLAs, and escalations that actually get followed.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fi fi-coral">SAM</div>
+        <h3>Asset tracking</h3>
+        <p>Know what software and hardware you own, who's using it, and when it renews.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fi fi-purple">Dev</div>
+        <h3>Boards &amp; sprints</h3>
+        <p>Kanban and sprint boards for engineering, without switching tools.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fi fi-blue">Ops</div>
+        <h3>Reporting</h3>
+        <p>Audit-ready reports on tickets, assets, and compliance — exportable in one click.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="quote-band">
+  <div class="wrap">
+    <blockquote>"We replaced three tools with Trakolo in a week. Our IT team finally has one place to look, instead of four."</blockquote>
+    <p class="attrib">— Head of IT Operations, mid-size logistics company</p>
+  </div>
+</section>
+
+<section class="cta-final">
+  <div class="wrap">
+    <h2>Never lose track of anything again.</h2>
+    <p>Set up your first board in under five minutes.</p>
+    <div class="hero-actions">
+      <a href="../login.html" class="btn btn-primary">Start free →</a>
+      <a href="../contact.html" class="btn btn-ghost">Book a demo</a>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer>
+    <span>© 2026 Trakolo. Never lose track.</span>
+    <span>Privacy · Terms · Contact</span>
+  </footer>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Integrations — Trakolo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .int-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .int-card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 12px; }
+  .int-mark { width: 38px; height: 38px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-family: 'Sora', sans-serif; font-weight: 600; font-size: 13px; flex-shrink: 0; }
+  .int-card h4 { font-size: 14.5px; margin-bottom: 2px; }
+  .int-card p { font-size: 12.5px; color: var(--ink-soft); }
+
+  .ai-band { background: var(--teal-900); border-radius: 20px; padding: 44px; color: #fff; }
+  .ai-band .eyebrow-ai { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: var(--teal-100); background: rgba(255,255,255,0.08); padding: 5px 12px; border-radius: 999px; margin-bottom: 18px; }
+  .ai-band h2 { color: #fff; font-size: 28px; margin-bottom: 10px; }
+  .ai-band p.lead { color: var(--teal-100); max-width: 600px; margin-bottom: 32px !important; }
+  .ai-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .ai-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 20px; }
+  .ai-card h4 { font-size: 15.5px; color: #fff; margin-bottom: 8px; }
+  .ai-card p { font-size: 13.5px; color: var(--teal-100); }
+
+  @media (max-width: 960px) {
+    .int-grid { grid-template-columns: repeat(2, 1fr); }
+    .ai-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a href="index.html" class="logo">
+      <svg width="30" height="30" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+      trakolo
+    </a>
+    <div class="nav-links">
+      <a href="how-it-works.html">How it works</a>
+      <a href="features.html">Features</a>
+      <a href="integrations.html" class="current">Integrations</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="docs.html">Docs</a>
+    </div>
+    <div class="nav-actions">
+      <a href="../login.html" class="btn btn-ghost">Sign in</a>
+      <a href="../login.html" class="btn btn-primary">Start free</a>
+    </div>
+  </nav>
+</div>
+
+<div class="page-header">
+  <div class="wrap">
+    <h1>Connects with the tools you already use</h1>
+    <p>Trakolo plugs into your identity provider, chat tools, dev stack, and business systems — so tickets, assets, and work stay in sync everywhere.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">Communication</span>
+    </div>
+    <div class="int-grid">
+      <div class="int-card"><div class="int-mark fi-purple" style="background:#EEEDFE;color:#534AB7;">Sl</div><div><h4>Slack</h4><p>Create &amp; update tickets from any channel</p></div></div>
+      <div class="int-card"><div class="int-mark" style="background:#E6F1FB;color:#185FA5;">Tm</div><div><h4>Microsoft Teams</h4><p>Ticket bot &amp; status notifications</p></div></div>
+      <div class="int-card"><div class="int-mark" style="background:#FAECE7;color:#993C1D;">@</div><div><h4>Email-to-ticket</h4><p>Turn any inbox into a ticket queue</p></div></div>
+      <div class="int-card"><div class="int-mark" style="background:#EAF3DE;color:#3B6D11;">Wa</div><div><h4>WhatsApp Business</h4><p>Log requests from customer chats</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">Identity &amp; access</span>
+    </div>
+    <div class="int-grid">
+      <div class="int-card"><div class="int-mark" style="background:var(--teal-50);color:var(--teal-800);">AD</div><div><h4>Active Directory</h4><p>Sync users, groups &amp; permissions</p></div></div>
+      <div class="int-card"><div class="int-mark" style="background:#E6F1FB;color:#185FA5;">Az</div><div><h4>Azure AD / Entra ID</h4><p>SSO &amp; automatic provisioning</p></div></div>
+      <div class="int-card"><div class="int-mark" style="background:#FBEAF0;color:#993556;">Ok</div><div><h4>Okta</h4><p>SSO, SCIM &amp; lifecycle management</p></div></div>
+      <div class="int-card"><div class="int-mark" style="background:#EEEDFE;color:#534AB7;">Go</div><div><h4>Google Workspace</h4><p>SSO &amp; directory sync</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">Development</span>
+    </div>
+    <div class="int-grid">
+      <div class="int-card"><div class="int-mark" style="background:var(--ink);color:#fff;">Gh</div><div><h4>GitHub</h4><p>Link commits, branches &amp; PRs to tickets</p></div></div>
+      <div class="int-card"><div class="int-mark" style="background:#FAECE7;color:#993C1D;">Gl</div><div><h4>GitLab</h4><p>Two-way status sync with merge requests</p></div></div>
+      <div class="int-card"><div class="int-mark" style="background:#E6F1FB;color:#185FA5;">Bb</div><div><h4>Bitbucket</h4><p>Branch-to-ticket linking</p></div></div>
+      <div class="int-card"><div class="int-mark" style="background:var(--teal-50);color:var(--teal-800);">Api</div><div><h4>REST API &amp; Webhooks</h4><p>Build your own custom connections</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">Business &amp; automation</span>
+    </div>
+    <div class="int-grid">
+      <div class="int-card"><div class="int-mark" style="background:#E6F1FB;color:#185FA5;">365</div><div><h4>Microsoft 365</h4><p>Calendar, files &amp; Teams sync</p></div></div>
+      <div class="int-card"><div class="int-mark" style="background:#EAF3DE;color:#3B6D11;">Sf</div><div><h4>Salesforce</h4><p>Link customer records to tickets</p></div></div>
+      <div class="int-card"><div class="int-mark" style="background:#FBEAF0;color:#993556;">Zp</div><div><h4>Zapier</h4><p>Connect to 6,000+ apps, no code</p></div></div>
+      <div class="int-card"><div class="int-mark" style="background:#EEEDFE;color:#534AB7;">PBI</div><div><h4>Power BI</h4><p>Feed reporting data into custom dashboards</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="ai-band" id="ai">
+      <span class="eyebrow-ai">✦ AI-powered</span>
+      <h2>Built-in AI, not a bolt-on</h2>
+      <p class="lead">Trakolo uses AI to cut manual triage work and catch problems before they become tickets — trained on your own workspace data, never shared across customers.</p>
+      <div class="ai-grid">
+        <div class="ai-card">
+          <h4>AI ticket triage &amp; routing</h4>
+          <p>Automatically categorizes, prioritizes, and routes incoming tickets to the right team — no manual sorting.</p>
+        </div>
+        <div class="ai-card">
+          <h4>AI virtual agent</h4>
+          <p>Resolves common requests (password resets, access requests, FAQs) instantly, before a human ever sees them.</p>
+        </div>
+        <div class="ai-card">
+          <h4>Predictive asset alerts</h4>
+          <p>Flags licenses likely to be under- or over-utilized, and predicts renewal risk before it becomes a cost surprise.</p>
+        </div>
+        <div class="ai-card">
+          <h4>Smart resolution suggestions</h4>
+          <p>Surfaces similar past tickets and their fixes as an agent types, shortening time-to-resolution.</p>
+        </div>
+        <div class="ai-card">
+          <h4>Sentiment &amp; escalation detection</h4>
+          <p>Flags frustrated or high-risk conversations early so they can be escalated before they churn.</p>
+        </div>
+        <div class="ai-card">
+          <h4>Natural-language reporting</h4>
+          <p>Ask "which team missed the most SLAs last month?" and get a chart back — no dashboard building required.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="text-align:center;">
+  <div class="wrap">
+    <h2>Don't see your tool?</h2>
+    <p class="lead" style="margin-left:auto; margin-right:auto;">Our open API and webhook support mean almost anything can be connected.</p>
+    <a href="docs.html#api" class="btn btn-primary">View API docs →</a>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer>
+    <span>© 2026 Trakolo. Never lose track.</span>
+    <span>Privacy · Terms · Contact</span>
+  </footer>
+</div>
+
+</body>
+</html>

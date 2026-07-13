@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — service desk</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a class="active" href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="desk-log-ticket.html">Log a ticket</a>
+  <a class="active" href="desk.html">Service desk</a>
+</div>
+
+<div class="wrap">
+  <div class="page-head">
+    <div><div class="page-title">Service desk</div><div class="page-desc">Click any ticket to see full detail — no page change, no losing your place in the queue.</div></div>
+    <button class="btn primary">New ticket</button>
+  </div>
+
+  <div class="strip">
+    <div class="mcard info"><div class="mlabel">Open tickets</div><div class="mval">128</div><div class="mdelta">+9 since yesterday</div></div>
+    <div class="mcard warn"><div class="mlabel">SLA at risk</div><div class="mval">14</div><div class="mdelta">breaching within 2h</div></div>
+    <div class="mcard crit"><div class="mlabel">Escalated</div><div class="mval">5</div><div class="mdelta">awaiting L3</div></div>
+    <div class="mcard ok"><div class="mlabel">Resolved today</div><div class="mval">41</div><div class="mdelta">avg 2h 14m</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="filters">
+      <div class="chip active">All queues</div>
+      <div class="chip">Unassigned</div>
+      <div class="chip">Breaching SLA</div>
+      <div class="chip">Escalated</div>
+      <div class="chip">My tickets</div>
+    </div>
+    <table>
+      <thead><tr><th>Ticket</th><th>Subject</th><th>Requester</th><th>Priority</th><th>SLA remaining</th><th>Assignee</th><th>Status</th></tr></thead>
+      <tbody id="ticket-rows"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeSO()"></div>
+<div class="slideover" id="slideover">
+  <div class="so-head">
+    <div>
+      <div class="id-mono" id="so-id" style="margin-bottom:4px;"></div>
+      <div style="font-family:var(--font-display);font-size:18px;font-weight:700;" id="so-subject"></div>
+    </div>
+    <button class="so-close" onclick="closeSO()">✕</button>
+  </div>
+  <div class="so-body" id="so-body"></div>
+</div>
+
+<script>
+const tickets = {
+  "TS-4821": {subject:"VPN drops on hybrid laptops", requester:"D. Ferreira", priority:"crit", priorityLabel:"Urgent", category:"Network & wifi", slaLabel:"18m left", slaPct:12, slaColor:"var(--coral)", assigneeAv:"RK", assignee:"Raj K.", status:"In progress", statusBadge:"neutral", escalation:null,
+    activity:[{av:"RK",name:"Raj K.",time:"10m ago",text:"Reproduced on a test device — looks tied to an AP firmware update. Working with networking now."}]},
+  "TS-4819": {subject:"Shared drive permissions for Finance", requester:"L. Adeyemi", priority:"warn", priorityLabel:"High", category:"Software & access", slaLabel:"1h 40m", slaPct:38, slaColor:"var(--amber)", assigneeAv:"SM", assignee:"Sara M.", status:"In progress", statusBadge:"neutral", escalation:null,
+    activity:[{av:"SM",name:"Sara M.",time:"25m ago",text:"Confirmed with Finance lead which folders need access — applying group changes now."}]},
+  "TS-4816": {subject:"Escalation: payroll SSO outage", requester:"Payroll team", priority:"crit", priorityLabel:"Urgent", category:"Account security", slaLabel:"7m left", slaPct:6, slaColor:"var(--coral)", assigneeAv:"L3", assignee:"L3 on-call", status:"Escalated", statusBadge:"crit", escalation:2,
+    activity:[
+      {av:"SY",name:"System",time:"09:41",text:"Ticket escalated to L3 on-call after breaching the L2 response window."},
+      {av:"SM",name:"Sara M.",time:"09:36",text:"Confirmed the SSO provider's status page shows a partial outage on their end. Escalating."},
+      {av:"PT",name:"Payroll team",time:"09:21",text:"Nobody can log in to run this morning's payroll batch. Deadline is 11:00."}
+    ]},
+  "TS-4812": {subject:"New starter laptop provisioning", requester:"People ops", priority:"neutral", priorityLabel:"Normal", category:"Hardware", slaLabel:"1d 4h", slaPct:70, slaColor:"var(--green)", assigneeAv:"—", assignee:"Unassigned", status:"Open", statusBadge:"neutral", escalation:null,
+    activity:[{av:"SY",name:"System",time:"1h ago",text:"Ticket logged and routed to IT Ops. Awaiting assignment."}]},
+  "TS-4809": {subject:"Printer offline, 3rd floor east", requester:"M. Alvarez", priority:"neutral", priorityLabel:"Low", category:"Hardware", slaLabel:"2d 1h", slaPct:82, slaColor:"var(--green)", assigneeAv:"RK", assignee:"Raj K.", status:"Open", statusBadge:"neutral", escalation:null,
+    activity:[{av:"RK",name:"Raj K.",time:"3h ago",text:"Ordered a replacement toner cartridge, should arrive tomorrow."}]}
+};
+
+const priorityBadge = p => p==="crit" ? '<span class="badge crit">Urgent</span>' : p==="warn" ? '<span class="badge warn">High</span>' : '<span class="badge neutral">' + (p==="neutral"?"Normal":p) + '</span>';
+
+function renderRows(){
+  const tb = document.getElementById('ticket-rows');
+  tb.innerHTML = Object.entries(tickets).map(([id,t]) => `
+    <tr class="clickable" onclick="openTicket('${id}')">
+      <td class="id-mono">${id}</td><td>${t.subject}</td><td>${t.requester}</td>
+      <td>${t.priorityLabel==="Urgent"?'<span class="badge crit">Urgent</span>':t.priorityLabel==="High"?'<span class="badge warn">High</span>':'<span class="badge neutral">'+t.priorityLabel+'</span>'}</td>
+      <td><div class="beam"><i style="width:${t.slaPct}%;background:${t.slaColor}"></i></div><div class="beam-label">${t.slaLabel}</div></td>
+      <td><div class="who"><div class="av">${t.assigneeAv}</div>${t.assignee}</div></td>
+      <td><span class="badge ${t.statusBadge}">${t.status}</span></td>
+    </tr>`).join('');
+}
+
+function openTicket(id){
+  const t = tickets[id];
+  document.getElementById('so-id').textContent = id;
+  document.getElementById('so-subject').textContent = t.subject;
+  let html = '';
+  if(t.escalation){
+    html += `<div class="section-label">Escalation path</div>
+      <div class="track"><div class="dot done"></div><div class="seg-line done"></div><div class="dot done"></div><div class="seg-line done"></div><div class="dot current"></div><div class="seg-line"></div><div class="dot"></div></div>
+      <div class="track-labels"><span>L1 triage</span><span>L2 investigation</span><span class="current">L3 on-call</span><span>Resolved</span></div>`;
+  }
+  html += `<div class="section-label" style="margin-top:20px;">SLA</div>
+    <div class="beam" style="width:100%;height:7px;"><i style="width:${t.slaPct}%;background:${t.slaColor}"></i></div>
+    <div class="beam-label" style="margin-top:6px;">${t.slaLabel}</div>
+
+    <div class="section-label" style="margin-top:20px;">Details</div>
+    <table style="width:100%;font-size:13px;">
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Requester</td><td style="text-align:right;">${t.requester}</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Category</td><td style="text-align:right;">${t.category}</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Priority</td><td style="text-align:right;">${priorityBadge(t.priority)}</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Assignee</td><td style="text-align:right;">${t.assignee}</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Status</td><td style="text-align:right;"><span class="badge ${t.statusBadge}">${t.status}</span></td></tr>
+    </table>
+
+    <div class="section-label" style="margin-top:20px;">Activity</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      ${t.activity.map(a => `<div style="display:flex;gap:11px;"><div class="who"><div class="av">${a.av}</div></div><div style="font-size:13px;"><b>${a.name}</b> <span style="color:var(--ink-muted);font-size:12px;">· ${a.time}</span><div style="color:var(--ink-2);margin-top:2px;">${a.text}</div></div></div>`).join('')}
+    </div>
+    <textarea placeholder="Add an update…" style="margin-top:16px;"></textarea>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:12px;"><button class="btn">Reassign</button><button class="btn primary">Post update</button></div>`;
+
+  document.getElementById('so-body').innerHTML = html;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('slideover').classList.add('open');
+}
+function closeSO(){
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('slideover').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSO(); });
+renderRows();
+</script>
+</body>
+</html>

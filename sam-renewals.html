@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — renewals &amp; compliance</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a class="active" href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="sam.html">Asset inventory</a>
+  <a class="active" href="sam-renewals.html">Renewals &amp; compliance</a>
+</div>
+
+<div class="wrap">
+  <div class="page-head">
+    <div><div class="page-title">Renewals &amp; compliance</div><div class="page-desc">Upcoming spend and audit posture across every asset.</div></div>
+    <button class="btn primary">Export report</button>
+  </div>
+
+  <div class="strip">
+    <div class="mcard warn"><div class="mlabel">Due in 30 days</div><div class="mval">37</div><div class="mdelta">$182k contract value</div></div>
+    <div class="mcard info"><div class="mlabel">Due in 90 days</div><div class="mval">112</div><div class="mdelta">$540k contract value</div></div>
+    <div class="mcard crit"><div class="mlabel">Unassigned licenses</div><div class="mval">61</div><div class="mdelta">$38k reclaimable</div></div>
+    <div class="mcard ok"><div class="mlabel">Compliance score</div><div class="mval">97%</div><div class="mdelta">2 items need action</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="filters">
+      <div class="chip active">All renewals</div>
+      <div class="chip">Hardware warranties</div>
+      <div class="chip">Software licenses</div>
+      <div class="chip">Overdue</div>
+    </div>
+    <table>
+      <thead><tr><th>Asset</th><th>Type</th><th>Owner</th><th>Renews</th><th>Value</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td class="id-mono">SW-01188</td><td>Figma — Full seat</td><td>Unassigned</td>
+          <td><div class="beam"><i style="width:8%;background:var(--coral)"></i></div><div class="beam-label">11 days</div></td><td>$540/yr</td>
+          <td><span class="badge crit">Reclaim or renew</span></td>
+        </tr>
+        <tr><td class="id-mono">HW-00392</td><td>Dell Latitude 5440</td><td>Sara M.</td>
+          <td><div class="beam"><i style="width:20%;background:var(--amber)"></i></div><div class="beam-label">3 mo</div></td><td>$210/yr warranty</td>
+          <td><span class="badge warn">Review</span></td>
+        </tr>
+        <tr><td class="id-mono">SW-00921</td><td>Datadog — 40 seats</td><td>Platform team</td>
+          <td><div class="beam"><i style="width:34%;background:var(--amber)"></i></div><div class="beam-label">45 days</div></td><td>$61,200/yr</td>
+          <td><span class="badge warn">Negotiate</span></td>
+        </tr>
+        <tr><td class="id-mono">SW-01102</td><td>Adobe Creative Cloud</td><td>M. Alvarez</td>
+          <td><div class="beam"><i style="width:52%;background:var(--green)"></i></div><div class="beam-label">6 mo</div></td><td>$720/yr</td>
+          <td><span class="badge ok">On track</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

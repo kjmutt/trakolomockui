@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — backlog &amp; planning</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a class="active" href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="dev.html">Sprint board</a>
+  <a class="active" href="dev-backlog.html">Backlog &amp; planning</a>
+</div>
+
+<div class="wrap split">
+  <div>
+    <div class="page-head">
+      <div><div class="page-title">Backlog</div><div class="page-desc">Prioritized, estimated, ready to pull into a sprint.</div></div>
+      <button class="btn primary">New item</button>
+    </div>
+
+    <div class="panel">
+      <div class="filters">
+        <div class="chip active">Unscheduled</div>
+        <div class="chip">P1</div>
+        <div class="chip">P2</div>
+        <div class="chip">Needs estimate</div>
+      </div>
+      <table>
+        <thead><tr><th>Item</th><th>Tag</th><th>Points</th><th>Priority</th><th>Owner</th></tr></thead>
+        <tbody>
+          <tr><td class="id-mono">DEV-1051</td><td>Bulk asset reassignment tool</td><td class="id-mono">5</td><td><span class="badge warn">P2</span></td><td><div class="who"><div class="av">TK</div></div></td></tr>
+          <tr><td class="id-mono">DEV-1048</td><td>Ticket macros for common requests</td><td class="id-mono">3</td><td><span class="badge crit">P1</span></td><td><div class="who"><div class="av">RK</div></div></td></tr>
+          <tr><td class="id-mono">DEV-1046</td><td>Sprint velocity chart on reports page</td><td class="id-mono">—</td><td><span class="badge neutral">Unestimated</span></td><td><div class="who"><div class="av">—</div></div></td></tr>
+          <tr><td class="id-mono">DEV-1044</td><td>Dark mode for board view</td><td class="id-mono">2</td><td><span class="badge neutral">P3</span></td><td><div class="who"><div class="av">NP</div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <div class="section-label">Sprint 35 planning</div>
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-2);margin:8px 0 6px;"><span>Capacity used</span><span>24 / 40 pts</span></div>
+      <div class="beam" style="width:100%;height:7px;"><i style="width:60%;background:var(--indigo)"></i></div>
+      <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:8px 10px;background:var(--surface-2);border-radius:7px;"><span class="id-mono">DEV-1048</span><span>3 pts</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:8px 10px;background:var(--surface-2);border-radius:7px;"><span class="id-mono">DEV-1051</span><span>5 pts</span></div>
+      </div>
+      <button class="btn primary" style="width:100%;margin-top:16px;">Start sprint</button>
+    </div>
+    <div class="card">
+      <div class="section-label">Team load this sprint</div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;"><span>Raj K.</span><span class="id-mono">13 pts</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;"><span>Sara M.</span><span class="id-mono">9 pts</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;"><span>Tomas K.</span><span class="id-mono">11 pts</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;"><span>Nadia P.</span><span class="id-mono">6 pts</span></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

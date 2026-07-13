@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — track a ticket</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="portal-header">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="portal-links">
+    <a href="contact.html">Contact us</a>
+    <a class="cta" href="login.html">Sign in</a>
+  </div>
+</div>
+
+<div class="portal-wrap wide">
+  <div style="text-align:center;margin-bottom:28px;">
+    <div class="page-title" style="font-size:26px;">Track your ticket</div>
+    <div class="page-desc">Enter your ticket ID or the email you submitted with.</div>
+  </div>
+
+  <div class="card" style="display:flex;gap:10px;align-items:flex-end;margin-bottom:28px;">
+    <div style="flex:1;">
+      <label style="margin-top:0;">Ticket ID or email</label>
+      <input type="text" value="TK-8841">
+    </div>
+    <button class="btn primary" style="height:41px;">Track</button>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;">
+      <div>
+        <div class="id-mono" style="margin-bottom:4px;">TK-8841</div>
+        <div style="font-family:var(--font-display);font-size:19px;font-weight:700;">VPN disconnects every 10 minutes</div>
+        <div style="font-size:12.5px;color:var(--ink-muted);margin-top:4px;">Submitted Jul 11, 2026 · Network &amp; wifi</div>
+      </div>
+      <span class="badge info" style="font-size:12px;padding:6px 12px;">In progress</span>
+    </div>
+
+    <div class="track track-big">
+      <div class="dot done"></div><div class="seg-line done"></div>
+      <div class="dot done"></div><div class="seg-line done"></div>
+      <div class="dot current"></div><div class="seg-line"></div>
+      <div class="dot"></div>
+    </div>
+    <div class="track-labels" style="font-size:11.5px;margin-top:8px;"><span>Logged</span><span>Triaged</span><span class="current">In progress</span><span>Resolved</span></div>
+
+    <div class="hint" style="margin-top:24px;">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" style="flex-shrink:0"><circle cx="7" cy="7" r="6"/><path d="M7 4v3.2l2.2 1.3"/></svg>
+      <span>Being worked on by <b>Raj K.</b> — expected update within <b>1 hour</b>.</span>
+    </div>
+
+    <div class="section-label" style="margin-top:26px;">Updates</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;gap:11px;"><div class="who"><div class="av">RK</div></div><div style="font-size:13px;"><b>Raj K.</b> <span style="color:var(--ink-muted);font-size:12px;">· today, 09:14</span><div style="color:var(--ink-2);margin-top:2px;">Reproduced the disconnects on a test device — looks tied to a firmware update on the office access points. Working with networking now.</div></div></div>
+      <div style="display:flex;gap:11px;"><div class="who"><div class="av">SY</div></div><div style="font-size:13px;"><b>System</b> <span style="color:var(--ink-muted);font-size:12px;">· yesterday, 16:02</span><div style="color:var(--ink-2);margin-top:2px;">Ticket triaged and assigned to Raj K.</div></div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

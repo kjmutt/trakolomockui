@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Features — Trakolo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .cat-block { margin-bottom: 8px; }
+  .cat-head { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+  .cat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px; }
+  .fi-teal { background: var(--teal-50); color: var(--teal-800); }
+  .fi-coral { background: #FAECE7; color: #993C1D; }
+  .fi-purple { background: #EEEDFE; color: #534AB7; }
+  .fi-blue { background: #E6F1FB; color: #185FA5; }
+  .cat-head h2 { font-size: 24px; margin: 0; }
+
+  .feat-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 32px; }
+  .feat-item { display: flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .feat-item .check { width: 20px; height: 20px; border-radius: 6px; background: var(--teal-50); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .feat-item h4 { font-size: 15px; margin-bottom: 4px; }
+  .feat-item p { font-size: 13.5px; color: var(--ink-soft); }
+
+  @media (max-width: 860px) {
+    .feat-list { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a href="index.html" class="logo">
+      <svg width="30" height="30" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+      trakolo
+    </a>
+    <div class="nav-links">
+      <a href="how-it-works.html">How it works</a>
+      <a href="features.html" class="current">Features</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="docs.html">Docs</a>
+    </div>
+    <div class="nav-actions">
+      <a href="../login.html" class="btn btn-ghost">Sign in</a>
+      <a href="../login.html" class="btn btn-primary">Start free</a>
+    </div>
+  </nav>
+</div>
+
+<div class="page-header">
+  <div class="wrap">
+    <h1>Everything IT, asset, and dev teams need</h1>
+    <p>Trakolo replaces the spreadsheet-and-ticket-tool patchwork most IT departments run on — with one connected system built for four core jobs.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="cat-block">
+      <div class="cat-head">
+        <div class="cat-icon fi-teal">IT</div>
+        <h2>Service desk</h2>
+      </div>
+      <div class="feat-list">
+        <div class="feat-item"><div class="check">✓</div><div><h4>Smart ticket routing</h4><p>Auto-assign by category, team, or workload.</p></div></div>
+        <div class="feat-item"><div class="check">✓</div><div><h4>SLA management</h4><p>Timers, escalations, and breach alerts built in.</p></div></div>
+        <div class="feat-item"><div class="check">✓</div><div><h4>Self-service portal</h4><p>A branded portal so employees can log and track their own requests.</p></div></div>
+        <div class="feat-item"><div class="check">✓</div><div><h4>Knowledge base</h4><p>Deflect repeat tickets with searchable internal articles.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cat-block">
+      <div class="cat-head">
+        <div class="cat-icon fi-coral">SAM</div>
+        <h2>Software &amp; asset management</h2>
+      </div>
+      <div class="feat-list">
+        <div class="feat-item"><div class="check">✓</div><div><h4>Full asset inventory</h4><p>Hardware and software in one register, with owners and locations.</p></div></div>
+        <div class="feat-item"><div class="check">✓</div><div><h4>License tracking</h4><p>Seat counts, renewal dates, and utilization in one view.</p></div></div>
+        <div class="feat-item"><div class="check">✓</div><div><h4>Lifecycle management</h4><p>Track a device from purchase to retirement automatically.</p></div></div>
+        <div class="feat-item"><div class="check">✓</div><div><h4>Renewal alerts</h4><p>Get notified before a license or warranty lapses, not after.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cat-block">
+      <div class="cat-head">
+        <div class="cat-icon fi-purple">Dev</div>
+        <h2>Boards &amp; sprints</h2>
+      </div>
+      <div class="feat-list">
+        <div class="feat-item"><div class="check">✓</div><div><h4>Kanban &amp; sprint boards</h4><p>Plan and run sprints without leaving the same system as IT.</p></div></div>
+        <div class="feat-item"><div class="check">✓</div><div><h4>Git integration</h4><p>Link tickets to commits, branches, and pull requests.</p></div></div>
+        <div class="feat-item"><div class="check">✓</div><div><h4>Backlogs &amp; epics</h4><p>Organize work at whatever level your team plans at.</p></div></div>
+        <div class="feat-item"><div class="check">✓</div><div><h4>Velocity tracking</h4><p>See throughput and cycle time trends automatically.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cat-block">
+      <div class="cat-head">
+        <div class="cat-icon fi-blue">Ops</div>
+        <h2>Reporting &amp; compliance</h2>
+      </div>
+      <div class="feat-list">
+        <div class="feat-item"><div class="check">✓</div><div><h4>Custom dashboards</h4><p>Build views for SLA performance, asset spend, or team load.</p></div></div>
+        <div class="feat-item"><div class="check">✓</div><div><h4>Audit-ready exports</h4><p>One-click exports formatted for compliance reviews.</p></div></div>
+        <div class="feat-item"><div class="check">✓</div><div><h4>Access &amp; permissions</h4><p>Role-based access down to the individual board or asset.</p></div></div>
+        <div class="feat-item"><div class="check">✓</div><div><h4>SSO &amp; SCIM</h4><p>Enterprise-ready identity and provisioning on higher plans.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">Beyond IT</span>
+    </div>
+    <h2>The same engine, for the rest of the business</h2>
+    <p class="lead">Once a team is running on Trakolo, other departments can spin up their own workspace on the same platform — same tickets engine, their own categories and workflows.</p>
+
+    <div class="feat-list">
+      <div class="feat-item"><div class="check">✓</div><div><h4>Enterprise service desk</h4><p>One shared front door for every department's requests, not just IT's.</p></div></div>
+      <div class="feat-item"><div class="check">✓</div><div><h4>HR service management</h4><p>Onboarding, leave requests, and employee queries on structured workflows.</p></div></div>
+      <div class="feat-item"><div class="check">✓</div><div><h4>Facilities management</h4><p>Maintenance requests, room bookings, and building issues tracked to resolution.</p></div></div>
+      <div class="feat-item"><div class="check">✓</div><div><h4>Complaint management</h4><p>A dedicated workflow for logging, escalating, and closing out formal complaints.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">AI, built in</span>
+    </div>
+    <h2>AI woven through every stage</h2>
+    <p class="lead">Ticket triage, resolution suggestions, and predictive asset alerts run on AI by default — see the full breakdown on the Integrations page.</p>
+    <a href="integrations.html#ai" class="btn btn-ghost">Explore AI features →</a>
+  </div>
+</section>
+
+<section style="text-align:center;">
+  <div class="wrap">
+    <h2>Ready to bring it all together?</h2>
+    <p class="lead" style="margin-left:auto; margin-right:auto;">Start free, and add the modules your team needs as you grow.</p>
+    <a href="../login.html" class="btn btn-primary">Start free →</a>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer>
+    <span>© 2026 Trakolo. Never lose track.</span>
+    <span>Privacy · Terms · Contact</span>
+  </footer>
+</div>
+
+</body>
+</html>

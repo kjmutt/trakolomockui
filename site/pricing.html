@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pricing — Trakolo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .plans { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .plan-card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 28px 24px; display: flex; flex-direction: column; }
+  .plan-card.featured { border-color: var(--teal-600); box-shadow: 0 16px 40px -18px rgba(15,110,86,0.28); position: relative; }
+  .plan-badge { position: absolute; top: -12px; left: 24px; background: var(--teal-600); color: #fff; font-size: 11.5px; font-weight: 600; padding: 4px 12px; border-radius: 999px; }
+  .plan-card h3 { font-size: 18px; margin-bottom: 6px; }
+  .plan-card .price { font-family: 'Sora', sans-serif; font-size: 34px; font-weight: 600; margin: 10px 0 4px; }
+  .plan-card .price span { font-size: 14px; font-weight: 500; color: var(--ink-faint); }
+  .plan-card .desc { font-size: 13.5px; color: var(--ink-soft); margin-bottom: 20px; min-height: 40px; }
+  .plan-card ul { list-style: none; margin: 0 0 24px; flex: 1; }
+  .plan-card li { font-size: 13.5px; color: var(--ink); padding: 7px 0; display: flex; gap: 8px; }
+  .plan-card li::before { content: "✓"; color: var(--teal-600); font-weight: 600; }
+  .plan-card .btn { width: 100%; justify-content: center; }
+
+  .compare-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  .compare-table th, .compare-table td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .compare-table th { font-family: 'Sora', sans-serif; font-weight: 600; color: var(--ink); }
+  .compare-table td { color: var(--ink-soft); }
+  .compare-table td.yes { color: var(--teal-600); font-weight: 600; }
+  .compare-table tr td:first-child, .compare-table tr th:first-child { color: var(--ink); font-weight: 500; }
+
+  .faq { max-width: 720px; }
+  .faq-item { border-bottom: 1px solid var(--line); padding: 20px 0; }
+  .faq-item h4 { font-size: 15.5px; margin-bottom: 8px; }
+  .faq-item p { font-size: 14px; color: var(--ink-soft); }
+
+  @media (max-width: 960px) {
+    .plans { grid-template-columns: 1fr 1fr; }
+    .compare-table { font-size: 12.5px; }
+  }
+  @media (max-width: 640px) {
+    .plans { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a href="index.html" class="logo">
+      <svg width="30" height="30" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+      trakolo
+    </a>
+    <div class="nav-links">
+      <a href="how-it-works.html">How it works</a>
+      <a href="features.html">Features</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="pricing.html" class="current">Pricing</a>
+      <a href="docs.html">Docs</a>
+    </div>
+    <div class="nav-actions">
+      <a href="../login.html" class="btn btn-ghost">Sign in</a>
+      <a href="../login.html" class="btn btn-primary">Start free</a>
+    </div>
+  </nav>
+</div>
+
+<div class="page-header">
+  <div class="wrap">
+    <h1>Simple pricing, as you grow</h1>
+    <p>Start free. Add asset management, dev boards, or compliance reporting only when your team needs them.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="plans">
+      <div class="plan-card">
+        <h3>Free</h3>
+        <p class="desc">For small teams getting started with tickets.</p>
+        <p class="price">£0<span> /month</span></p>
+        <ul>
+          <li>Up to 10 users</li>
+          <li>Unlimited tickets</li>
+          <li>Basic kanban board</li>
+          <li>Email support</li>
+        </ul>
+        <a href="../login.html" class="btn btn-ghost">Start free</a>
+      </div>
+
+      <div class="plan-card featured">
+        <span class="plan-badge">Most popular · 30% off</span>
+        <h3>Team</h3>
+        <p class="desc">For growing IT and dev teams that need it all.</p>
+        <p class="price">£6.30<span> /user/month</span></p>
+        <p style="font-size:12.5px; color:var(--ink-faint); margin-top:-8px; margin-bottom:16px; text-decoration:line-through;">was £9.00</p>
+        <ul>
+          <li>Everything in Free</li>
+          <li>Software asset management</li>
+          <li>SLA timers &amp; escalations</li>
+          <li>Sprint boards &amp; Git integration</li>
+          <li>Custom dashboards</li>
+        </ul>
+        <a href="../login.html" class="btn btn-primary">Start free trial</a>
+      </div>
+
+      <div class="plan-card">
+        <span class="plan-badge" style="background:var(--ink-faint);">30% off</span>
+        <h3>Business</h3>
+        <p class="desc">For multi-department IT operations.</p>
+        <p class="price">£12.60<span> /user/month</span></p>
+        <p style="font-size:12.5px; color:var(--ink-faint); margin-top:-8px; margin-bottom:16px; text-decoration:line-through;">was £18.00</p>
+        <ul>
+          <li>Everything in Team</li>
+          <li>Audit-ready compliance exports</li>
+          <li>Role-based permissions</li>
+          <li>Priority support</li>
+        </ul>
+        <a href="../login.html" class="btn btn-ghost">Start free trial</a>
+      </div>
+
+      <div class="plan-card">
+        <h3>Enterprise</h3>
+        <p class="desc">For large orgs with security &amp; compliance needs.</p>
+        <p class="price">Custom</p>
+        <ul>
+          <li>Everything in Business</li>
+          <li>SSO &amp; SCIM provisioning</li>
+          <li>Dedicated onboarding</li>
+          <li>Custom contract &amp; SLA</li>
+        </ul>
+        <a href="../contact.html" class="btn btn-ghost">Contact sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">Licensing &amp; deployment</span>
+    </div>
+    <h2>Choose how Trakolo runs</h2>
+    <p class="lead">Most teams run on our cloud. Regulated or security-sensitive teams can install Trakolo entirely inside their own environment instead.</p>
+
+    <div class="plans" style="grid-template-columns: 1fr 1fr;">
+      <div class="plan-card">
+        <h3>Cloud (SaaS)</h3>
+        <p class="desc">Hosted and managed by us. Subscription billing, monthly or annual.</p>
+        <ul>
+          <li>No infrastructure to manage</li>
+          <li>Automatic updates &amp; patching</li>
+          <li>Billed per user, per month</li>
+          <li>Get started in minutes</li>
+        </ul>
+        <a href="../login.html" class="btn btn-primary">Start free →</a>
+      </div>
+
+      <div class="plan-card" style="border-color: var(--teal-600);">
+        <h3>Standalone / On-premise</h3>
+        <p class="desc">A perpetual license installed into your own environment — your servers, your cloud tenant, or an air-gapped network.</p>
+        <ul>
+          <li>One-time perpetual license fee, from £4,200</li>
+          <li>Optional annual support &amp; upgrades plan (18% of license)</li>
+          <li>Full data residency — nothing leaves your environment</li>
+          <li>Ideal for regulated industries and government</li>
+        </ul>
+        <a href="../contact.html" class="btn btn-ghost">Talk to sales</a>
+      </div>
+    </div>
+
+    <p style="font-size: 13.5px; color: var(--ink-faint); margin-top: 20px; max-width: 640px;">
+      Perpetual license pricing is based on named users and modules enabled (ITSM, SAM, Dev boards). Support &amp; upgrade plans are optional but recommended to stay on the latest release.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">Compare plans</span>
+    </div>
+    <h2>Full feature comparison</h2>
+    <table class="compare-table">
+      <tr><th>Feature</th><th>Free</th><th>Team</th><th>Business</th><th>Enterprise</th></tr>
+      <tr><td>Users</td><td>Up to 10</td><td>Unlimited</td><td>Unlimited</td><td>Unlimited</td></tr>
+      <tr><td>Ticketing &amp; SLAs</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+      <tr><td>Asset management</td><td>—</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+      <tr><td>Dev boards &amp; Git integration</td><td>—</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+      <tr><td>Audit-ready reporting</td><td>—</td><td>—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+      <tr><td>SSO &amp; SCIM</td><td>—</td><td>—</td><td>—</td><td class="yes">✓</td></tr>
+      <tr><td>Support</td><td>Email</td><td>Email &amp; chat</td><td>Priority</td><td>Dedicated</td></tr>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Pricing FAQ</h2>
+    <div class="faq" style="margin-top:32px;">
+      <div class="faq-item">
+        <h4>Can I switch plans later?</h4>
+        <p>Yes — upgrade or downgrade at any time. Changes apply on your next billing cycle.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Is there a discount for annual billing?</h4>
+        <p>Yes, annual billing saves 20% compared to monthly on Team and Business plans.</p>
+      </div>
+      <div class="faq-item">
+        <h4>What happens after the free trial?</h4>
+        <p>You can downgrade to the Free plan at any time — your data stays intact, no forced deletion.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer>
+    <span>© 2026 Trakolo. Never lose track.</span>
+    <span>Privacy · Terms · Contact</span>
+  </footer>
+</div>
+
+</body>
+</html>

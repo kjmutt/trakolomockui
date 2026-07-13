@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — reporting</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .rcard.clickable{cursor:pointer;}
+  .rcard .rmore{font-size:12px;color:var(--indigo-text);font-weight:600;margin-top:8px;}
+  .rdetail{display:none;grid-column:1/-1;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 24px;margin-top:-2px;}
+  .rdetail.open{display:block;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a class="active" href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a class="active" href="ops.html">Reports</a>
+  <a href="ops-compliance-audit.html">Compliance audit</a>
+</div>
+
+<div class="wrap">
+  <div class="page-head">
+    <div><div class="page-title">Reporting</div><div class="page-desc">Click a report to expand it in place — filters and export stay right there.</div></div>
+    <button class="btn primary">Export all</button>
+  </div>
+
+  <div class="rgrid" id="rgrid"></div>
+</div>
+
+<script>
+const reports = [
+  {id:"sla", title:"Ticket volume & SLA compliance", sub:"Last 30 days · 94.2% within SLA", color:"var(--indigo)",
+    spark:[40,55,35,70,50,65,80,60,90,72,85,95],
+    metrics:[["Tickets closed","1,204","+6% vs prior period"],["SLA compliance","94.2%","target 95%"],["Avg resolution","2h 14m","-18m vs prior period"],["Breaches","70","mostly urgent tier"]],
+    table:{head:["Priority","Volume","Compliance","Avg resolution"], rows:[["Urgent","84","81.0%","34m"],["High","216","91.2%","1h 48m"],["Normal","640","96.8%","2h 30m"],["Low","264","99.1%","1d 2h"]]}},
+  {id:"velocity", title:"Sprint velocity trend", sub:"Last 6 sprints · avg 41 pts", color:"var(--violet)",
+    spark:[50,62,44,70,66,80],
+    metrics:[["Sprints tracked","6","rolling window"],["Avg velocity","41 pts","+9% vs last quarter"],["Carry-over rate","12%","cards rolled to next sprint"],["Team size","5","engineers"]],
+    table:{head:["Sprint","Points planned","Points completed","Carry-over"], rows:[["Sprint 34","47","32*","in progress"],["Sprint 33","44","41","3"],["Sprint 32","38","38","0"],["Sprint 31","42","36","6"]]}},
+  {id:"assets", title:"Asset compliance audit", sub:"2,340 assets · quarterly", color:"var(--amber)",
+    spark:[88,90,85,93,97,96],
+    metrics:[["Assets covered","2,340","full fleet"],["Compliance score","97%","2 items need action"],["Encryption coverage","99.4%","managed devices"],["Idle licenses flagged","61","$38k reclaimable"]],
+    table:{head:["Category","Assets","Compliant","Action needed"], rows:[["Hardware","842","99%","8 devices"],["Software & licenses","1,340","95%","61 seats"],["Mobile devices","158","100%","0"]]}},
+  {id:"uptime", title:"Incident & uptime report", sub:"99.94% uptime · 2 P1 incidents", color:"var(--coral)",
+    spark:[96,97,60,98,99,70],
+    metrics:[["Uptime","99.94%","last 30 days"],["P1 incidents","2","both resolved"],["MTTR","41m","mean time to resolve"],["Affected users","~340","across both incidents"]],
+    table:{head:["Date","Severity","Duration","Cause"], rows:[["Jul 9","P1","28m","SSO provider outage"],["Jul 2","P1","54m","Network AP firmware bug"],["Jun 24","P2","12m","Deploy rollback"]]}}
+];
+
+function renderCards(){
+  document.getElementById('rgrid').innerHTML = reports.map(r => `
+    <div class="rcard clickable" onclick="toggleReport('${r.id}')">
+      <div class="rhead"><div><div class="rtitle">${r.title}</div><div class="rsub">${r.sub}</div></div><button class="btn sm" onclick="event.stopPropagation()">Export</button></div>
+      <div class="spark">${r.spark.map(v=>`<i style="height:${v}%;background:${r.color}"></i>`).join('')}</div>
+      <div class="rmore" id="more-${r.id}">Click to expand ↓</div>
+    </div>
+    <div class="rdetail" id="detail-${r.id}">
+      <div class="strip" style="margin-bottom:18px;">
+        ${r.metrics.map(([label,val,delta]) => `<div class="mcard info"><div class="mlabel">${label}</div><div class="mval">${val}</div><div class="mdelta">${delta}</div></div>`).join('')}
+      </div>
+      <div class="panel">
+        <table>
+          <thead><tr>${r.table.head.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+          <tbody>${r.table.rows.map(row => `<tr>${row.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table>
+      </div>
+    </div>`).join('');
+}
+
+function toggleReport(id){
+  const el = document.getElementById('detail-'+id);
+  const more = document.getElementById('more-'+id);
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.rdetail').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('[id^="more-"]').forEach(m => m.textContent = "Click to expand ↓");
+  if(!isOpen){
+    el.classList.add('open');
+    more.textContent = "Click to collapse ↑";
+  }
+}
+renderCards();
+</script>
+</body>
+</html>

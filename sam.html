@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — assets</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a class="active" href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a class="active" href="sam.html">Asset inventory</a>
+  <a href="sam-renewals.html">Renewals &amp; compliance</a>
+</div>
+
+<div class="wrap">
+  <div class="page-head">
+    <div><div class="page-title">Assets</div><div class="page-desc">Click any asset to see specs, owner, and history — right here, no new page.</div></div>
+    <button class="btn primary">Add asset</button>
+  </div>
+
+  <div class="strip">
+    <div class="mcard info"><div class="mlabel">Total assets</div><div class="mval">2,340</div><div class="mdelta">hardware + software</div></div>
+    <div class="mcard warn"><div class="mlabel">Renewals, 30 days</div><div class="mval">37</div><div class="mdelta">$182k contract value</div></div>
+    <div class="mcard crit"><div class="mlabel">Unassigned licenses</div><div class="mval">61</div><div class="mdelta">reclaimable spend</div></div>
+    <div class="mcard ok"><div class="mlabel">Compliance</div><div class="mval">97%</div><div class="mdelta">audit-ready</div></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active">Hardware</div>
+    <div class="tab">Software &amp; licenses</div>
+    <div class="tab">Retired</div>
+  </div>
+
+  <div class="panel">
+    <table>
+      <thead><tr><th>Asset tag</th><th>Item</th><th>Owner</th><th>Status</th><th>Renews in</th><th>Location</th></tr></thead>
+      <tbody id="asset-rows"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeSO()"></div>
+<div class="slideover" id="slideover">
+  <div class="so-head">
+    <div>
+      <div class="id-mono" id="so-id" style="margin-bottom:4px;"></div>
+      <div style="font-family:var(--font-display);font-size:18px;font-weight:700;" id="so-subject"></div>
+    </div>
+    <button class="so-close" onclick="closeSO()">✕</button>
+  </div>
+  <div class="so-body" id="so-body"></div>
+</div>
+
+<script>
+const assets = {
+  "HW-00417": {name:"MacBook Pro 14\\" M4", owner:"D. Ferreira", ownerAv:"DF", status:"Active", statusBadge:"ok", renewLabel:"14 mo", renewPct:64, renewColor:"var(--green)", location:"Remote — Lisbon",
+    specs:[["Serial number","C02FX9Q1MD6R"],["Chip","Apple M4 Pro, 24GB"],["Storage","1TB SSD"],["Purchased","Apr 22, 2025"],["Purchase price","$2,899"]],
+    warranty:"AppleCare+ through Sep 2027",
+    history:[{av:"DF",text:"Assigned to D. Ferreira",time:"May 2, 2025"},{av:"IT",text:"Encryption & MDM enrollment confirmed",time:"May 3, 2025"},{av:"SY",text:"Linked to ticket TS-4109 — battery health warning",time:"Feb 2026"}],
+    compliance:[["Disk encryption","ok","Pass"],["MDM enrolled","ok","Pass"],["OS up to date","warn","Update available"]]},
+  "HW-00392": {name:"Dell Latitude 5440", owner:"Sara M.", ownerAv:"SM", status:"In repair", statusBadge:"warn", renewLabel:"3 mo", renewPct:20, renewColor:"var(--amber)", location:"HQ — Floor 2",
+    specs:[["Serial number","5G7J2Q3"],["CPU","Intel i7-1365U"],["Storage","512GB SSD"],["Purchased","Jan 14, 2024"],["Purchase price","$1,650"]],
+    warranty:"Dell ProSupport through Oct 2026",
+    history:[{av:"SM",text:"Assigned to Sara M.",time:"Jan 2024"},{av:"IT",text:"Sent for hinge repair",time:"3 days ago"}],
+    compliance:[["Disk encryption","ok","Pass"],["MDM enrolled","ok","Pass"],["OS up to date","ok","Pass"]]},
+  "SW-01188": {name:"Figma — Full seat", owner:"Unassigned", ownerAv:"—", status:"Idle 40d", statusBadge:"crit", renewLabel:"11 days", renewPct:8, renewColor:"var(--coral)", location:"—",
+    specs:[["License type","Full seat"],["Annual cost","$540/yr"],["Last login","40 days ago"]],
+    warranty:"Renews automatically unless cancelled",
+    history:[{av:"SY",text:"Flagged idle — no login in 30+ days",time:"10 days ago"},{av:"IT",text:"Previous owner (design contractor) offboarded",time:"40 days ago"}],
+    compliance:[["Seat reclaim recommended","crit","Action needed"]]},
+  "SW-01102": {name:"Adobe Creative Cloud", owner:"M. Alvarez", ownerAv:"MA", status:"Active", statusBadge:"ok", renewLabel:"6 mo", renewPct:52, renewColor:"var(--green)", location:"—",
+    specs:[["License type","All apps"],["Annual cost","$720/yr"],["Last login","Today"]],
+    warranty:"Renews Jan 2027",
+    history:[{av:"MA",text:"Assigned to M. Alvarez",time:"Jan 2025"}],
+    compliance:[["Usage healthy","ok","Pass"]]},
+  "HW-00288": {name:"iPhone 16, company line", owner:"L. Adeyemi", ownerAv:"LA", status:"Active", statusBadge:"ok", renewLabel:"22 mo", renewPct:90, renewColor:"var(--green)", location:"Remote — Lagos",
+    specs:[["Serial number","F2LN9Q4KP"],["Storage","256GB"],["Purchased","May 2025"],["Purchase price","$999"]],
+    warranty:"AppleCare+ through May 2028",
+    history:[{av:"LA",text:"Assigned to L. Adeyemi",time:"May 2025"}],
+    compliance:[["MDM enrolled","ok","Pass"],["Passcode enforced","ok","Pass"]]}
+};
+
+function renderRows(){
+  const tb = document.getElementById('asset-rows');
+  tb.innerHTML = Object.entries(assets).map(([id,a]) => `
+    <tr class="clickable" onclick="openAsset('${id}')">
+      <td class="id-mono">${id}</td><td>${a.name}</td>
+      <td><div class="who"><div class="av">${a.ownerAv}</div>${a.owner}</div></td>
+      <td><span class="badge ${a.statusBadge}">${a.status}</span></td>
+      <td><div class="beam"><i style="width:${a.renewPct}%;background:${a.renewColor}"></i></div><div class="beam-label">${a.renewLabel}</div></td>
+      <td>${a.location}</td>
+    </tr>`).join('');
+}
+
+function openAsset(id){
+  const a = assets[id];
+  document.getElementById('so-id').textContent = id;
+  document.getElementById('so-subject').textContent = a.name;
+  let html = `<div class="section-label">Specs</div>
+    <table style="width:100%;font-size:13px;">
+      ${a.specs.map(([k,v]) => `<tr><td style="color:var(--ink-2);padding:6px 0;">${k}</td><td style="text-align:right;">${v}</td></tr>`).join('')}
+    </table>
+
+    <div class="section-label" style="margin-top:20px;">Warranty &amp; renewal</div>
+    <div class="beam" style="width:100%;height:7px;"><i style="width:${a.renewPct}%;background:${a.renewColor}"></i></div>
+    <div class="beam-label" style="margin-top:6px;">${a.renewLabel} remaining · ${a.warranty}</div>
+
+    <div class="section-label" style="margin-top:20px;">Owner</div>
+    <div class="who" style="margin-bottom:10px;"><div class="av">${a.ownerAv}</div>${a.owner}</div>
+    <button class="btn sm" style="width:100%;">Reassign owner</button>
+
+    <div class="section-label" style="margin-top:20px;">Compliance</div>
+    ${a.compliance.map(([k,badge,label]) => `<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;"><span>${k}</span><span class="badge ${badge}">${label}</span></div>`).join('')}
+
+    <div class="section-label" style="margin-top:20px;">History</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      ${a.history.map(h => `<div style="display:flex;gap:11px;"><div class="who"><div class="av">${h.av}</div></div><div style="font-size:13px;"><b>${h.text}</b><div style="color:var(--ink-muted);font-size:12px;margin-top:2px;">${h.time}</div></div></div>`).join('')}
+    </div>`;
+  document.getElementById('so-body').innerHTML = html;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('slideover').classList.add('open');
+}
+function closeSO(){
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('slideover').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSO(); });
+renderRows();
+</script>
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — admin settings</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .admin-shell{display:flex;max-width:1180px;margin:0 auto;padding:32px 40px 60px;gap:28px;align-items:flex-start;}
+  .set-rail{width:210px;flex-shrink:0;}
+  .set-nav-group{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink-muted);font-family:var(--font-mono);margin:18px 0 8px;}
+  .set-nav-group:first-child{margin-top:0;}
+  .set-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;color:var(--ink-2);font-size:13px;}
+  .set-item svg{flex-shrink:0;opacity:.8;}
+  .set-item:hover{background:var(--surface-2);}
+  .set-item.active{background:var(--indigo-bg);color:var(--indigo-text);font-weight:600;}
+  .set-item.active svg{opacity:1;}
+  .set-main{flex:1;min-width:0;}
+  .set-panel{display:none;}
+  .set-panel.active{display:block;}
+  .row-line{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--border);gap:16px;}
+  .row-line:last-child{border-bottom:none;}
+  .row-line .rname{font-size:13px;font-weight:500;}
+  .row-line .rdesc{font-size:12px;color:var(--ink-muted);margin-top:2px;}
+  .switch{width:36px;height:20px;border-radius:12px;background:var(--border-strong);position:relative;cursor:pointer;flex-shrink:0;}
+  .switch.on{background:var(--indigo);}
+  .switch::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s;}
+  .switch.on::after{left:18px;}
+  .mini-input{width:64px;text-align:center;padding:6px 4px;}
+  .rule-row{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .rule-row:last-child{border-bottom:none;}
+  .col-chip{padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:12.5px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;background:var(--surface-2);}
+  .swatch{width:22px;height:22px;border-radius:6px;border:2px solid transparent;cursor:pointer;}
+  .swatch.sel{border-color:var(--ink);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a class="active" href="admin.html">Admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+
+<div class="admin-shell">
+  <div class="set-rail">
+    <div class="page-title" style="font-size:19px;margin-bottom:16px;">Settings</div>
+
+    <div class="set-nav-group">Workspace</div>
+    <div class="set-item active" data-panel="general">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5v4l2.6 1.5"/></svg>General
+    </div>
+    <div class="set-item" data-panel="users">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5.5" r="2.3"/><path d="M2 14c0-2.4 1.8-4 4-4s4 1.6 4 4"/><circle cx="12" cy="6" r="1.8"/><path d="M10.5 14c.2-1.8 1.3-3 2.9-3.4"/></svg>Users &amp; roles
+    </div>
+    <div class="set-item" data-panel="notifications">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 11V7a4 4 0 018 0v4l1.3 2H2.7L4 11z"/><path d="M6.5 15a1.6 1.6 0 003 0"/></svg>Notifications
+    </div>
+    <div class="set-item" data-panel="integrations">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>Integrations
+    </div>
+    <div class="set-item" data-panel="portal">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M2 6h12"/></svg>Self-service portal
+    </div>
+
+    <div class="set-nav-group">Modules</div>
+    <div class="set-item" data-panel="desk">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 5l6-3 6 3-6 3-6-3z"/><path d="M2 5v6l6 3 6-3V5"/></svg>Service desk
+    </div>
+    <div class="set-item" data-panel="assets">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="3" width="12" height="8" rx="1"/><path d="M6 13h4M8 11v2"/></svg>Assets
+    </div>
+    <div class="set-item" data-panel="dev">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="12" height="12" rx="1.5"/><path d="M6 2v12M10.5 5.5v3"/></svg>Boards &amp; sprints
+    </div>
+    <div class="set-item" data-panel="reporting">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 13V7M8 13V3M13 13V9"/></svg>Reporting
+    </div>
+  </div>
+
+  <div class="set-main">
+
+    <!-- GENERAL -->
+    <div class="set-panel active" id="panel-general">
+      <div class="page-title" style="font-size:20px;margin-bottom:4px;">General</div>
+      <div class="page-desc" style="margin-bottom:20px;">Workspace identity and defaults.</div>
+      <div class="card">
+        <div class="section-label">Organization</div>
+        <label>Workspace name</label>
+        <input type="text" value="Acme Corp">
+        <label>Timezone</label>
+        <select><option>GMT (London)</option><option>ET (New York)</option><option>PT (San Francisco)</option></select>
+        <label>Brand accent color</label>
+        <div style="display:flex;gap:10px;margin-top:4px;">
+          <div class="swatch sel" style="background:#4453D8;"></div>
+          <div class="swatch" style="background:#2E9E6D;"></div>
+          <div class="swatch" style="background:#DD5A44;"></div>
+          <div class="swatch" style="background:#7F77DD;"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-label">Modules enabled</div>
+        <div class="row-line"><div><div class="rname">Service desk</div><div class="rdesc">Ticket routing, SLAs, escalations</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Asset tracking</div><div class="rdesc">Hardware &amp; software inventory</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Boards &amp; sprints</div><div class="rdesc">Kanban and sprint planning</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Reporting</div><div class="rdesc">Audit-ready exports</div></div><div class="switch on"></div></div>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="set-panel" id="panel-users">
+      <div class="page-head"><div><div class="page-title" style="font-size:20px;">Users &amp; roles</div><div class="page-desc">Who has access, and what they can do.</div></div><button class="btn primary">Invite user</button></div>
+      <div class="panel">
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><div class="who"><div class="av">RK</div>Raj K.</div></td><td class="id-mono">raj@acme.com</td><td><select style="width:auto;padding:5px 8px;"><option>Admin</option></select></td><td><span class="badge ok">Active</span></td></tr>
+            <tr><td><div class="who"><div class="av">SM</div>Sara M.</div></td><td class="id-mono">sara@acme.com</td><td><select style="width:auto;padding:5px 8px;"><option>Agent</option></select></td><td><span class="badge ok">Active</span></td></tr>
+            <tr><td><div class="who"><div class="av">DF</div>D. Ferreira</div></td><td class="id-mono">diego@acme.com</td><td><select style="width:auto;padding:5px 8px;"><option>Viewer</option></select></td><td><span class="badge ok">Active</span></td></tr>
+            <tr><td><div class="who"><div class="av">NP</div>Nadia P.</div></td><td class="id-mono">nadia@acme.com</td><td><select style="width:auto;padding:5px 8px;"><option>Manager</option></select></td><td><span class="badge neutral">Invited</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="set-panel" id="panel-notifications">
+      <div class="page-title" style="font-size:20px;margin-bottom:4px;">Notifications</div>
+      <div class="page-desc" style="margin-bottom:20px;">Where alerts get sent, and when.</div>
+      <div class="card">
+        <div class="section-label">Channels</div>
+        <div class="row-line"><div><div class="rname">Email</div><div class="rdesc">Digest and real-time alerts</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Slack</div><div class="rdesc">Posts to #it-ops</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">In-app</div><div class="rdesc">Notification bell</div></div><div class="switch on"></div></div>
+      </div>
+      <div class="card">
+        <div class="section-label">Alert thresholds</div>
+        <div class="row-line"><div><div class="rname">SLA breach warning</div><div class="rdesc">Notify when this much time is left</div></div><input class="mini-input" type="text" value="20%"></div>
+        <div class="row-line"><div><div class="rname">Asset renewal reminder</div><div class="rdesc">Days before expiry</div></div><input class="mini-input" type="text" value="30"></div>
+        <div class="row-line"><div><div class="rname">Idle license flag</div><div class="rdesc">Days unused</div></div><input class="mini-input" type="text" value="14"></div>
+      </div>
+    </div>
+
+    <!-- INTEGRATIONS -->
+    <div class="set-panel" id="panel-integrations">
+      <div class="page-title" style="font-size:20px;margin-bottom:4px;">Integrations</div>
+      <div class="page-desc" style="margin-bottom:20px;">Connect the tools your team already uses.</div>
+      <div class="card">
+        <div class="row-line"><div><div class="rname">Slack</div><div class="rdesc">Escalation and SLA alerts</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Google Workspace</div><div class="rdesc">SSO and directory sync</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Okta</div><div class="rdesc">SSO provider</div></div><div class="switch"></div></div>
+        <div class="row-line"><div><div class="rname">GitHub</div><div class="rdesc">Link commits &amp; PRs to cards</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Jira</div><div class="rdesc">One-time backlog import</div></div><div class="switch"></div></div>
+      </div>
+    </div>
+
+    <!-- PORTAL -->
+    <div class="set-panel" id="panel-portal">
+      <div class="page-title" style="font-size:20px;margin-bottom:4px;">Self-service portal</div>
+      <div class="page-desc" style="margin-bottom:20px;">What employees see at login, contact, and tracking pages — <a href="ssp-login.html" style="color:var(--indigo-text);">preview login</a>, <a href="contact.html" style="color:var(--indigo-text);">contact</a>, <a href="track.html" style="color:var(--indigo-text);">track</a>.</div>
+
+      <div class="card">
+        <div class="section-label">Branding</div>
+        <label>Portal welcome message</label>
+        <input type="text" value="Access your tickets, assets, and requests">
+        <label>Support email shown on Contact page</label>
+        <input type="text" value="support@acme.com">
+        <label>Support phone shown on Contact page</label>
+        <input type="text" value="+1 (555) 019-2244">
+      </div>
+
+      <div class="card">
+        <div class="section-label">Login options</div>
+        <div class="row-line"><div><div class="rname">Google Workspace SSO</div><div class="rdesc">Shown as "Continue with Google"</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Okta SSO</div><div class="rdesc">Shown as "Continue with Okta"</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Email &amp; password</div><div class="rdesc">Fallback if SSO is unavailable</div></div><div class="switch on"></div></div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Contact channels shown</div>
+        <div class="row-line"><div><div class="rname">Log a ticket</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Live chat</div><div class="rdesc">Mon–Fri, 9:00–18:00 GMT</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Email</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Phone</div></div><div class="switch on"></div></div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Public ticket tracking</div>
+        <div class="row-line"><div><div class="rname">Allow tracking without login</div><div class="rdesc">Anyone with a ticket ID or email can view status</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Show assignee name on track page</div><div class="rdesc">Otherwise shows "IT team"</div></div><div class="switch on"></div></div>
+      </div>
+    </div>
+
+    <!-- SERVICE DESK -->
+    <div class="set-panel" id="panel-desk">
+      <div class="page-title" style="font-size:20px;margin-bottom:4px;">Service desk configuration</div>
+      <div class="page-desc" style="margin-bottom:20px;">SLA targets, escalation rules, and routing — the rules that get enforced automatically.</div>
+
+      <div class="card">
+        <div class="section-label">SLA targets by priority</div>
+        <table style="width:100%;">
+          <thead><tr><th>Priority</th><th>First response</th><th>Resolution</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge crit">Urgent</span></td><td><input class="mini-input" type="text" value="15m"></td><td><input class="mini-input" type="text" value="2h"></td></tr>
+            <tr><td><span class="badge warn">High</span></td><td><input class="mini-input" type="text" value="1h"></td><td><input class="mini-input" type="text" value="8h"></td></tr>
+            <tr><td><span class="badge neutral">Normal</span></td><td><input class="mini-input" type="text" value="4h"></td><td><input class="mini-input" type="text" value="2d"></td></tr>
+            <tr><td><span class="badge ok">Low</span></td><td><input class="mini-input" type="text" value="1d"></td><td><input class="mini-input" type="text" value="5d"></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Escalation rule</div>
+        <div class="row-line"><div><div class="rname">Auto-escalate unassigned tickets</div><div class="rdesc">Moves ticket to the next tier if untouched</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">L1 → L2 threshold</div><div class="rdesc">Minutes without assignment</div></div><input class="mini-input" type="text" value="10"></div>
+        <div class="row-line"><div><div class="rname">L2 → L3 threshold</div><div class="rdesc">Minutes without assignment</div></div><input class="mini-input" type="text" value="15"></div>
+        <div class="row-line"><div><div class="rname">Page on-call for Urgent</div><div class="rdesc">Sends a page immediately on L3</div></div><div class="switch on"></div></div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Routing rules</div>
+        <div class="rule-row" style="font-family:var(--font-mono);font-size:10.5px;color:var(--ink-muted);text-transform:uppercase;border-bottom:1px solid var(--border);"><span>Category</span><span>Routes to</span><span></span></div>
+        <div class="rule-row"><span>Hardware</span><span>IT Ops</span><button class="btn sm">Edit</button></div>
+        <div class="rule-row"><span>Software &amp; access</span><span>IT Ops</span><button class="btn sm">Edit</button></div>
+        <div class="rule-row"><span>Network &amp; wifi</span><span>Infrastructure</span><button class="btn sm">Edit</button></div>
+        <div class="rule-row"><span>Account security</span><span>Security</span><button class="btn sm">Edit</button></div>
+        <div class="rule-row"><span>Facilities</span><span>Workplace</span><button class="btn sm">Edit</button></div>
+        <button class="btn" style="margin-top:12px;">+ Add routing rule</button>
+      </div>
+    </div>
+
+    <!-- ASSETS -->
+    <div class="set-panel" id="panel-assets">
+      <div class="page-title" style="font-size:20px;margin-bottom:4px;">Asset configuration</div>
+      <div class="page-desc" style="margin-bottom:20px;">Renewal reminders, idle license detection, and categories.</div>
+
+      <div class="card">
+        <div class="section-label">Renewal reminders</div>
+        <div class="row-line"><div><div class="rname">Remind before renewal</div><div class="rdesc">Lead time for hardware warranties &amp; licenses</div></div>
+          <div style="display:flex;gap:6px;"><div class="chip active">30d</div><div class="chip">60d</div><div class="chip">90d</div></div>
+        </div>
+        <div class="row-line"><div><div class="rname">Flag idle software licenses</div><div class="rdesc">Days unused before flagging</div></div><input class="mini-input" type="text" value="14"></div>
+        <div class="row-line"><div><div class="rname">Auto-suggest reclaim</div><div class="rdesc">Prompt to reassign or cancel idle seats</div></div><div class="switch on"></div></div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Categories</div>
+        <div class="col-chip"><span>Hardware</span><span class="id-mono" style="color:var(--ink-muted);">842 assets</span></div>
+        <div class="col-chip"><span>Software &amp; licenses</span><span class="id-mono" style="color:var(--ink-muted);">1,340 assets</span></div>
+        <div class="col-chip"><span>Mobile devices</span><span class="id-mono" style="color:var(--ink-muted);">158 assets</span></div>
+        <button class="btn" style="margin-top:6px;">+ Add category</button>
+      </div>
+    </div>
+
+    <!-- DEV -->
+    <div class="set-panel" id="panel-dev">
+      <div class="page-title" style="font-size:20px;margin-bottom:4px;">Boards &amp; sprints configuration</div>
+      <div class="page-desc" style="margin-bottom:20px;">Defaults for new boards and sprints.</div>
+
+      <div class="card">
+        <div class="section-label">Board columns</div>
+        <div class="col-chip"><span>Backlog</span><span class="id-mono" style="color:var(--ink-muted);">⠿</span></div>
+        <div class="col-chip"><span>In progress</span><span class="id-mono" style="color:var(--ink-muted);">⠿</span></div>
+        <div class="col-chip"><span>In review</span><span class="id-mono" style="color:var(--ink-muted);">⠿</span></div>
+        <div class="col-chip"><span>Done</span><span class="id-mono" style="color:var(--ink-muted);">⠿</span></div>
+        <button class="btn" style="margin-top:6px;">+ Add column</button>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Sprint defaults</div>
+        <div class="row-line"><div><div class="rname">Sprint length</div><div class="rdesc">Default duration for new sprints</div></div>
+          <div style="display:flex;gap:6px;"><div class="chip">1wk</div><div class="chip active">2wk</div><div class="chip">4wk</div></div>
+        </div>
+        <div class="row-line"><div><div class="rname">Estimation scale</div><div class="rdesc">Fibonacci vs. linear points</div></div>
+          <div style="display:flex;gap:6px;"><div class="chip active">Fibonacci</div><div class="chip">Linear</div></div>
+        </div>
+        <div class="row-line"><div><div class="rname">Auto-carry unfinished cards</div><div class="rdesc">Roll incomplete cards into next sprint</div></div><div class="switch on"></div></div>
+      </div>
+    </div>
+
+    <!-- REPORTING -->
+    <div class="set-panel" id="panel-reporting">
+      <div class="page-title" style="font-size:20px;margin-bottom:4px;">Reporting configuration</div>
+      <div class="page-desc" style="margin-bottom:20px;">Scheduled exports and default formats.</div>
+
+      <div class="card">
+        <div class="section-label">Scheduled exports</div>
+        <div class="row-line"><div><div class="rname">Weekly SLA report</div><div class="rdesc">Every Monday 8:00 → finance@acme.com</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Monthly compliance audit</div><div class="rdesc">1st of month → PDF, saved to Drive</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Sprint velocity digest</div><div class="rdesc">End of each sprint → #eng-leads</div></div><div class="switch"></div></div>
+        <button class="btn" style="margin-top:12px;">+ New scheduled export</button>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Defaults</div>
+        <label>Default export format</label>
+        <select><option>CSV</option><option>PDF</option><option>XLSX</option></select>
+        <label>Retention period for audit records</label>
+        <select><option>1 year</option><option>3 years</option><option>7 years</option></select>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.set-item').forEach(item=>{
+    item.addEventListener('click', ()=>{
+      document.querySelectorAll('.set-item').forEach(n=>n.classList.remove('active'));
+      item.classList.add('active');
+      document.querySelectorAll('.set-panel').forEach(p=>p.classList.remove('active'));
+      document.getElementById('panel-'+item.dataset.panel).classList.add('active');
+    });
+  });
+  document.querySelectorAll('.switch').forEach(s=>s.addEventListener('click', ()=>s.classList.toggle('on')));
+  document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click', ()=>{
+    c.parentElement.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');
+  }));
+  document.querySelectorAll('.swatch').forEach(s=>s.addEventListener('click', ()=>{
+    document.querySelectorAll('.swatch').forEach(x=>x.classList.remove('sel'));
+    s.classList.add('sel');
+  }));
+</script>
+</body>
+</html>
