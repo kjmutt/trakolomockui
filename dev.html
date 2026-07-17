@@ -89,11 +89,13 @@ const cards = {
     desc:"Nightly job that flags software licenses with no login activity for 14+ days, feeding the Assets idle-license badge.",
     subtasks:[["Build scan job",true],["Wire into asset status",true]], comments:[]},
   "DEV-1058":{title:"Bulk asset reassignment tool", tags:["backend","use-case"], av:"RK", pts:5, ticket:"TS-4830", sprint:"Sprint 34",
-    desc:"Use case submitted through the self-service portal (TS-4830): reassigning laptops one at a time during offboarding doesn't scale. Adds a bulk reassignment endpoint and UI to Assets.",
-    subtasks:[["Open PR",true],["Code review",true],["Merge PR",true],["Deploy to testing",true]],
+    desc:"Use case submitted through the self-service portal (TS-4830): reassigning laptops one at a time during offboarding doesn't scale. Adds a bulk reassignment endpoint and UI to Assets. Built and verified across DEV, INT, and UAT before merge — promotion to PROD goes through change management, not this board.",
+    subtasks:[["Build &amp; unit test in DEV",true],["Verify in INT",true],["UAT sign-off",true],["Open PR",true],["Code review",true],["Merge PR",true]],
     comments:[
-      {av:"RK",name:"Raj K.",time:"2 days ago",text:"PR #482 merged and deployed to Testing — QA passed. Change request CR-0091 opened for the production window."},
-      {av:"SM",name:"Sara M.",time:"3 days ago",text:"Reviewed and approved PR #482 — reassignment logic looks solid, left a couple of naming nitpicks."}
+      {av:"RK",name:"Raj K.",time:"2 days ago",text:"PR #482 merged. Opened change request CR-0091 to promote from PRE to PROD."},
+      {av:"RK",name:"Raj K.",time:"2 days ago",text:"UAT sign-off from IT Ops — bulk reassignment verified against a real offboarding scenario."},
+      {av:"SM",name:"Sara M.",time:"3 days ago",text:"Reviewed and approved PR #482 — reassignment logic looks solid, left a couple of naming nitpicks."},
+      {av:"RK",name:"Raj K.",time:"3 days ago",text:"Verified in INT against integrated asset data. Promoting to UAT for sign-off."}
     ]}
 };
 

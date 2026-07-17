@@ -39,7 +39,7 @@
 
 <div class="wrap" style="max-width:820px;">
   <div class="page-title">From use case to production</div>
-  <div class="page-desc" style="margin-bottom:6px;">One request, tracked end-to-end — self-service portal → service desk → sprint board → GitHub → change management → live.</div>
+  <div class="page-desc" style="margin-bottom:6px;">One request, tracked end-to-end — self-service portal → service desk → sprint board (DEV → INT → UAT) → GitHub → change management (PRE → PROD) → live.</div>
   <div class="page-desc" style="color:var(--ink-muted);font-size:12.5px;">Example: <b style="color:var(--ink-2);">“Bulk asset reassignment tool”</b> — submitted Jul 14, live in production Jul 20.</div>
 
   <div class="journey-track">
@@ -53,7 +53,7 @@
     <div class="dot current"></div>
   </div>
   <div class="journey-labels">
-    <span>Use case</span><span>Ticket</span><span>Sprint</span><span>Code review</span><span>Testing</span><span>Change request</span><span>Approved</span><span class="current">Live</span>
+    <span>Use case</span><span>Ticket</span><span>Sprint</span><span>Dev → UAT</span><span>Code merged</span><span>Change request</span><span>Approved</span><span class="current">Live</span>
   </div>
 
   <div class="card">
@@ -99,9 +99,10 @@
     <div class="stage-card">
       <div class="stage-num">4</div>
       <div class="stage-body">
-        <div class="stage-head"><div class="stage-title">Code review on GitHub</div><span class="badge ok">PR #482 merged</span></div>
-        <div class="stage-meta">Jul 15–17 · Reviewed by Sara M.</div>
-        <div class="stage-desc">PR #482 implements the bulk reassignment endpoint and UI. Once merged, the workflow automation configured in Admin → Boards &amp; sprints moves DEV-1058 straight to Done — no manual card-dragging.</div>
+        <div class="stage-head"><div class="stage-title">Built &amp; verified — DEV → INT → UAT</div><span class="badge info">UAT signed off</span></div>
+        <div class="stage-meta">Jul 15–17 · Raj K.</div>
+        <div class="stage-desc">All the lower-environment work happens here, as part of development: unit-tested in DEV, verified against integrated data in INT, then signed off by IT Ops in UAT. Nothing below this point touches change management — that's reserved for the PRE → PROD promotion.</div>
+        <a class="stage-link" href="dev.html">View DEV-1058 on the sprint board →</a>
       </div>
     </div>
   </div>
@@ -111,9 +112,9 @@
     <div class="stage-card">
       <div class="stage-num">5</div>
       <div class="stage-body">
-        <div class="stage-head"><div class="stage-title">Deployed to Testing</div><span class="badge info">QA passed</span></div>
-        <div class="stage-meta">Jul 17</div>
-        <div class="stage-desc">Automatically deployed to the Testing environment. QA verifies the reassignment flow against a real offboarding scenario before anything touches production.</div>
+        <div class="stage-head"><div class="stage-title">Code merged on GitHub</div><span class="badge ok">PR #482 merged</span></div>
+        <div class="stage-meta">Jul 17 · Reviewed by Sara M.</div>
+        <div class="stage-desc">PR #482 implements the bulk reassignment endpoint and UI. Once merged, the workflow automation configured in Admin → Boards &amp; sprints moves DEV-1058 straight to Done — no manual card-dragging.</div>
       </div>
     </div>
   </div>
@@ -124,8 +125,8 @@
       <div class="stage-num">6</div>
       <div class="stage-body">
         <div class="stage-head"><div class="stage-title">Change request raised</div><span class="badge warn">CR-0091</span></div>
-        <div class="stage-meta">Jul 18 · ITSM change management</div>
-        <div class="stage-desc">Production deploys go through change management, not a direct push. Risk assessed as Low, rollback plan attached (redeploy previous build, no schema changes), and routed to the Change Advisory Board.</div>
+        <div class="stage-meta">Jul 18 · Raj K. · ITSM change management</div>
+        <div class="stage-desc">With DEV/INT/UAT already passed, the developer opens the change request themselves — this one's specifically to promote the build from PRE to PROD. Risk assessed as Low, rollback plan attached (redeploy previous build, no schema changes).</div>
         <a class="stage-link" href="desk.html">View change request CR-0091 →</a>
       </div>
     </div>
@@ -136,9 +137,9 @@
     <div class="stage-card">
       <div class="stage-num">7</div>
       <div class="stage-body">
-        <div class="stage-head"><div class="stage-title">Approved</div><span class="badge ok">CAB · Nadia P.</span></div>
+        <div class="stage-head"><div class="stage-title">Approved &amp; scheduled</div><span class="badge ok">Nadia P. (manager)</span></div>
         <div class="stage-meta">Jul 18</div>
-        <div class="stage-desc">Approved with a confirmed deployment window: Jul 20, 02:00–03:00 UTC. The window and approver are both visible on the change request for audit purposes.</div>
+        <div class="stage-desc">Raj K. selects the PRE → PROD deployment window — Jul 20, 02:00–03:00 UTC, a low-traffic slot — and Nadia P. approves it. Both the window and the approver are visible on the change request for audit purposes.</div>
       </div>
     </div>
   </div>
@@ -150,7 +151,7 @@
       <div class="stage-body">
         <div class="stage-head"><div class="stage-title">Deployed to production</div><span class="badge ok">Live</span></div>
         <div class="stage-meta">Jul 20, 02:14 UTC</div>
-        <div class="stage-desc">Released successfully within the approved window. The change request closes, the source ticket resolves, and the use case that started in the self-service portal is now a shipped feature.</div>
+        <div class="stage-desc">Promoted from PRE to PROD within the approved window. The change request closes, the source ticket resolves, and the use case that started in the self-service portal is now a shipped feature.</div>
       </div>
     </div>
   </div>
