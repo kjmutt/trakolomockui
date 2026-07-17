@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — platform services</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .plat-wrap{max-width:1080px;margin:0 auto;padding:32px 40px 60px;}
+  .plat-card{background:#151F1B;border:1px solid #26362F;border-radius:14px;}
+  .plat-card table{width:100%;border-collapse:collapse;}
+  .plat-card th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:#7C948A;font-family:var(--font-mono);font-weight:500;padding:12px 18px;border-bottom:1px solid #26362F;}
+  .plat-card td{padding:14px 18px;border-bottom:1px solid #26362F;font-size:13px;color:#D6E4DE;vertical-align:middle;}
+  .plat-card tbody tr:last-child td{border-bottom:none;}
+  .plat-card tbody tr:hover{background:#1B2620;}
+  .plat-mcard{background:#151F1B;border:1px solid #26362F;border-radius:12px;padding:16px 18px;}
+  .plat-mcard .mlabel{font-size:11px;color:#7C948A;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.5px;}
+  .plat-mcard .mval{font-family:var(--font-display);font-size:23px;font-weight:700;margin-top:6px;color:#fff;}
+  .plat-section{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:#7C948A;font-family:var(--font-mono);margin:26px 0 10px;}
+  .plat-section:first-of-type{margin-top:0;}
+  .svc-badge{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:4px 10px 4px 8px;border-radius:6px;}
+  .svc-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+  .svc-badge.running{background:rgba(93,202,165,.14);color:#5DCAA5;}
+  .svc-badge.degraded{background:rgba(221,162,52,.14);color:#DDA234;}
+  .svc-badge.stopped{background:rgba(216,90,48,.14);color:#E8795A;}
+  .svc-badge.pending{background:rgba(143,167,156,.14);color:#8FA79C;}
+  .svc-badge.pending::before{animation:svcpulse 1s ease-in-out infinite;}
+  @keyframes svcpulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+  .svc-btn{font-family:var(--font-body);font-size:11.5px;font-weight:600;padding:6px 12px;border-radius:7px;border:1px solid #2B3B33;background:#1B2620;color:#D6E4DE;cursor:pointer;white-space:nowrap;transition:background .15s,opacity .15s;}
+  .svc-btn:hover{background:#26362F;}
+  .svc-btn.danger{color:#E8795A;}
+  .svc-btn.primary{background:#1D9E75;border-color:#1D9E75;color:#fff;}
+  .svc-btn.primary:hover{background:#22B583;}
+  .svc-btn:disabled{opacity:.4;cursor:default;}
+  .svc-btn:disabled:hover{background:#1B2620;}
+  .svc-actions{display:flex;gap:8px;justify-content:flex-end;}
+  .svc-name{color:#fff;font-weight:500;}
+  .svc-meta{color:#7C948A;font-size:11.5px;margin-top:2px;font-family:var(--font-mono);}
+  .svc-protected{font-size:10.5px;color:#5C7268;font-family:var(--font-mono);}
+</style>
+</head>
+<body class="platform-body">
+<div class="platform-header">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#1B2E27" stroke="#5DCAA5" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#5DCAA5" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5"/><circle cx="100" cy="100" r="16" fill="#5DCAA5"/><circle cx="150" cy="50" r="21" fill="#5DCAA5"/></svg>
+    <span class="brand-name">Trakolo</span>
+    <span class="plat-tag">Platform</span>
+  </a>
+  <div class="top-right"><a href="saas-admin-login.html">Sign out</a></div>
+</div>
+<div style="display:flex;gap:22px;padding:0 40px;background:#0E1613;border-bottom:1px solid #223028;">
+  <a href="saas-admin-console.html" style="font-size:13px;color:#8FA79C;text-decoration:none;padding:11px 0;border-bottom:2px solid transparent;">Tenant workspaces</a>
+  <a href="saas-admin-services.html" style="font-size:13px;color:#fff;text-decoration:none;padding:11px 0;border-bottom:2px solid #5DCAA5;font-weight:500;">Services</a>
+</div>
+
+<div class="plat-wrap">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:22px;">
+    <div>
+      <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;">Platform services</div>
+      <div style="font-size:13px;color:#8FA79C;margin-top:4px;">Start, stop, and restart the infrastructure behind every tenant. Changes here affect all customers — handle with care.</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:8px;">
+    <div class="plat-mcard"><div class="mlabel">Running</div><div class="mval" id="stat-running">8</div></div>
+    <div class="plat-mcard"><div class="mlabel">Degraded</div><div class="mval" id="stat-degraded">1</div></div>
+    <div class="plat-mcard"><div class="mlabel">Stopped</div><div class="mval" id="stat-stopped">0</div></div>
+    <div class="plat-mcard"><div class="mlabel">Uptime, 30 days</div><div class="mval">99.98%</div></div>
+  </div>
+
+  <div class="plat-section">Core services</div>
+  <div class="plat-card">
+    <table>
+      <thead><tr><th>Service</th><th>Status</th><th>Region</th><th></th></tr></thead>
+      <tbody id="rows-core"></tbody>
+    </table>
+  </div>
+
+  <div class="plat-section">Background jobs</div>
+  <div class="plat-card">
+    <table>
+      <thead><tr><th>Job</th><th>Status</th><th>Region</th><th></th></tr></thead>
+      <tbody id="rows-jobs"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const services = {
+  core: [
+    {id:"api", name:"API service", meta:"api.trakolo.com · 6 instances", region:"us-east", status:"running", protect:false},
+    {id:"db", name:"Database (primary + replica)", meta:"Postgres 16 · multi-AZ", region:"us-east", status:"running", protect:true},
+    {id:"auth", name:"Authentication (SSO + sessions)", meta:"OIDC + session store", region:"us-east", status:"running", protect:false},
+    {id:"storage", name:"File storage", meta:"attachments, exports", region:"us-east", status:"running", protect:false}
+  ],
+  jobs: [
+    {id:"routing", name:"Ticket routing engine", meta:"consumes desk.tickets queue", region:"us-east", status:"running", protect:false},
+    {id:"escalation", name:"SLA escalation worker", meta:"runs every 60s", region:"us-east", status:"running", protect:false},
+    {id:"renewal", name:"Asset renewal nightly scan", meta:"cron · 02:00 UTC", region:"us-east", status:"running", protect:false},
+    {id:"export", name:"Report export scheduler", meta:"retrying since 07:12 UTC", region:"eu-west", status:"degraded", protect:false},
+    {id:"webhook", name:"Webhook delivery queue", meta:"outbound integrations", region:"us-east", status:"running", protect:false}
+  ]
+};
+
+function badge(status){
+  const label = {running:"Running", degraded:"Degraded", stopped:"Stopped", pending:"Restarting…"}[status];
+  return `<span class="svc-badge ${status}">${label}</span>`;
+}
+
+function actions(svc){
+  if(svc.status === "pending") return `<div class="svc-actions"><button class="svc-btn" disabled>Restart</button><button class="svc-btn" disabled>Stop</button></div>`;
+  if(svc.status === "stopped") return `<div class="svc-actions"><button class="svc-btn primary" onclick="startSvc('${svc.id}')">Start</button></div>`;
+  const stopBtn = svc.protect
+    ? `<button class="svc-btn" disabled title="Protected — cannot be stopped from here">Stop</button>`
+    : `<button class="svc-btn danger" onclick="stopSvc('${svc.id}')">Stop</button>`;
+  return `<div class="svc-actions"><button class="svc-btn" onclick="restartSvc('${svc.id}')">Restart</button>${stopBtn}</div>`;
+}
+
+function findSvc(id){
+  return services.core.find(s=>s.id===id) || services.jobs.find(s=>s.id===id);
+}
+
+function renderRows(){
+  document.getElementById('rows-core').innerHTML = services.core.map(rowHtml).join('');
+  document.getElementById('rows-jobs').innerHTML = services.jobs.map(rowHtml).join('');
+  const all = [...services.core, ...services.jobs];
+  document.getElementById('stat-running').textContent = all.filter(s=>s.status==="running").length;
+  document.getElementById('stat-degraded').textContent = all.filter(s=>s.status==="degraded").length;
+  document.getElementById('stat-stopped').textContent = all.filter(s=>s.status==="stopped").length;
+}
+
+function rowHtml(svc){
+  return `<tr>
+    <td><div class="svc-name">${svc.name}</div><div class="svc-meta">${svc.meta}</div></td>
+    <td>${badge(svc.status)}</td>
+    <td>${svc.region}</td>
+    <td>${actions(svc)}</td>
+  </tr>`;
+}
+
+function stopSvc(id){
+  const svc = findSvc(id);
+  if(!confirm(`Stop "${svc.name}"? This affects every tenant using it.`)) return;
+  svc.status = "stopped";
+  renderRows();
+}
+function startSvc(id){
+  const svc = findSvc(id);
+  svc.status = "pending";
+  renderRows();
+  setTimeout(()=>{ svc.status = "running"; renderRows(); }, 1200);
+}
+function restartSvc(id){
+  const svc = findSvc(id);
+  const wasDegraded = svc.status === "degraded";
+  svc.status = "pending";
+  renderRows();
+  setTimeout(()=>{
+    svc.status = "running";
+    if(wasDegraded) svc.meta = "restarted just now — healthy";
+    renderRows();
+  }, wasDegraded ? 1600 : 1000);
+}
+
+renderRows();
+</script>
+</body>
+</html>
