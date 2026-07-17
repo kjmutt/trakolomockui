@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Use cases — Trakolo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .uc-list { display: flex; flex-direction: column; gap: 18px; }
+  .uc-card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+    padding: 30px 32px; display: grid; grid-template-columns: 1fr 200px; gap: 28px; align-items: start;
+  }
+  .uc-tag {
+    display: inline-block; font-size: 12px; font-weight: 600; color: var(--teal-800);
+    background: var(--teal-50); border: 1px solid var(--teal-100);
+    padding: 5px 12px; border-radius: 999px; margin-bottom: 14px;
+  }
+  .uc-card h3 { font-size: 21px; margin-bottom: 10px; }
+  .uc-card p { font-size: 14.5px; color: var(--ink-soft); max-width: 560px; }
+  .uc-side { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding-top: 2px; }
+  .uc-side .num { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 13px; color: var(--teal-400); }
+  .uc-link {
+    font-size: 14px; font-weight: 600; color: var(--teal-800);
+    border: 1.5px solid var(--line); border-radius: 8px; padding: 9px 16px;
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  }
+  .uc-link:hover { border-color: var(--teal-600); color: var(--teal-600); }
+
+  @media (max-width: 780px) {
+    .uc-card { grid-template-columns: 1fr; }
+    .uc-side { flex-direction: row; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a href="index.html" class="logo">
+      <svg width="30" height="30" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+      trakolo
+    </a>
+    <div class="nav-links">
+      <a href="how-it-works.html">How it works</a>
+      <a href="features.html">Features</a>
+      <a href="use-cases.html" class="current">Use cases</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="docs.html">Docs</a>
+    </div>
+    <div class="nav-actions">
+      <a href="../login.html" class="btn btn-ghost">Sign in</a>
+      <a href="../login.html" class="btn btn-primary">Start free</a>
+    </div>
+  </nav>
+</div>
+
+<div class="page-header">
+  <div class="wrap">
+    <h1>Use cases</h1>
+    <p>Real scenarios, running in the live product linked from every card below — not screenshots of a plan that doesn't exist yet.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">Eight ways teams actually use Trakolo</span>
+    </div>
+
+    <div class="uc-list">
+
+      <div class="uc-card">
+        <div>
+          <div class="uc-tag">Portal → Service desk → Sprint → GitHub → Change management</div>
+          <h3>From a use case to a production deploy</h3>
+          <p>An employee submits a use case through the self-service portal. It becomes a ticket, then a sprint card, then a merged pull request — and a change request carries it from PRE to PROD, with the developer picking the deployment window and a manager signing off before anything ships.</p>
+        </div>
+        <div class="uc-side">
+          <span class="num">01</span>
+          <a class="uc-link" href="../use-case-journey.html">See the full journey →</a>
+        </div>
+      </div>
+
+      <div class="uc-card">
+        <div>
+          <div class="uc-tag">Sprint board → Change management</div>
+          <h3>Tech debt, without the paperwork</h3>
+          <p>Not everything starts with a ticket. An engineer notices a slow query, opens a card directly on the board, and takes it through the same DEV → INT → UAT path — then the same change request process gets it safely to production, no use case required.</p>
+        </div>
+        <div class="uc-side">
+          <span class="num">02</span>
+          <a class="uc-link" href="../dev.html">See it on the sprint board →</a>
+        </div>
+      </div>
+
+      <div class="uc-card">
+        <div>
+          <div class="uc-tag">Azure Active Directory → Automation</div>
+          <h3>Onboard a new hire before their laptop arrives</h3>
+          <p>Enter a new starter's name, department, and manager, and automation creates the Azure AD account, assigns a license, generates a temporary password, posts it to the ticket, and emails it to their personal address — not the work inbox they can't check yet.</p>
+        </div>
+        <div class="uc-side">
+          <span class="num">03</span>
+          <a class="uc-link" href="../azure-onboarding.html">Run the automation →</a>
+        </div>
+      </div>
+
+      <div class="uc-card">
+        <div>
+          <div class="uc-tag">Service desk → SLA escalation</div>
+          <h3>Escalate before it becomes a crisis</h3>
+          <p>A payroll SSO outage breaches its response window and escalates itself — L1 to L2 to L3 on-call — paging the right person automatically instead of waiting for someone to notice the clock ran out.</p>
+        </div>
+        <div class="uc-side">
+          <span class="num">04</span>
+          <a class="uc-link" href="../desk.html">See the escalation path →</a>
+        </div>
+      </div>
+
+      <div class="uc-card">
+        <div>
+          <div class="uc-tag">Asset tracking → Renewals &amp; compliance</div>
+          <h3>Know what's renewing before finance asks</h3>
+          <p>Every license and device carries an owner and a renewal date. Idle seats get flagged for reclaim, and nothing quietly auto-renews three weeks before someone finally asks where the budget went.</p>
+        </div>
+        <div class="uc-side">
+          <span class="num">05</span>
+          <a class="uc-link" href="../sam-renewals.html">See renewals &amp; compliance →</a>
+        </div>
+      </div>
+
+      <div class="uc-card">
+        <div>
+          <div class="uc-tag">Reporting → Compliance audit</div>
+          <h3>Audit-ready reporting, one click away</h3>
+          <p>SLA compliance, asset encryption status, and sprint velocity all live in the same reporting surface — exportable for an auditor without a week of spreadsheet reconciliation first.</p>
+        </div>
+        <div class="uc-side">
+          <span class="num">06</span>
+          <a class="uc-link" href="../ops-compliance-audit.html">See the compliance audit →</a>
+        </div>
+      </div>
+
+      <div class="uc-card">
+        <div>
+          <div class="uc-tag">Admin → Projects &amp; scrum teams</div>
+          <h3>Keep every engineer pointed at the same goal</h3>
+          <p>Projects carry a goal, not just a backlog — Platform Reliability, Self-Service Experience, Compliance &amp; Reporting — each with its own scrum team, so anyone can see what a team is actually trying to achieve this quarter.</p>
+        </div>
+        <div class="uc-side">
+          <span class="num">07</span>
+          <a class="uc-link" href="../admin.html">See Projects in Admin →</a>
+        </div>
+      </div>
+
+      <div class="uc-card">
+        <div>
+          <div class="uc-tag">Platform console → Service health</div>
+          <h3>See what's actually running</h3>
+          <p>Start, stop, and restart the infrastructure behind every tenant from one screen — with a confirmation before anything risky, and a protected database that can't be stopped by accident.</p>
+        </div>
+        <div class="uc-side">
+          <span class="num">08</span>
+          <a class="uc-link" href="../saas-admin-services.html">See platform services →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section style="text-align:center;">
+  <div class="wrap">
+    <h2>See your own use case running</h2>
+    <p class="lead" style="margin-left:auto; margin-right:auto;">Start free, and try any of these flows on your own workspace in minutes.</p>
+    <a href="../login.html" class="btn btn-primary">Start free →</a>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer>
+    <span>© 2026 Trakolo. Never lose track.</span>
+    <span>Privacy · Terms · Contact</span>
+  </footer>
+</div>
+
+</body>
+</html>
