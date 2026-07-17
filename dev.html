@@ -17,6 +17,7 @@
     <a class="active" href="dev.html">Dev</a>
     <a href="ops.html">Ops</a>
     <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
   </div>
   <div class="top-right"><div class="avatar">EM</div></div>
 </div>
@@ -58,7 +59,7 @@ const columns = [
   {name:"Backlog", cards:["DEV-1042","DEV-1039"]},
   {name:"In progress", cards:["DEV-1031","DEV-1028"]},
   {name:"In review", cards:["DEV-1019","DEV-1014"]},
-  {name:"Done", cards:["DEV-1002","DEV-0997"]}
+  {name:"Done", cards:["DEV-1002","DEV-0997","DEV-1058"]}
 ];
 
 const cards = {
@@ -86,7 +87,14 @@ const cards = {
     subtasks:[["Build scoring model",true],["Wire into ticket creation",true]], comments:[]},
   "DEV-0997":{title:"Unassigned license nightly scan", tags:["backend"], av:"SM", pts:3,
     desc:"Nightly job that flags software licenses with no login activity for 14+ days, feeding the Assets idle-license badge.",
-    subtasks:[["Build scan job",true],["Wire into asset status",true]], comments:[]}
+    subtasks:[["Build scan job",true],["Wire into asset status",true]], comments:[]},
+  "DEV-1058":{title:"Bulk asset reassignment tool", tags:["backend","use-case"], av:"RK", pts:5, ticket:"TS-4830", sprint:"Sprint 34",
+    desc:"Use case submitted through the self-service portal (TS-4830): reassigning laptops one at a time during offboarding doesn't scale. Adds a bulk reassignment endpoint and UI to Assets.",
+    subtasks:[["Open PR",true],["Code review",true],["Merge PR",true],["Deploy to testing",true]],
+    comments:[
+      {av:"RK",name:"Raj K.",time:"2 days ago",text:"PR #482 merged and deployed to Testing — QA passed. Change request CR-0091 opened for the production window."},
+      {av:"SM",name:"Sara M.",time:"3 days ago",text:"Reviewed and approved PR #482 — reassignment logic looks solid, left a couple of naming nitpicks."}
+    ]}
 };
 
 function renderBoard(){
@@ -125,7 +133,8 @@ function openCard(id){
     <table style="width:100%;font-size:13px;">
       <tr><td style="color:var(--ink-2);padding:6px 0;">Points</td><td style="text-align:right;">${c.pts}</td></tr>
       <tr><td style="color:var(--ink-2);padding:6px 0;">Tags</td><td style="text-align:right;">${c.tags.join(', ')}</td></tr>
-      <tr><td style="color:var(--ink-2);padding:6px 0;">Sprint</td><td style="text-align:right;">Sprint 34</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Sprint</td><td style="text-align:right;">${c.sprint || 'Sprint 34'}</td></tr>
+      ${c.ticket ? `<tr><td style="color:var(--ink-2);padding:6px 0;">Source ticket</td><td style="text-align:right;"><a href="desk.html" style="color:var(--indigo-text);">${c.ticket} →</a></td></tr>` : ''}
     </table>
 
     <div class="section-label" style="margin-top:20px;">Comments</div>

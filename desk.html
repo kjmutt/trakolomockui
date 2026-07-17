@@ -17,6 +17,7 @@
     <a href="dev.html">Dev</a>
     <a href="ops.html">Ops</a>
     <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
   </div>
   <div class="top-right"><div class="avatar">EM</div></div>
 </div>
@@ -80,7 +81,23 @@ const tickets = {
   "TS-4812": {subject:"New starter laptop provisioning", requester:"People ops", priority:"neutral", priorityLabel:"Normal", category:"Hardware", slaLabel:"1d 4h", slaPct:70, slaColor:"var(--green)", assigneeAv:"—", assignee:"Unassigned", status:"Open", statusBadge:"neutral", escalation:null,
     activity:[{av:"SY",name:"System",time:"1h ago",text:"Ticket logged and routed to IT Ops. Awaiting assignment."}]},
   "TS-4809": {subject:"Printer offline, 3rd floor east", requester:"M. Alvarez", priority:"neutral", priorityLabel:"Low", category:"Hardware", slaLabel:"2d 1h", slaPct:82, slaColor:"var(--green)", assigneeAv:"RK", assignee:"Raj K.", status:"Open", statusBadge:"neutral", escalation:null,
-    activity:[{av:"RK",name:"Raj K.",time:"3h ago",text:"Ordered a replacement toner cartridge, should arrive tomorrow."}]}
+    activity:[{av:"RK",name:"Raj K.",time:"3h ago",text:"Ordered a replacement toner cartridge, should arrive tomorrow."}]},
+  "TS-4830": {subject:"Use case: Bulk asset reassignment tool", requester:"IT Ops (self-service portal)", priority:"neutral", priorityLabel:"Normal", category:"Use case", slaLabel:"on track", slaPct:55, slaColor:"var(--indigo)", assigneeAv:"RK", assignee:"Raj K.", status:"Deployed to testing", statusBadge:"info", escalation:null,
+    linked:[["Sprint card","DEV-1058 · Sprint 34","dev.html"],["GitHub PR","#482 merged","dev.html"],["Change request","CR-0091 · approved","desk.html"]],
+    activity:[
+      {av:"SY",name:"System",time:"Jul 17, 4h ago",text:"QA passed in the Testing environment — change request CR-0091 opened for production deployment."},
+      {av:"RK",name:"Raj K.",time:"Jul 17",text:"Deployed to Testing. Bulk reassignment endpoint + UI both verified against the offboarding flow."},
+      {av:"SY",name:"System",time:"Jul 17",text:"PR #482 merged on GitHub. Card DEV-1058 auto-moved to Done via workflow automation."},
+      {av:"RK",name:"Raj K.",time:"Jul 15",text:"Opened PR #482 — implementing bulk reassignment endpoint and UI."},
+      {av:"SY",name:"System",time:"Jul 15",text:"Added to Sprint 34 backlog as DEV-1058, estimated 5 points."},
+      {av:"SY",name:"System",time:"Jul 14",text:"Use case submitted via the self-service portal — routed to Product & Engineering."}
+    ]},
+  "CR-0091": {subject:"Change request: Deploy bulk asset reassignment tool to production", requester:"Raj K.", priority:"warn", priorityLabel:"High", category:"Change request", slaLabel:"awaiting window", slaPct:70, slaColor:"var(--amber)", assigneeAv:"CAB", assignee:"Change Advisory Board", status:"Approved", statusBadge:"ok", escalation:null,
+    linked:[["Use case ticket","TS-4830","desk.html"],["Sprint card","DEV-1058 · Sprint 34","dev.html"]],
+    activity:[
+      {av:"NP",name:"Nadia P.",time:"Jul 18",text:"Approved. Deployment window confirmed: Jul 20, 02:00–03:00 UTC. Low risk, rollback plan on file."},
+      {av:"RK",name:"Raj K.",time:"Jul 18",text:"Submitted for approval — risk: Low. Rollback: redeploy previous build, no schema changes."}
+    ]}
 };
 
 const priorityBadge = p => p==="crit" ? '<span class="badge crit">Urgent</span>' : p==="warn" ? '<span class="badge warn">High</span>' : '<span class="badge neutral">' + (p==="neutral"?"Normal":p) + '</span>';
@@ -119,6 +136,11 @@ function openTicket(id){
       <tr><td style="color:var(--ink-2);padding:6px 0;">Assignee</td><td style="text-align:right;">${t.assignee}</td></tr>
       <tr><td style="color:var(--ink-2);padding:6px 0;">Status</td><td style="text-align:right;"><span class="badge ${t.statusBadge}">${t.status}</span></td></tr>
     </table>
+    ${t.linked ? `
+    <div class="section-label" style="margin-top:20px;">Linked work</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      ${t.linked.map(([label,val,href]) => `<a href="${href}" style="display:flex;justify-content:space-between;align-items:center;text-decoration:none;color:var(--ink);font-size:12.5px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;"><span style="color:var(--ink-muted);">${label}</span><span class="id-mono" style="color:var(--indigo-text);">${val} →</span></a>`).join('')}
+    </div>` : ''}
 
     <div class="section-label" style="margin-top:20px;">Activity</div>
     <div style="display:flex;flex-direction:column;gap:14px;">
