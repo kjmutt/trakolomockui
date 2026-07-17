@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — Azure AD onboarding automation</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .trail{display:flex;flex-direction:column;gap:10px;margin-top:18px;}
+  .trail-step{display:flex;gap:11px;align-items:flex-start;font-size:13px;opacity:0;animation:stepIn .25s ease forwards;}
+  @keyframes stepIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+  .trail-step .si{width:20px;height:20px;border-radius:50%;background:var(--indigo-bg);color:var(--indigo-text);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+  .trail-step .st{color:var(--ink-2);}
+  .result-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);padding:16px 18px;margin-top:14px;}
+  .result-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:13px;}
+  .pw-mask{font-family:var(--font-mono);letter-spacing:1px;}
+  .pw-toggle{font-size:11.5px;font-weight:600;color:var(--indigo-text);cursor:pointer;background:none;border:none;padding:0;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a class="active" href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+
+<div class="wrap" style="max-width:900px;">
+  <div class="page-head">
+    <div><div class="page-title">Azure Active Directory</div><div class="page-desc">Onboarding automation — request a new starter account and let Azure AD provisioning run itself.</div></div>
+    <a href="admin.html" class="btn">← Back to Integrations</a>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Connection</div>
+    <div class="row-line"><div><div class="rname">Tenant</div><div class="rdesc">acme.onmicrosoft.com</div></div><span class="badge ok">Connected</span></div>
+    <div class="row-line"><div><div class="rname">Directory sync</div><div class="rdesc">Users, groups, and licenses</div></div><div class="switch on"></div></div>
+    <div class="row-line"><div><div class="rname">Last synced</div></div><span class="id-mono">4 min ago</span></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">New starter automation</div>
+    <div class="row-line"><div><div class="rname">Auto-provision on new starter ticket</div><div class="rdesc">Creates the Azure AD account, assigns a license, and generates a temporary password</div></div><div class="switch on"></div></div>
+    <div class="row-line"><div><div class="rname">Post password back to the ticket</div><div class="rdesc">Added as an internal activity note, not visible to the requester</div></div><div class="switch on"></div></div>
+    <div class="row-line"><div><div class="rname">Email credentials to contact email</div><div class="rdesc">Sent to the personal email on file, not the new work address</div></div><div class="switch on"></div></div>
+    <div class="row-line"><div><div class="rname">Force password reset on first login</div></div><div class="switch on"></div></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Request a new starter account</div>
+    <label>Full name</label>
+    <input id="on-name" type="text" placeholder="e.g. Priya Shah">
+    <label>Contact email <span style="font-weight:400;color:var(--ink-muted);">(personal — credentials go here, not the new work address)</span></label>
+    <input id="on-email" type="text" placeholder="e.g. priya.personal@gmail.com">
+    <label>Department</label>
+    <select id="on-dept"><option>Engineering</option><option>Sales</option><option>Finance</option><option>People ops</option><option>Design</option></select>
+    <label>Manager</label>
+    <input id="on-manager" type="text" placeholder="e.g. Nadia P.">
+    <label>Start date</label>
+    <input id="on-start" type="date">
+    <div id="on-error" class="hint" style="display:none;background:var(--coral-bg);border-color:#F0C1B6;color:var(--coral-text);"></div>
+    <button class="btn primary" id="on-submit" style="margin-top:16px;" onclick="runOnboarding()">Create account &amp; notify</button>
+
+    <div class="trail" id="on-trail"></div>
+    <div class="result-card" id="on-result" style="display:none;"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Recent onboarding automations</div>
+    <div class="panel" style="box-shadow:none;">
+      <table>
+        <thead><tr><th>Ticket</th><th>New hire</th><th>Department</th><th>Status</th><th>Completed</th></tr></thead>
+        <tbody id="on-history">
+          <tr><td class="id-mono">TS-4788</td><td>Marcus B.</td><td>Sales</td><td><span class="badge ok">Provisioned</span></td><td class="id-mono">Jul 15</td></tr>
+          <tr><td class="id-mono">TS-4771</td><td>Aisha K.</td><td>Design</td><td><span class="badge ok">Provisioned</span></td><td class="id-mono">Jul 10</td></tr>
+          <tr><td class="id-mono">TS-4760</td><td>Diego R.</td><td>Engineering</td><td><span class="badge ok">Provisioned</span></td><td class="id-mono">Jul 8</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+function genPassword(){
+  const words = ["Cedar","Harbor","Amber","Falcon","Willow","Comet"];
+  const w = words[Math.floor(Math.random()*words.length)];
+  const n = Math.floor(100 + Math.random()*900);
+  const sym = "!@#$%".charAt(Math.floor(Math.random()*5));
+  return `${w}${n}${sym}Trk`;
+}
+function genTicket(){ return "TS-" + (4831 + Math.floor(Math.random()*900)); }
+
+function runOnboarding(){
+  const name = document.getElementById('on-name').value.trim();
+  const email = document.getElementById('on-email').value.trim();
+  const dept = document.getElementById('on-dept').value;
+  const manager = document.getElementById('on-manager').value.trim() || "Unassigned";
+  const errBox = document.getElementById('on-error');
+
+  if(!name || !email || !email.includes('@')){
+    errBox.textContent = "Enter the new hire's full name and a valid contact email before running the automation.";
+    errBox.style.display = 'flex';
+    return;
+  }
+  errBox.style.display = 'none';
+
+  const btn = document.getElementById('on-submit');
+  btn.disabled = true; btn.style.opacity = .6;
+  const trail = document.getElementById('on-trail');
+  const resultBox = document.getElementById('on-result');
+  trail.innerHTML = '';
+  resultBox.style.display = 'none';
+
+  const ticket = genTicket();
+  const upn = name.toLowerCase().trim().split(/\s+/).join('.') + "@acme.com";
+  const password = genPassword();
+
+  const steps = [
+    `Ticket ${ticket} logged — new starter: ${name}, ${dept}, reporting to ${manager}.`,
+    `Creating Azure AD user <b>${upn}</b>…`,
+    `Assigning Microsoft 365 E3 license and adding to ${dept} security group…`,
+    `Generating temporary password and setting "change at next sign-in"…`,
+    `Password posted to ${ticket} as an internal activity note.`,
+    `Credentials emailed to <b>${email}</b>.`
+  ];
+
+  let i = 0;
+  function next(){
+    if(i >= steps.length){
+      resultBox.style.display = 'block';
+      resultBox.innerHTML = `
+        <div class="result-row"><span style="color:var(--ink-2);">Ticket</span><a href="desk.html" class="id-mono" style="color:var(--indigo-text);">${ticket} →</a></div>
+        <div class="result-row"><span style="color:var(--ink-2);">Account</span><span class="id-mono">${upn}</span></div>
+        <div class="result-row"><span style="color:var(--ink-2);">Temporary password</span><span><span class="pw-mask" id="pw-value">••••••••••</span> <button class="pw-toggle" onclick="togglePw('${password}')">Show</button></span></div>
+        <div class="result-row"><span style="color:var(--ink-2);">Status</span><span class="badge ok">Provisioned</span></div>`;
+      const hist = document.getElementById('on-history');
+      hist.insertAdjacentHTML('afterbegin', `<tr><td class="id-mono">${ticket}</td><td>${name}</td><td>${dept}</td><td><span class="badge ok">Provisioned</span></td><td class="id-mono">Just now</td></tr>`);
+      btn.disabled = false; btn.style.opacity = 1;
+      return;
+    }
+    const el = document.createElement('div');
+    el.className = 'trail-step';
+    el.style.animationDelay = '0s';
+    el.innerHTML = `<div class="si">✓</div><div class="st">${steps[i]}</div>`;
+    trail.appendChild(el);
+    i++;
+    setTimeout(next, 450);
+  }
+  next();
+}
+function togglePw(pw){
+  const el = document.getElementById('pw-value');
+  const showing = el.textContent === pw;
+  el.textContent = showing ? '••••••••••' : pw;
+  event.target.textContent = showing ? 'Show' : 'Hide';
+}
+</script>
+</body>
+</html>
