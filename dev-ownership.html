@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — team ownership</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .team-card{margin-bottom:20px;}
+  .team-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px;}
+  .team-name{font-family:var(--font-display);font-size:18px;font-weight:700;}
+  .team-goal{font-size:12.5px;color:var(--ink-2);margin-top:3px;}
+  .team-members{display:flex;gap:8px;flex-shrink:0;}
+  .infra-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+  .env-row{display:grid;grid-template-columns:110px 1fr 1fr auto;gap:10px;align-items:center;justify-items:start;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .env-row:last-child{border-bottom:none;}
+  .env-row .env-name{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-muted);}
+  .dep-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0 32px;}
+  .dep-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .dep-row:nth-last-child(-n+1), .dep-row:nth-last-child(-n+2){border-bottom:none;}
+  @media (max-width:700px){ .dep-grid{grid-template-columns:1fr;} .env-row{grid-template-columns:80px 1fr;row-gap:4px;} }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a class="active" href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="dev.html">Sprint board</a>
+  <a href="dev-backlog.html">Backlog &amp; planning</a>
+  <a class="active" href="dev-ownership.html">Team ownership</a>
+</div>
+
+<div class="wrap">
+  <div class="page-head">
+    <div><div class="page-title">Team ownership</div><div class="page-desc">What each scrum team owns — infrastructure, environments, and what's actually deployed where.</div></div>
+  </div>
+
+  <!-- PLATFORM RELIABILITY -->
+  <div class="card team-card">
+    <div class="team-head">
+      <div>
+        <div class="team-name">Platform Reliability</div>
+        <div class="team-goal">Goal: reduce P1 incidents and hold SLA compliance at 95%+.</div>
+      </div>
+      <div class="team-members">
+        <div class="who"><div class="av">RK</div>Raj K.</div>
+        <div class="who"><div class="av">SM</div>Sara M.</div>
+        <div class="who"><div class="av">TK</div>Tomas K.</div>
+      </div>
+    </div>
+
+    <div class="section-label">Infrastructure owned</div>
+    <div class="infra-chips">
+      <span class="tag-pill">API service</span>
+      <span class="tag-pill">Database (primary + replica)</span>
+      <span class="tag-pill">Ticket routing engine</span>
+      <span class="tag-pill">SLA escalation worker</span>
+      <span class="tag-pill">Webhook delivery queue</span>
+    </div>
+
+    <div class="section-label">Environments</div>
+    <div class="env-row" style="font-family:var(--font-mono);font-size:10px;color:var(--ink-muted);text-transform:uppercase;border-bottom:1px solid var(--border);"><span>Env</span><span>Status</span><span>Version</span><span>Last deployed</span></div>
+    <div class="env-row"><span class="env-name">DEV</span><span class="badge ok">Healthy</span><span class="id-mono">v2.15.0-dev.42</span><span class="id-mono">12m ago</span></div>
+    <div class="env-row"><span class="env-name">INT</span><span class="badge ok">Healthy</span><span class="id-mono">v2.15.0-rc.3</span><span class="id-mono">2h ago</span></div>
+    <div class="env-row"><span class="env-name">UAT</span><span class="badge ok">Healthy</span><span class="id-mono">v2.14.4</span><span class="id-mono">1d ago</span></div>
+    <div class="env-row"><span class="env-name">PRE</span><span class="badge ok">Healthy</span><span class="id-mono">v2.14.3</span><span class="id-mono">3d ago</span></div>
+    <div class="env-row"><span class="env-name">PROD</span><span class="badge ok">Healthy</span><span class="id-mono">v2.14.3</span><span class="id-mono">3d ago</span></div>
+
+    <div class="section-label" style="margin-top:18px;">Dependencies</div>
+    <div class="dep-grid">
+      <div class="dep-row"><span style="color:var(--ink-2);">OS</span><span class="id-mono">Ubuntu 22.04 LTS</span></div>
+      <div class="dep-row"><span style="color:var(--ink-2);">Runtime</span><span class="id-mono">Node.js 20.11.1</span></div>
+      <div class="dep-row"><span style="color:var(--ink-2);">Database</span><span class="id-mono">PostgreSQL 16.2</span></div>
+      <div class="dep-row"><span style="color:var(--ink-2);">Cache</span><span class="id-mono">Redis 7.2.4</span></div>
+      <div class="dep-row"><span style="color:var(--ink-2);">Web server</span><span class="id-mono">Nginx 1.25.3</span></div>
+      <div class="dep-row"><span style="color:var(--ink-2);">Queue</span><span class="id-mono">RabbitMQ 3.13</span></div>
+    </div>
+  </div>
+
+  <!-- SELF-SERVICE EXPERIENCE -->
+  <div class="card team-card">
+    <div class="team-head">
+      <div>
+        <div class="team-name">Self-Service Experience</div>
+        <div class="team-goal">Goal: cut average resolution time by improving self-service tooling and automation.</div>
+      </div>
+      <div class="team-members">
+        <div class="who"><div class="av">NP</div>Nadia P.</div>
+        <div class="who"><div class="av">DF</div>D. Ferreira</div>
+      </div>
+    </div>
+
+    <div class="section-label">Infrastructure owned</div>
+    <div class="infra-chips">
+      <span class="tag-pill">Self-service portal</span>
+      <span class="tag-pill">File storage</span>
+      <span class="tag-pill">Asset renewal nightly scan</span>
+      <span class="tag-pill">Azure AD onboarding automation</span>
+    </div>
+
+    <div class="section-label">Environments</div>
+    <div class="env-row" style="font-family:var(--font-mono);font-size:10px;color:var(--ink-muted);text-transform:uppercase;border-bottom:1px solid var(--border);"><span>Env</span><span>Status</span><span>Version</span><span>Last deployed</span></div>
+    <div class="env-row"><span class="env-name">DEV</span><span class="badge ok">Healthy</span><span class="id-mono">v1.8.0-dev.9</span><span class="id-mono">40m ago</span></div>
+    <div class="env-row"><span class="env-name">INT</span><span class="badge ok">Healthy</span><span class="id-mono">v1.8.0-rc.1</span><span class="id-mono">5h ago</span></div>
+    <div class="env-row"><span class="env-name">UAT</span><span class="badge warn">Degraded</span><span class="id-mono">v1.7.2</span><span class="id-mono">2d ago</span></div>
+    <div class="env-row"><span class="env-name">PRE</span><span class="badge ok">Healthy</span><span class="id-mono">v1.7.1</span><span class="id-mono">6d ago</span></div>
+    <div class="env-row"><span class="env-name">PROD</span><span class="badge ok">Healthy</span><span class="id-mono">v1.7.1</span><span class="id-mono">6d ago</span></div>
+
+    <div class="hint" style="margin-top:4px;margin-bottom:14px;">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" style="flex-shrink:0"><path d="M7 1.5l6 11h-12l6-11z"/><path d="M7 6v2.3M7 10.5v.01"/></svg>
+      <span>UAT is running a hotfix ahead of INT — <b>v1.7.2</b> patches a session-timeout bug found during sign-off testing.</span>
+    </div>
+
+    <div class="section-label">Dependencies</div>
+    <div class="dep-grid">
+      <div class="dep-row"><span style="color:var(--ink-2);">OS</span><span class="id-mono">Ubuntu 22.04 LTS</span></div>
+      <div class="dep-row"><span style="color:var(--ink-2);">Runtime</span><span class="id-mono">Node.js 20.11.1</span></div>
+      <div class="dep-row"><span style="color:var(--ink-2);">Database</span><span class="id-mono">PostgreSQL 16.2</span></div>
+      <div class="dep-row"><span style="color:var(--ink-2);">Object storage</span><span class="id-mono">S3-compatible</span></div>
+      <div class="dep-row"><span style="color:var(--ink-2);">Identity</span><span class="id-mono">Azure AD Graph API v1.0</span></div>
+      <div class="dep-row"><span style="color:var(--ink-2);">Email</span><span class="id-mono">SendGrid v3</span></div>
+    </div>
+  </div>
+
+  <!-- COMPLIANCE & REPORTING -->
+  <div class="card team-card">
+    <div class="team-head">
+      <div>
+        <div class="team-name">Compliance &amp; Reporting</div>
+        <div class="team-goal">Goal: automate SOC 2 and ISO 27001 evidence collection for audits.</div>
+      </div>
+      <div class="team-members">
+        <div class="who"><div class="av">TK</div>Tomas K.</div>
+        <div class="who"><div class="av">SM</div>Sara M.</div>
+      </div>
+    </div>
+
+    <div class="section-label">Infrastructure owned</div>
+    <div class="infra-chips">
+      <span class="tag-pill">Report export scheduler</span>
+      <span class="tag-pill">Reporting dashboards</span>
+      <span class="tag-pill">Compliance audit exports</span>
+    </div>
+
+    <div class="section-label">Environments</div>
+    <div class="env-row" style="font-family:var(--font-mono);font-size:10px;color:var(--ink-muted);text-transform:uppercase;border-bottom:1px solid var(--border);"><span>Env</span><span>Status</span><span>Version</span><span>Last deployed</span></div>
+    <div class="env-row"><span class="env-name">DEV</span><span class="badge ok">Healthy</span><span class="id-mono">v0.9.0-dev.4</span><span class="id-mono">3h ago</span></div>
+    <div class="env-row"><span class="env-name">INT</span><span class="badge ok">Healthy</span><span class="id-mono">v0.9.0-rc.2</span><span class="id-mono">1d ago</span></div>
+    <div class="env-row"><span class="env-name">UAT</span><span class="badge ok">Healthy</span><span class="id-mono">v0.8.5</span><span class="id-mono">4d ago</span></div>
+    <div class="env-row"><span class="env-name">PRE</span><span class="badge neutral">Not deployed</span><span class="id-mono">—</span><span class="id-mono">—</span></div>
+    <div class="env-row"><span class="env-name">PROD</span><span class="badge neutral">Not deployed</span><span class="id-mono">—</span><span class="id-mono">—</span></div>
+
+    <div class="section-label" style="margin-top:18px;">Dependencies</div>
+    <div class="dep-grid">
+      <div class="dep-row"><span style="color:var(--ink-2);">OS</span><span class="id-mono">Ubuntu 22.04 LTS</span></div>
+      <div class="dep-row"><span style="color:var(--ink-2);">Runtime</span><span class="id-mono">Python 3.12.2</span></div>
+      <div class="dep-row"><span style="color:var(--ink-2);">Database</span><span class="id-mono">PostgreSQL 16.2</span></div>
+      <div class="dep-row"><span style="color:var(--ink-2);">Data processing</span><span class="id-mono">Pandas 2.2.0</span></div>
+      <div class="dep-row"><span style="color:var(--ink-2);">Scheduler</span><span class="id-mono">Celery 5.3</span></div>
+      <div class="dep-row"><span style="color:var(--ink-2);">Export format</span><span class="id-mono">WeasyPrint 61</span></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
