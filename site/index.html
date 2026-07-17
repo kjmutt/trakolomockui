@@ -122,7 +122,7 @@
   }
   .how h2 { font-size: 34px; margin-bottom: 12px; }
   .how > .wrap > p { color: var(--ink-soft); font-size: 16px; max-width: 520px; margin-bottom: 56px; }
-  .stages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; position: relative; }
+  .stages { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
   .stage { position: relative; padding: 0 28px 0 0; }
   .stage-icon {
     width: 52px; height: 52px; border-radius: 14px; background: var(--teal-50); border: 1.5px solid var(--teal-200);
@@ -141,7 +141,7 @@
   .features { padding: 88px 0; }
   .features h2 { font-size: 34px; margin-bottom: 12px; }
   .features > .wrap > p { color: var(--ink-soft); font-size: 16px; max-width: 520px; margin-bottom: 48px; }
-  .feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
   .feature-card {
     background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 26px 22px;
   }
@@ -154,6 +154,7 @@
   .fi-coral { background: #FAECE7; color: #993C1D; }
   .fi-purple { background: #EEEDFE; color: #534AB7; }
   .fi-blue { background: #E6F1FB; color: #185FA5; }
+  .fi-amber { background: #FAEEDA; color: #854F0B; }
   .feature-card h3 { font-size: 17px; margin-bottom: 8px; }
   .feature-card p { font-size: 14px; color: var(--ink-soft); }
 
@@ -213,10 +214,10 @@
     <div>
       <div class="eyebrow">
         <svg width="14" height="14" viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="none" stroke="#085041" stroke-width="14"/><path d="M60,100 L90,130 L145,65" fill="none" stroke="#085041" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Now supporting unlimited assets on every plan
+        Now built in: full change management, PRE to PROD
       </div>
-      <h1>Every ticket.<br>Every asset.<br><span>Tracked to the end.</span></h1>
-      <p class="lead">Trakolo brings IT service management, software asset tracking, and dev team workflows into one calm, connected system. No spreadsheets. No blind spots.</p>
+      <h1>From idea<br>to production.<br><span>Never three tools apart.</span></h1>
+      <p class="lead">Trakolo connects IT service management, asset tracking, sprint-based development, and ITSM change management in one system — so a use case, a ticket, a sprint card, and a production deploy are one thread, not four.</p>
       <div class="hero-actions">
         <a href="../login.html" class="btn btn-primary">Start free →</a>
         <a href="how-it-works.html" class="btn btn-ghost">See how it works</a>
@@ -231,16 +232,16 @@
       </div>
       <div class="mock-tabs">
         <span class="active">All tickets</span>
-        <span>Assets</span>
-        <span>Boards</span>
+        <span>Sprints</span>
+        <span>Changes</span>
         <span>Reports</span>
       </div>
       <div class="mock-body">
-        <div class="mock-row"><span class="badge badge-open">Open</span><span class="title">VPN access request — finance team</span><span class="meta">2m ago</span></div>
-        <div class="mock-row"><span class="badge badge-progress">In progress</span><span class="title">Laptop reassignment — new hire onboarding</span><span class="meta">18m ago</span></div>
-        <div class="mock-row"><span class="badge badge-progress">In progress</span><span class="title">Slack integration bug — notifications delayed</span><span class="meta">1h ago</span></div>
-        <div class="mock-row"><span class="badge badge-done">Resolved</span><span class="title">Software license renewal — design team</span><span class="meta">3h ago</span></div>
-        <div class="mock-row"><span class="badge badge-done">Resolved</span><span class="title">Server access audit — Q3 compliance</span><span class="meta">Yesterday</span></div>
+        <div class="mock-row"><span class="badge badge-open">Open</span><span class="title">Use case: Bulk asset reassignment tool</span><span class="meta">2m ago</span></div>
+        <div class="mock-row"><span class="badge badge-progress">In progress</span><span class="title">DEV-1058 · Sprint 34 · PR in review</span><span class="meta">18m ago</span></div>
+        <div class="mock-row"><span class="badge badge-progress">In progress</span><span class="title">CR-0091 · Change request awaiting approval</span><span class="meta">1h ago</span></div>
+        <div class="mock-row"><span class="badge badge-done">Resolved</span><span class="title">CR-0088 · Deployed PRE → PROD</span><span class="meta">3h ago</span></div>
+        <div class="mock-row"><span class="badge badge-done">Resolved</span><span class="title">Software license renewal — design team</span><span class="meta">Yesterday</span></div>
       </div>
     </div>
   </div>
@@ -253,8 +254,8 @@
       <div class="rule"></div>
       <span class="tag">How it works</span>
     </div>
-    <h2>One path, from report to resolution</h2>
-    <p>Every ticket and asset moves through the same clear stages — so nothing sits forgotten in an inbox or a spreadsheet tab.</p>
+    <h2>One path, from report to production</h2>
+    <p>Every ticket, asset, and dev task moves through the same clear stages — including the ones that end in a production deploy, not just a closed ticket.</p>
 
     <div class="stages">
       <div class="stage">
@@ -268,6 +269,12 @@
         <div class="stage-icon"><div class="dot"></div></div>
         <h3>Track it</h3>
         <p>See status, owner, and history in one board. Nothing moves without a visible trail.</p>
+      </div>
+      <div class="stage">
+        <div class="stage-connector"></div>
+        <div class="stage-icon"><div class="dot"></div></div>
+        <h3>Ship it safely</h3>
+        <p>Code merges, then a change request captures risk, approval, and a deployment window — before anything reaches production.</p>
       </div>
       <div class="stage">
         <div class="stage-icon"><div class="dot"></div></div>
@@ -285,8 +292,8 @@
       <div class="rule"></div>
       <span class="tag">Features</span>
     </div>
-    <h2>Built for IT, asset, and dev teams alike</h2>
-    <p>One system, three teams. Trakolo replaces the spreadsheet-and-ticket-tool patchwork most IT departments run on.</p>
+    <h2>Built for IT, asset, dev, and change teams alike</h2>
+    <p>One system, every team. Trakolo replaces the spreadsheet-and-ticket-tool patchwork most IT departments run on.</p>
 
     <div class="feature-grid">
       <div class="feature-card">
@@ -303,6 +310,11 @@
         <div class="fi fi-purple">Dev</div>
         <h3>Boards &amp; sprints</h3>
         <p>Kanban and sprint boards for engineering, without switching tools.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fi fi-amber">CM</div>
+        <h3>Change management</h3>
+        <p>Change requests, approvals, and deployment windows for every PRE → PROD promotion.</p>
       </div>
       <div class="feature-card">
         <div class="fi fi-blue">Ops</div>

@@ -54,7 +54,7 @@
 <div class="page-header">
   <div class="wrap">
     <h1>How Trakolo works</h1>
-    <p>One system, one path. Every ticket, asset, and dev task moves through the same clear stages — so nothing sits forgotten in an inbox or a spreadsheet.</p>
+    <p>One system, one path. Every ticket, asset, and dev task moves through the same clear stages — including a full change management step before code reaches production — so nothing sits forgotten in an inbox or a spreadsheet.</p>
   </div>
 </div>
 
@@ -63,7 +63,7 @@
     <div class="path-track">
       <div class="node"></div><div class="node"></div><div class="node end"></div>
       <div class="rule"></div>
-      <span class="tag">The four stages</span>
+      <span class="tag">The five stages</span>
     </div>
 
     <div class="stage-block">
@@ -108,7 +108,20 @@
     </div>
 
     <div class="stage-block">
-      <div class="stage-rail"><div class="marker">4</div></div>
+      <div class="stage-rail"><div class="marker">4</div><div class="line"></div></div>
+      <div class="stage-content">
+        <h3>Ship it safely</h3>
+        <p class="desc">For dev work, "resolved" means merged code, not a live deploy. Once a PR merges, a change request captures risk and rollback, routes for approval, and gets a scheduled PRE → PROD window — whether it started life as a use case ticket or a backlog item the developer opened themselves.</p>
+        <div class="stage-tags">
+          <span class="stage-tag">Change requests</span>
+          <span class="stage-tag">Manager / CAB approval</span>
+          <span class="stage-tag">Deployment windows</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stage-block">
+      <div class="stage-rail"><div class="marker">5</div></div>
       <div class="stage-content">
         <h3>Report on it</h3>
         <p class="desc">Every resolved item feeds straight into audit-ready reporting — SLA compliance, license utilization, asset lifecycle, and team performance, exportable in one click.</p>
@@ -143,7 +156,7 @@
       </div>
       <div class="persona-card">
         <h4>Engineering &amp; dev teams</h4>
-        <p>The same tickets can live on a sprint board, linked to commits and pull requests, without leaving the same system.</p>
+        <p>The same tickets live on a sprint board, linked to commits and pull requests — and once merged, a change request handles the PRE → PROD promotion without leaving the same system.</p>
       </div>
     </div>
   </div>
