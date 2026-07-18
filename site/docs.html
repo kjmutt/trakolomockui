@@ -98,6 +98,12 @@
         <a href="#api">API reference</a>
         <a href="#bulk-assets">Bulk upload &amp; update assets</a>
       </div>
+      <div class="group">
+        <div class="group-title">Standalone / On-premise</div>
+        <a href="#onprem-install">Installation guide</a>
+        <a href="#onprem-license">License management</a>
+        <a href="#onprem-upgrade">Upgrades &amp; backups</a>
+      </div>
     </div>
 
     <div>
@@ -201,6 +207,54 @@ GET /v1/assets/bulk/blk_8f21ac
           <li><span class="opt">optional</span> <span><code>category</code>, <code>owner_email</code>, <code>purchase_date</code>, <code>license_expiry</code> (ISO <code>YYYY-MM-DD</code>), <code>cost_center</code> — blank on an update leaves the existing value untouched, it does not clear it</span></li>
         </ul>
         <p>Limits: 10,000 rows or 15MB per file, whichever comes first — split larger exports into multiple calls. <code>owner_email</code> must match a user already in the workspace or the row is rejected (shown in the job's <code>errors</code> array with a row number and reason), not silently dropped.</p>
+      </div>
+
+      <div class="doc-card" id="onprem-install">
+        <h3>Standalone / On-premise: installation guide <span class="time">45 min</span></h3>
+        <p>The Standalone edition runs entirely inside your environment — your servers, your cloud tenant, or an air-gapped network. Nothing leaves your infrastructure, including license validation.</p>
+        <p><b>System requirements:</b></p>
+        <table>
+          <tr><th>Component</th><th>Minimum</th><th>Recommended (500+ users)</th></tr>
+          <tr><td>CPU / RAM</td><td>4 vCPU / 8 GB</td><td>8 vCPU / 16 GB</td></tr>
+          <tr><td>Storage</td><td>50 GB SSD</td><td>200 GB SSD, snapshot-capable</td></tr>
+          <tr><td>OS</td><td>Ubuntu 22.04+, RHEL 9+, or any Docker host</td><td>Same, with a container runtime</td></tr>
+          <tr><td>Database</td><td>Bundled PostgreSQL</td><td>External PostgreSQL 15+ you manage</td></tr>
+        </table>
+        <p><b>Install with Docker Compose</b> (the supported path — a native installer exists for air-gapped RHEL):</p>
+        <pre># 1. Download the bundle from your customer portal (or via USB for air-gapped)
+curl -O https://downloads.trakolo.com/standalone/trakolo-2026.7.2.tar.gz
+tar -xzf trakolo-2026.7.2.tar.gz && cd trakolo
+
+# 2. Set your hostname and admin email
+cp .env.example .env && edit .env
+
+# 3. Start — first boot runs migrations and prompts for the license file
+docker compose up -d
+
+# 4. Open https://your-host and upload your .trklic license file</pre>
+        <p>First login creates the initial admin account. From there, setup is identical to cloud: <code>Settings → Workspace</code>, invite users, enable modules.</p>
+      </div>
+
+      <div class="doc-card" id="onprem-license">
+        <h3>Standalone / On-premise: license management</h3>
+        <div class="doc-note"><b>Where it lives:</b> <code>Admin → Settings → License</code>. On-premise has no billing page — your license is a signed <code>.trklic</code> file, validated locally. No phone-home, works air-gapped.</div>
+        <p>The license file encodes four things: who it's licensed to, the <b>named-user seat count</b>, the <b>modules enabled</b> (ITSM, SAM, Dev boards, Reporting, AI features), and the <b>support &amp; upgrades expiry date</b>.</p>
+        <p><b>Common operations:</b></p>
+        <ul class="field-list">
+          <li><span class="req">seats</span> <span>Adding seats — buy an expansion, get a replacement <code>.trklic</code> file, upload it under <code>License → Upload new license file</code>. Applies instantly, no restart.</span></li>
+          <li><span class="req">modules</span> <span>Enabling a module you didn't license — same flow: new license file, upload, the module appears in Settings immediately.</span></li>
+          <li><span class="req">renewal</span> <span>Support &amp; upgrades expiry — the product <b>keeps working forever</b> after expiry (it's a perpetual license). What stops: new version upgrades and support tickets. Renewing issues a new file with a new date.</span></li>
+          <li><span class="opt">air-gap</span> <span>Offline activation — for networks with no outbound access, <code>License → Offline activation</code> generates a request code; exchange it on the customer portal from any machine and paste the response back.</span></li>
+        </ul>
+        <p>If the license expires or seats are exceeded, admins get a banner and a 30-day grace period — users are never locked out mid-incident.</p>
+      </div>
+
+      <div class="doc-card" id="onprem-upgrade">
+        <h3>Standalone / On-premise: upgrades &amp; backups</h3>
+        <p>Upgrades are manual and under your control — download the new bundle, then:</p>
+        <pre>docker compose pull && docker compose up -d   # migrations run automatically</pre>
+        <p>Always take a database snapshot first. The bundled PostgreSQL can be dumped with <code>./bin/trakolo-backup</code>, which writes a single restorable archive (database + uploaded attachments + your license file). Point it at a network share or object storage on a nightly cron.</p>
+        <p>Version support policy: each release gets security fixes for 18 months. You can skip versions — migrations chain automatically — but upgrading requires an active support &amp; upgrades plan.</p>
       </div>
     </div>
   </div>

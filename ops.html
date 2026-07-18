@@ -9,6 +9,10 @@
   .rcard .rmore{font-size:12px;color:var(--indigo-text);font-weight:600;margin-top:8px;}
   .rdetail{display:none;grid-column:1/-1;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 24px;margin-top:-2px;}
   .rdetail.open{display:block;}
+  .rgroup-label{display:flex;align-items:center;gap:10px;margin:26px 0 12px;}
+  .rgroup-label:first-child{margin-top:0;}
+  .rgroup-label .gl-name{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--ink-muted);font-family:var(--font-mono);font-weight:600;}
+  .rgroup-label .gl-rule{flex:1;height:1px;background:var(--border);}
 </style>
 </head>
 <body>
@@ -34,50 +38,66 @@
 
 <div class="wrap">
   <div class="page-head">
-    <div><div class="page-title">Reporting</div><div class="page-desc">Click a report to expand it in place — filters and export stay right there.</div></div>
+    <div><div class="page-title">Reporting</div><div class="page-desc">One report library, grouped by module. Click a report to expand it in place — filters and export stay right there.</div></div>
     <button class="btn primary">Export all</button>
   </div>
 
-  <div class="rgrid" id="rgrid"></div>
+  <div id="rgroups"></div>
 </div>
 
 <script>
 const reports = [
-  {id:"sla", title:"Ticket volume & SLA compliance", sub:"Last 30 days · 94.2% within SLA", color:"var(--indigo)",
+  {id:"sla", group:"Service desk", title:"Ticket volume & SLA compliance", sub:"Last 30 days · 94.2% within SLA", color:"var(--indigo)",
     spark:[40,55,35,70,50,65,80,60,90,72,85,95],
     metrics:[["Tickets closed","1,204","+6% vs prior period"],["SLA compliance","94.2%","target 95%"],["Avg resolution","2h 14m","-18m vs prior period"],["Breaches","70","mostly urgent tier"]],
-    table:{head:["Priority","Volume","Compliance","Avg resolution"], rows:[["Urgent","84","81.0%","34m"],["High","216","91.2%","1h 48m"],["Normal","640","96.8%","2h 30m"],["Low","264","99.1%","1d 2h"]]}},
-  {id:"velocity", title:"Sprint velocity trend", sub:"Last 6 sprints · avg 41 pts", color:"var(--violet)",
-    spark:[50,62,44,70,66,80],
-    metrics:[["Sprints tracked","6","rolling window"],["Avg velocity","41 pts","+9% vs last quarter"],["Carry-over rate","12%","cards rolled to next sprint"],["Team size","5","engineers"]],
-    table:{head:["Sprint","Points planned","Points completed","Carry-over"], rows:[["Sprint 34","47","32*","in progress"],["Sprint 33","44","41","3"],["Sprint 32","38","38","0"],["Sprint 31","42","36","6"]]}},
-  {id:"assets", title:"Asset compliance audit", sub:"2,340 assets · quarterly", color:"var(--amber)",
+    table:{head:["Priority","Volume","Compliance","Avg resolution"], rows:[["P1 — Urgent","84","81.0%","34m"],["P2 — High","216","91.2%","1h 48m"],["P3 — Normal","640","96.8%","2h 30m"],["P4 — Low","264","99.1%","1d 2h"]]}},
+  {id:"priority", group:"Service desk", title:"P1s & incidents — last month", sub:"84 P1 tickets · 341 incidents logged", color:"var(--coral)",
+    spark:[30,45,25,60,80,40,55,35,70,50,45,30],
+    metrics:[["P1 tickets","84","last month · 81% within SLA"],["Incidents logged","341","of 1,204 total tickets"],["Major outages","2","see incident & uptime report"],["P1s still open","6","oldest 2 days"]],
+    table:{head:["Week","P1 tickets","Incidents","Top driver"], rows:[["Jun 16–22","19","78","VPN drops after client update"],["Jun 23–29","31","102","SSO provider degradation"],["Jun 30–Jul 6","21","89","printer fleet firmware"],["Jul 7–13","13","72","normal load"]]}},
+  {id:"uptime", group:"Service desk", title:"Incident & uptime report", sub:"99.94% uptime · 2 P1 incidents", color:"var(--coral)",
+    spark:[96,97,60,98,99,70],
+    metrics:[["Uptime","99.94%","last 30 days"],["P1 incidents","2","both resolved"],["MTTR","41m","mean time to resolve"],["Affected users","~340","across both incidents"]],
+    table:{head:["Date","Severity","Duration","Cause"], rows:[["Jul 9","P1","28m","SSO provider outage"],["Jul 2","P1","54m","Network AP firmware bug"],["Jun 24","P2","12m","Deploy rollback"]]}},
+  {id:"assets", group:"Assets", title:"Asset compliance audit", sub:"2,340 assets · quarterly", color:"var(--amber)",
     spark:[88,90,85,93,97,96],
     metrics:[["Assets covered","2,340","full fleet"],["Compliance score","97%","2 items need action"],["Encryption coverage","99.4%","managed devices"],["Idle licenses flagged","61","$38k reclaimable"]],
     table:{head:["Category","Assets","Compliant","Action needed"], rows:[["Hardware","842","99%","8 devices"],["Software & licenses","1,340","95%","61 seats"],["Mobile devices","158","100%","0"]]}},
-  {id:"uptime", title:"Incident & uptime report", sub:"99.94% uptime · 2 P1 incidents", color:"var(--coral)",
-    spark:[96,97,60,98,99,70],
-    metrics:[["Uptime","99.94%","last 30 days"],["P1 incidents","2","both resolved"],["MTTR","41m","mean time to resolve"],["Affected users","~340","across both incidents"]],
-    table:{head:["Date","Severity","Duration","Cause"], rows:[["Jul 9","P1","28m","SSO provider outage"],["Jul 2","P1","54m","Network AP firmware bug"],["Jun 24","P2","12m","Deploy rollback"]]}}
+  {id:"assetmoves", group:"Assets", title:"Fleet changes — last month", sub:"57 added · 23 retired · 18 licenses reclaimed", color:"var(--amber)",
+    spark:[20,35,50,30,60,45,40,55],
+    metrics:[["Assets added","57","42 from Q3 laptop refresh"],["Assets retired","23","wiped & recycled"],["Licenses reclaimed","18","$11k annualized"],["Renewals closed","9","of 37 due this quarter"]],
+    table:{head:["Change","Count","Value","Note"], rows:[["Hardware added","44","$92k","bulk upload, Q3 refresh"],["Software seats added","13","$8k","new starters"],["Hardware retired","23","—","end of life"],["Seats reclaimed","18","$11k/yr","idle > 40 days"]]}},
+  {id:"velocity", group:"Sprint reports", title:"Sprint velocity trend", sub:"Last 6 sprints · avg 41 pts", color:"var(--violet)",
+    spark:[50,62,44,70,66,80],
+    metrics:[["Sprints tracked","6","rolling window"],["Avg velocity","41 pts","+9% vs last quarter"],["Carry-over rate","12%","cards rolled to next sprint"],["Team size","5","engineers"]],
+    table:{head:["Sprint","Points planned","Points completed","Carry-over"], rows:[["Sprint 34","47","32*","in progress"],["Sprint 33","44","41","3"],["Sprint 32","38","38","0"],["Sprint 31","42","36","6"]]}},
+  {id:"delivery", group:"Sprint reports", title:"Delivery & change — last month", sub:"14 production deploys · 9 change requests approved", color:"var(--violet)",
+    spark:[40,20,60,45,70,35,55,65],
+    metrics:[["Production deploys","14","all via change management"],["Change requests","9 approved","1 pending, 0 rejected"],["Lead time","4.2 days","card started → deployed"],["Rollbacks","1","Jun 24, recovered in 12m"]],
+    table:{head:["Change","Sprint card","Approved by","Deployed"], rows:[["CR-0091 — bulk reassignment tool","DEV-1058","N. Patel","Jul 11"],["CR-0092 — asset query optimization","DEV-1063","pending","—"],["CR-0088 — CSAT survey rollout","DEV-1049","N. Patel","Jul 4"],["CR-0087 — SSO fallback provider","DEV-1041","R. Okafor","Jun 27"]]}}
 ];
 
 function renderCards(){
-  document.getElementById('rgrid').innerHTML = reports.map(r => `
-    <div class="rcard clickable" onclick="toggleReport('${r.id}')">
-      <div class="rhead"><div><div class="rtitle">${r.title}</div><div class="rsub">${r.sub}</div></div><button class="btn sm" onclick="event.stopPropagation()">Export</button></div>
-      <div class="spark">${r.spark.map(v=>`<i style="height:${v}%;background:${r.color}"></i>`).join('')}</div>
-      <div class="rmore" id="more-${r.id}">Click to expand ↓</div>
-    </div>
-    <div class="rdetail" id="detail-${r.id}">
-      <div class="strip" style="margin-bottom:18px;">
-        ${r.metrics.map(([label,val,delta]) => `<div class="mcard info"><div class="mlabel">${label}</div><div class="mval">${val}</div><div class="mdelta">${delta}</div></div>`).join('')}
+  const groups = [...new Set(reports.map(r => r.group))];
+  document.getElementById('rgroups').innerHTML = groups.map(g => `
+    <div class="rgroup-label"><span class="gl-name">${g}</span><span class="gl-rule"></span></div>
+    <div class="rgrid">${reports.filter(r => r.group === g).map(r => `
+      <div class="rcard clickable" onclick="toggleReport('${r.id}')">
+        <div class="rhead"><div><div class="rtitle">${r.title}</div><div class="rsub">${r.sub}</div></div><button class="btn sm" onclick="event.stopPropagation()">Export</button></div>
+        <div class="spark">${r.spark.map(v=>`<i style="height:${v}%;background:${r.color}"></i>`).join('')}</div>
+        <div class="rmore" id="more-${r.id}">Click to expand ↓</div>
       </div>
-      <div class="panel">
-        <table>
-          <thead><tr>${r.table.head.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
-          <tbody>${r.table.rows.map(row => `<tr>${row.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
-        </table>
-      </div>
+      <div class="rdetail" id="detail-${r.id}">
+        <div class="strip" style="margin-bottom:18px;">
+          ${r.metrics.map(([label,val,delta]) => `<div class="mcard info"><div class="mlabel">${label}</div><div class="mval">${val}</div><div class="mdelta">${delta}</div></div>`).join('')}
+        </div>
+        <div class="panel">
+          <table>
+            <thead><tr>${r.table.head.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+            <tbody>${r.table.rows.map(row => `<tr>${row.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+          </table>
+        </div>
+      </div>`).join('')}
     </div>`).join('');
 }
 
