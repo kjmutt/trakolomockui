@@ -256,14 +256,54 @@
         <div class="row-line"><div><div class="rname">Asset management (SAM)</div></div><span class="badge ok">Licensed</span></div>
         <div class="row-line"><div><div class="rname">Dev boards &amp; sprints</div></div><span class="badge ok">Licensed</span></div>
         <div class="row-line"><div><div class="rname">Reporting &amp; compliance</div></div><span class="badge ok">Licensed</span></div>
-        <div class="row-line"><div><div class="rname">AI features</div><div class="rdesc">Triage, virtual agent, predictive alerts</div></div><span class="badge neutral">Not licensed — contact sales</span></div>
+        <div class="row-line"><div><div class="rname">AI features</div><div class="rdesc">Triage, AI agent auto-resolution, predictive alerts</div></div><span class="badge ok">Licensed</span></div>
       </div>
     </div>
 
     <!-- SERVICE DESK -->
     <div class="set-panel" id="panel-desk">
       <div class="page-title" style="font-size:20px;margin-bottom:4px;">Service desk configuration</div>
-      <div class="page-desc" style="margin-bottom:20px;">SLA targets, escalation rules, and routing — the rules that get enforced automatically.</div>
+      <div class="page-desc" style="margin-bottom:20px;">Ticket sources, AI agent, SLA targets, escalation rules, and routing — the rules that get enforced automatically.</div>
+
+      <div class="card">
+        <div class="section-label">Ticket sources</div>
+        <div class="page-desc" style="margin:-4px 0 8px;">Every channel lands in the same queue with a Source field on the ticket. Each channel is backed by a running service — health lives in <b>System status</b>.</div>
+        <div class="row-line"><div><div class="rname">Email-to-ticket</div><div class="rdesc">Anything sent to the support mailbox becomes a ticket; the requester gets the ticket ID by reply. Runs on the <b>Email ingestion service</b>, polled every 60s.</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Support mailbox</div><div class="rdesc">Forwarded to acme.trakolo.com's inbound address</div></div><input type="text" value="support@acme.com" style="width:220px;"></div>
+        <div class="row-line"><div><div class="rname">Phone / IVR</div><div class="rdesc">Calls are answered by the IVR; voicemail is transcribed and logged as a ticket by the <b>Phone gateway service</b>.</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Support number</div></div><input type="text" value="+1 (555) 019-2244" style="width:220px;"></div>
+        <div class="row-line"><div><div class="rname">Self-service portal</div><div class="rdesc">Log a ticket, contact, and track pages</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Live chat</div><div class="rdesc">Chats escalated past the AI agent become tickets with the transcript attached</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Slack</div><div class="rdesc">/trakolo new in any channel</div></div><div class="switch on"></div></div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">AI agent</div>
+        <div class="page-desc" style="margin:-4px 0 8px;">Yes — the AI agent can fully resolve tickets, not just triage them. It runs on the <b>AI agent worker</b>, and every resolution is logged and reopenable. See <a href="desk.html" style="color:var(--indigo-text);">TS-4833 on the service desk</a> for a real AI-resolved ticket.</div>
+        <div class="row-line"><div><div class="rname">AI triage &amp; routing</div><div class="rdesc">Classifies, prioritizes, and routes every new ticket regardless of source</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">AI agent resolves tickets end-to-end</div><div class="rdesc">Handles the request itself when it's inside the auto-resolve policy below</div></div><div class="switch on"></div></div>
+        <label style="margin-top:14px;">Auto-resolve categories</label>
+        <div class="col-chip"><span>Password resets &amp; MFA re-enrollment</span><span class="id-mono" style="color:var(--ink-muted);">identity verified via SSO challenge</span></div>
+        <div class="col-chip"><span>Standard access requests</span><span class="id-mono" style="color:var(--ink-muted);">pre-approved groups only</span></div>
+        <div class="col-chip"><span>FAQ / how-to questions</span><span class="id-mono" style="color:var(--ink-muted);">answers from the knowledge base</span></div>
+        <div class="col-chip"><span>VPN &amp; wifi setup</span><span class="id-mono" style="color:var(--ink-muted);">guided walkthrough</span></div>
+        <label style="margin-top:14px;">Guardrails</label>
+        <div class="row-line"><div><div class="rname">Never auto-resolve Urgent / P1</div><div class="rdesc">Always goes straight to a human</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Hand off on frustrated sentiment</div><div class="rdesc">Detected frustration escalates with full context</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">"Talk to a human" always works</div><div class="rdesc">Requester can opt out at any point, no argument</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Last month</div><div class="rdesc">118 tickets resolved by AI · 34% of eligible volume · avg 4m to resolve · CSAT 4.7</div></div><span class="badge ok">On track</span></div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Business rules</div>
+        <div class="page-desc" style="margin:-4px 0 8px;">If-this-then-that automation, evaluated on every ticket event by the <b>Business rules engine</b> (see System status). Rules run in order; the first match per event wins.</div>
+        <div class="row-line"><div><div class="rname">New starter onboarding</div><div class="rdesc">When category = Onboarding request → run the <a href="azure-onboarding.html" style="color:var(--indigo-text);">Azure AD provisioning automation</a></div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">VIP fast lane</div><div class="rdesc">When requester is in Executives group → set priority to at least High, route to IT Ops</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">SLA breach warning</div><div class="rdesc">When SLA timer reaches 80% → notify assignee and their manager in Slack</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Outage clustering</div><div class="rdesc">When 3+ similar tickets arrive within 10 minutes → open a problem ticket and link them all</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Repair vs replace</div><div class="rdesc">When the linked asset is over 3 years old → suggest replacement instead of repair</div></div><div class="switch"></div></div>
+        <button class="btn" style="margin-top:12px;">+ New business rule</button>
+      </div>
 
       <div class="card">
         <div class="section-label">SLA targets by priority</div>
@@ -612,6 +652,10 @@
           <table>
             <thead><tr><th>Job</th><th>Status</th><th>Last run</th><th>Next run</th><th>Queue depth</th></tr></thead>
             <tbody>
+              <tr><td>Email ingestion service <span class="id-mono" style="margin-left:4px;">creates tickets from support@acme.com</span></td><td><span class="badge ok">Operational</span></td><td class="id-mono">45s ago</td><td class="id-mono">every 60s</td><td class="id-mono">0</td></tr>
+              <tr><td>Phone gateway <span class="id-mono" style="margin-left:4px;">IVR + voicemail transcription</span></td><td><span class="badge ok">Operational</span></td><td class="id-mono">2m ago</td><td class="id-mono">Continuous</td><td class="id-mono">0</td></tr>
+              <tr><td>AI agent worker <span class="id-mono" style="margin-left:4px;">triage + auto-resolve</span></td><td><span class="badge ok">Operational</span></td><td class="id-mono">8s ago</td><td class="id-mono">Continuous</td><td class="id-mono">1</td></tr>
+              <tr><td>Business rules engine <span class="id-mono" style="margin-left:4px;">evaluates rules on every ticket event</span></td><td><span class="badge ok">Operational</span></td><td class="id-mono">3s ago</td><td class="id-mono">Continuous</td><td class="id-mono">0</td></tr>
               <tr><td>Ticket routing engine</td><td><span class="badge ok">Operational</span></td><td class="id-mono">12s ago</td><td class="id-mono">Continuous</td><td class="id-mono">3</td></tr>
               <tr><td>SLA escalation worker</td><td><span class="badge ok">Operational</span></td><td class="id-mono">40s ago</td><td class="id-mono">Continuous</td><td class="id-mono">0</td></tr>
               <tr><td>Asset renewal nightly scan</td><td><span class="badge ok">Operational</span></td><td class="id-mono">6h ago</td><td class="id-mono">in 18h</td><td class="id-mono">—</td></tr>

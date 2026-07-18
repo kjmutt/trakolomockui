@@ -68,21 +68,29 @@
 
 <script>
 const tickets = {
-  "TS-4821": {subject:"VPN drops on hybrid laptops", requester:"D. Ferreira", priority:"crit", priorityLabel:"Urgent", category:"Network & wifi", slaLabel:"18m left", slaPct:12, slaColor:"var(--coral)", assigneeAv:"RK", assignee:"Raj K.", status:"In progress", statusBadge:"neutral", escalation:null,
+  "TS-4833": {subject:"Password reset — locked out after new phone", requester:"J. Okoye", priority:"neutral", priorityLabel:"Normal", category:"Account security", source:"Email · support@acme.com", slaLabel:"resolved in 3m", slaPct:100, slaColor:"var(--green)", assigneeAv:"AI", assignee:"Trakolo AI agent", status:"Resolved by AI", statusBadge:"ok", escalation:null,
+    activity:[
+      {av:"SY",name:"System",time:"11:55",text:"CSAT survey returned 5/5. Auto-closed with the full conversation transcript attached."},
+      {av:"AI",name:"Trakolo AI agent",time:"11:49",text:"Requester confirmed access is restored. Resolving — no human touch needed. Noted for problem management: third MFA-device lockout this week, may warrant a how-to announcement."},
+      {av:"AI",name:"Trakolo AI agent",time:"11:47",text:"Identity verified via SSO challenge to the registered backup email. Sent a password reset link and re-enrolled MFA on the new device."},
+      {av:"AI",name:"Trakolo AI agent",time:"11:46",text:"Classified as Account security → password reset (confidence 0.97). Within the auto-resolve policy — handling it without queueing for an agent."},
+      {av:"SY",name:"System",time:"11:46",text:"Email received at support@acme.com — parsed by the email ingestion service and logged as a ticket. Requester sent the ticket ID by reply."}
+    ]},
+  "TS-4821": {subject:"VPN drops on hybrid laptops", requester:"D. Ferreira", priority:"crit", priorityLabel:"Urgent", category:"Network & wifi", source:"Portal", slaLabel:"18m left", slaPct:12, slaColor:"var(--coral)", assigneeAv:"RK", assignee:"Raj K.", status:"In progress", statusBadge:"neutral", escalation:null,
     activity:[{av:"RK",name:"Raj K.",time:"10m ago",text:"Reproduced on a test device — looks tied to an AP firmware update. Working with networking now."}]},
-  "TS-4819": {subject:"Shared drive permissions for Finance", requester:"L. Adeyemi", priority:"warn", priorityLabel:"High", category:"Software & access", slaLabel:"1h 40m", slaPct:38, slaColor:"var(--amber)", assigneeAv:"SM", assignee:"Sara M.", status:"In progress", statusBadge:"neutral", escalation:null,
+  "TS-4819": {subject:"Shared drive permissions for Finance", requester:"L. Adeyemi", priority:"warn", priorityLabel:"High", category:"Software & access", source:"Email · support@acme.com", slaLabel:"1h 40m", slaPct:38, slaColor:"var(--amber)", assigneeAv:"SM", assignee:"Sara M.", status:"In progress", statusBadge:"neutral", escalation:null,
     activity:[{av:"SM",name:"Sara M.",time:"25m ago",text:"Confirmed with Finance lead which folders need access — applying group changes now."}]},
-  "TS-4816": {subject:"Escalation: payroll SSO outage", requester:"Payroll team", priority:"crit", priorityLabel:"Urgent", category:"Account security", slaLabel:"7m left", slaPct:6, slaColor:"var(--coral)", assigneeAv:"L3", assignee:"L3 on-call", status:"Escalated", statusBadge:"crit", escalation:2,
+  "TS-4816": {subject:"Escalation: payroll SSO outage", requester:"Payroll team", priority:"crit", priorityLabel:"Urgent", category:"Account security", source:"Phone · IVR", slaLabel:"7m left", slaPct:6, slaColor:"var(--coral)", assigneeAv:"L3", assignee:"L3 on-call", status:"Escalated", statusBadge:"crit", escalation:2,
     activity:[
       {av:"SY",name:"System",time:"09:41",text:"Ticket escalated to L3 on-call after breaching the L2 response window."},
       {av:"SM",name:"Sara M.",time:"09:36",text:"Confirmed the SSO provider's status page shows a partial outage on their end. Escalating."},
       {av:"PT",name:"Payroll team",time:"09:21",text:"Nobody can log in to run this morning's payroll batch. Deadline is 11:00."}
     ]},
-  "TS-4812": {subject:"New starter laptop provisioning", requester:"People ops", priority:"neutral", priorityLabel:"Normal", category:"Hardware", slaLabel:"1d 4h", slaPct:70, slaColor:"var(--green)", assigneeAv:"—", assignee:"Unassigned", status:"Open", statusBadge:"neutral", escalation:null,
+  "TS-4812": {subject:"New starter laptop provisioning", requester:"People ops", priority:"neutral", priorityLabel:"Normal", category:"Hardware", source:"Portal", slaLabel:"1d 4h", slaPct:70, slaColor:"var(--green)", assigneeAv:"—", assignee:"Unassigned", status:"Open", statusBadge:"neutral", escalation:null,
     activity:[{av:"SY",name:"System",time:"1h ago",text:"Ticket logged and routed to IT Ops. Awaiting assignment."}]},
-  "TS-4809": {subject:"Printer offline, 3rd floor east", requester:"M. Alvarez", priority:"neutral", priorityLabel:"Low", category:"Hardware", slaLabel:"2d 1h", slaPct:82, slaColor:"var(--green)", assigneeAv:"RK", assignee:"Raj K.", status:"Open", statusBadge:"neutral", escalation:null,
+  "TS-4809": {subject:"Printer offline, 3rd floor east", requester:"M. Alvarez", priority:"neutral", priorityLabel:"Low", category:"Hardware", source:"Slack", slaLabel:"2d 1h", slaPct:82, slaColor:"var(--green)", assigneeAv:"RK", assignee:"Raj K.", status:"Open", statusBadge:"neutral", escalation:null,
     activity:[{av:"RK",name:"Raj K.",time:"3h ago",text:"Ordered a replacement toner cartridge, should arrive tomorrow."}]},
-  "TS-4830": {subject:"Use case: Bulk asset reassignment tool", requester:"IT Ops (self-service portal)", priority:"neutral", priorityLabel:"Normal", category:"Use case", slaLabel:"on track", slaPct:70, slaColor:"var(--indigo)", assigneeAv:"RK", assignee:"Raj K.", status:"Awaiting deployment window", statusBadge:"info", escalation:null,
+  "TS-4830": {subject:"Use case: Bulk asset reassignment tool", requester:"IT Ops (self-service portal)", priority:"neutral", priorityLabel:"Normal", category:"Use case", source:"Portal", slaLabel:"on track", slaPct:70, slaColor:"var(--indigo)", assigneeAv:"RK", assignee:"Raj K.", status:"Awaiting deployment window", statusBadge:"info", escalation:null,
     linked:[["Sprint card","DEV-1058 · Sprint 34","dev.html"],["GitHub PR","#482 merged","dev.html"],["Change request","CR-0091 · approved","desk.html"]],
     activity:[
       {av:"RK",name:"Raj K.",time:"Jul 18",text:"Change request CR-0091 opened to promote the build from PRE to PROD."},
@@ -93,14 +101,14 @@ const tickets = {
       {av:"SY",name:"System",time:"Jul 15",text:"Added to Sprint 34 backlog as DEV-1058, estimated 5 points."},
       {av:"SY",name:"System",time:"Jul 14",text:"Use case submitted via the self-service portal — routed to Product & Engineering."}
     ]},
-  "CR-0091": {subject:"Change request: Promote bulk asset reassignment tool from PRE to PROD", requester:"Raj K.", priority:"warn", priorityLabel:"High", category:"Change request", slaLabel:"Jul 20, 02:00 UTC", slaPct:70, slaColor:"var(--amber)", assigneeAv:"NP", assignee:"Nadia P. (manager)", status:"Approved", statusBadge:"ok", escalation:null,
+  "CR-0091": {subject:"Change request: Promote bulk asset reassignment tool from PRE to PROD", requester:"Raj K.", priority:"warn", priorityLabel:"High", category:"Change request", source:"Change management", slaLabel:"Jul 20, 02:00 UTC", slaPct:70, slaColor:"var(--amber)", assigneeAv:"NP", assignee:"Nadia P. (manager)", status:"Approved", statusBadge:"ok", escalation:null,
     linked:[["Use case ticket","TS-4830","desk.html"],["Sprint card","DEV-1058 · Sprint 34","dev.html"]],
     activity:[
       {av:"NP",name:"Nadia P.",time:"Jul 18",text:"Approved for the requested window: Jul 20, 02:00–03:00 UTC. Low risk, rollback plan on file."},
       {av:"RK",name:"Raj K.",time:"Jul 18",text:"Selected deployment window: Jul 20, 02:00–03:00 UTC — low-traffic slot for the PRE → PROD promotion."},
       {av:"RK",name:"Raj K.",time:"Jul 18",text:"Submitted after PR #482 merged and passed DEV, INT, and UAT. Risk: Low. Rollback: redeploy previous build, no schema changes."}
     ]},
-  "CR-0092": {subject:"Change request: Promote asset query optimization from PRE to PROD", requester:"Tomas K.", priority:"neutral", priorityLabel:"Normal", category:"Change request", slaLabel:"awaiting approval", slaPct:35, slaColor:"var(--amber)", assigneeAv:"NP", assignee:"Nadia P. (manager)", status:"Pending approval", statusBadge:"warn", escalation:null,
+  "CR-0092": {subject:"Change request: Promote asset query optimization from PRE to PROD", requester:"Tomas K.", priority:"neutral", priorityLabel:"Normal", category:"Change request", source:"Change management", slaLabel:"awaiting approval", slaPct:35, slaColor:"var(--amber)", assigneeAv:"NP", assignee:"Nadia P. (manager)", status:"Pending approval", statusBadge:"warn", escalation:null,
     linked:[["Sprint card","DEV-1063 · Sprint 34","dev.html"]],
     activity:[
       {av:"TK",name:"Tomas K.",time:"Jul 19",text:"Selected deployment window: Jul 22, 03:00–04:00 UTC — off-peak slot for the index migration."},
@@ -140,6 +148,7 @@ function openTicket(id){
     <table style="width:100%;font-size:13px;">
       <tr><td style="color:var(--ink-2);padding:6px 0;">Requester</td><td style="text-align:right;">${t.requester}</td></tr>
       <tr><td style="color:var(--ink-2);padding:6px 0;">Category</td><td style="text-align:right;">${t.category}</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Source</td><td style="text-align:right;">${t.source || "Portal"}</td></tr>
       <tr><td style="color:var(--ink-2);padding:6px 0;">Priority</td><td style="text-align:right;">${priorityBadge(t.priority)}</td></tr>
       <tr><td style="color:var(--ink-2);padding:6px 0;">Assignee</td><td style="text-align:right;">${t.assignee}</td></tr>
       <tr><td style="color:var(--ink-2);padding:6px 0;">Status</td><td style="text-align:right;"><span class="badge ${t.statusBadge}">${t.status}</span></td></tr>
