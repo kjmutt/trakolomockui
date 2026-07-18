@@ -22,6 +22,20 @@
   .doc-card code { background: var(--teal-50); color: var(--teal-800); padding: 2px 7px; border-radius: 5px; font-size: 13px; }
   .doc-card pre { background: var(--teal-900); color: #DFF3EA; padding: 16px 18px; border-radius: 10px; font-size: 13px; overflow-x: auto; margin-top: 10px; }
 
+  .doc-note { background: var(--teal-50); border: 1px solid var(--teal-100); border-radius: 10px; padding: 12px 16px; font-size: 13.5px; color: var(--teal-800); margin-bottom: 14px; }
+  .doc-note b { color: var(--teal-900); }
+  .doc-card table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+  .doc-card th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-faint); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  .doc-card td { padding: 9px 10px; border-bottom: 1px solid var(--line); color: var(--ink-soft); }
+  .doc-card td code, .doc-card td:first-child { color: var(--ink); }
+  .doc-card td.yes { color: var(--teal-600); font-weight: 600; }
+  .doc-card tr:last-child td { border-bottom: none; }
+  .doc-card ul.field-list { list-style: none; margin-top: 10px; }
+  .doc-card ul.field-list li { font-size: 13.5px; padding: 6px 0; border-bottom: 1px solid var(--line); display: flex; gap: 10px; }
+  .doc-card ul.field-list li:last-child { border-bottom: none; }
+  .doc-card ul.field-list .req { font-size: 10.5px; font-weight: 600; color: var(--teal-800); background: var(--teal-50); padding: 2px 7px; border-radius: 999px; flex-shrink: 0; height: fit-content; }
+  .doc-card ul.field-list .opt { font-size: 10.5px; font-weight: 600; color: var(--ink-faint); background: var(--line); padding: 2px 7px; border-radius: 999px; flex-shrink: 0; height: fit-content; }
+
   @media (max-width: 860px) {
     .docs-layout { grid-template-columns: 1fr; }
     .docs-nav { position: static; }
@@ -77,7 +91,12 @@
         <div class="group-title">Integrations</div>
         <a href="#slack">Slack &amp; Teams</a>
         <a href="#git">Git integration</a>
+      </div>
+      <div class="group">
+        <div class="group-title">API &amp; bulk data</div>
+        <a href="#api-access">Getting API access</a>
         <a href="#api">API reference</a>
+        <a href="#bulk-assets">Bulk upload &amp; update assets</a>
       </div>
     </div>
 
@@ -96,13 +115,8 @@
 
       <div class="doc-card" id="import">
         <h3>Importing assets</h3>
-        <p>Bring your existing asset spreadsheet in with a guided CSV import.</p>
-        <pre>POST /v1/assets/import
-Content-Type: text/csv
-
-name,type,owner,license_expiry
-MacBook Pro 14",hardware,jane@company.com,
-Figma Team License,software,design-team@company.com,2027-03-01</pre>
+        <p>Moving off Jira, ServiceNow, Zendesk, Freshdesk, Trello, or a spreadsheet? The guided migration wizard maps fields for you, runs as a background job, and shows a completed/skipped/error count when it's done — no API key needed, it runs from inside your workspace.</p>
+        <p>Open <code>Admin → Integrations → Data migration</code> to pick a source and run a one-time import. For ongoing bulk uploads and updates to assets already in Trakolo, see <a href="#bulk-assets" style="color:var(--teal-800); font-weight:600;">Bulk upload &amp; update assets</a> below.</p>
       </div>
 
       <div class="doc-card" id="tickets">
@@ -130,11 +144,63 @@ Figma Team License,software,design-team@company.com,2027-03-01</pre>
         <p>Connect a GitHub or GitLab repo to link commits and pull requests to tickets automatically when a branch name includes the ticket ID.</p>
       </div>
 
-      <div class="doc-card" id="api">
-        <h3>API reference</h3>
-        <p>Full REST API for tickets, assets, and boards. Authenticate with a workspace API key.</p>
+      <div class="doc-card" id="api-access">
+        <h3>Getting API access</h3>
+        <div class="doc-note"><b>Do you need to be a customer?</b> Yes. The API is workspace-scoped — every request runs as a specific workspace, so there's no public or anonymous access. Sign up for a workspace first, then generate a key from inside it.</div>
+        <p>The REST API is included on the <b>Team plan and above</b> (not available on Free). One workspace can issue multiple keys — for example, one per integration you build.</p>
+        <p>1. Sign in as a workspace admin.<br>2. Go to <code>Settings → Integrations → API keys → Generate key</code>.<br>3. Name the key (e.g. "Reporting export") and choose its scope — <code>read-only</code> or <code>read-write</code>.<br>4. Copy the key immediately — the full value is only shown once.</p>
+        <p>Every request needs the key in the <code>Authorization</code> header, and is rejected with <code>401 Unauthorized</code> without it:</p>
         <pre>GET /v1/tickets?status=open
 Authorization: Bearer YOUR_API_KEY</pre>
+        <table>
+          <tr><th>Plan</th><th>API access</th><th>Rate limit</th></tr>
+          <tr><td>Free</td><td>Not available</td><td>—</td></tr>
+          <tr><td>Team</td><td class="yes">Included</td><td>300 req/min per workspace</td></tr>
+          <tr><td>Business</td><td class="yes">Included</td><td>600 req/min per workspace</td></tr>
+          <tr><td>Enterprise</td><td class="yes">Included</td><td>Custom, negotiated</td></tr>
+        </table>
+        <p>Requests over the limit get a <code>429 Too Many Requests</code> with a <code>Retry-After</code> header. Keys can be revoked instantly from the same settings page — revoked keys fail closed within seconds.</p>
+      </div>
+
+      <div class="doc-card" id="api">
+        <h3>API reference</h3>
+        <p>Full REST API for tickets, assets, boards, and reporting, plus the bulk endpoints documented below. All endpoints are relative to <code>https://api.trakolo.com</code> and return JSON.</p>
+        <table>
+          <tr><th>Method &amp; path</th><th>Description</th></tr>
+          <tr><td><code>GET /v1/tickets</code></td><td>List tickets, filterable by status, priority, category</td></tr>
+          <tr><td><code>POST /v1/tickets</code></td><td>Create a ticket</td></tr>
+          <tr><td><code>GET /v1/assets</code></td><td>List assets, filterable by type, owner, status</td></tr>
+          <tr><td><code>POST /v1/assets/bulk</code></td><td>Bulk create/update assets — see below</td></tr>
+          <tr><td><code>GET /v1/assets/bulk/:job_id</code></td><td>Check the status of a bulk job</td></tr>
+          <tr><td><code>GET /v1/boards/:id/cards</code></td><td>List cards on a sprint or kanban board</td></tr>
+          <tr><td><code>POST /v1/webhooks</code></td><td>Register a webhook for ticket, asset, or board events</td></tr>
+        </table>
+      </div>
+
+      <div class="doc-card" id="bulk-assets">
+        <h3>Bulk upload &amp; update assets</h3>
+        <p>Once you're past the initial migration, day-to-day fleet changes (a new laptop batch, a mass license renewal, a re-org that moves owners) go through the same bulk endpoint — either from the UI or the API. Both use the exact same file format, so a template built for one works for the other.</p>
+        <p><b>From the UI:</b> <code>SAM → Asset inventory → Bulk upload</code> — download the CSV template, fill it in, and drag it back in. You get a preview of what will be created vs. updated before anything is saved.</p>
+        <p><b>From the API:</b></p>
+        <pre>POST /v1/assets/bulk
+Authorization: Bearer YOUR_API_KEY
+Content-Type: text/csv
+
+asset_tag,name,type,category,owner_email,purchase_date,license_expiry,cost_center
+AST-2041,MacBook Pro 14" M4,hardware,laptop,jane@company.com,2026-06-01,,ENG-100
+AST-1187,Figma Team License,software,saas,design-team@company.com,,2027-03-01,DES-200</pre>
+        <p>The response is <code>202 Accepted</code> with a job id — bulk jobs run async, the same way the migration wizard does:</p>
+        <pre>{ "job_id": "blk_8f21ac", "status": "processing", "rows_received": 2 }
+
+GET /v1/assets/bulk/blk_8f21ac
+{ "status": "completed", "created": 1, "updated": 1, "skipped": 0, "errors": [] }</pre>
+        <p>How the system decides create vs. update, and what it requires:</p>
+        <ul class="field-list">
+          <li><span class="req">required</span> <span><code>asset_tag</code> — the upsert key. A matching existing tag updates that asset; no match creates a new one. This is the only column the system uses to decide create-vs-update.</span></li>
+          <li><span class="req">required</span> <span><code>name</code>, <code>type</code> — <code>type</code> must be one of <code>hardware</code>, <code>software</code>, <code>saas</code></span></li>
+          <li><span class="opt">optional</span> <span><code>category</code>, <code>owner_email</code>, <code>purchase_date</code>, <code>license_expiry</code> (ISO <code>YYYY-MM-DD</code>), <code>cost_center</code> — blank on an update leaves the existing value untouched, it does not clear it</span></li>
+        </ul>
+        <p>Limits: 10,000 rows or 15MB per file, whichever comes first — split larger exports into multiple calls. <code>owner_email</code> must match a user already in the workspace or the row is rejected (shown in the job's <code>errors</code> array with a row number and reason), not silently dropped.</p>
       </div>
     </div>
   </div>

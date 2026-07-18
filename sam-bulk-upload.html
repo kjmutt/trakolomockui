@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — bulk upload assets</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .drop-zone{border:2px dashed var(--border-strong);border-radius:var(--r-md);padding:28px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;}
+  .drop-zone:hover{border-color:var(--indigo);background:var(--indigo-bg);}
+  .drop-zone .dz-icon{font-size:24px;margin-bottom:8px;}
+  .drop-zone .dz-name{font-size:12.5px;color:var(--ink-muted);margin-top:6px;}
+  .prev-table{width:100%;font-size:12.5px;}
+  .prev-table th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-muted);font-family:var(--font-mono);font-weight:500;padding:8px 10px;border-bottom:1px solid var(--border);}
+  .prev-table td{padding:8px 10px;border-bottom:1px solid var(--border);}
+  .prev-table tr:last-child td{border-bottom:none;}
+  .trail{display:flex;flex-direction:column;gap:10px;margin-top:18px;}
+  .trail-step{display:flex;gap:11px;align-items:flex-start;font-size:13px;opacity:0;animation:stepIn .25s ease forwards;}
+  @keyframes stepIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+  .trail-step .si{width:20px;height:20px;border-radius:50%;background:var(--indigo-bg);color:var(--indigo-text);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:11px;}
+  .trail-step .st{color:var(--ink-2);}
+  .result-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;}
+  .field-note{font-size:12px;color:var(--ink-muted);margin-top:8px;}
+  .field-note code{background:var(--surface-2);padding:1px 5px;border-radius:4px;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a class="active" href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+
+<div class="wrap" style="max-width:900px;">
+  <div class="page-head">
+    <div><div class="page-title">Bulk upload assets</div><div class="page-desc">Create or update many assets at once — the same format the <code>POST /v1/assets/bulk</code> API endpoint accepts.</div></div>
+    <a href="sam.html" class="btn">← Back to Asset inventory</a>
+  </div>
+
+  <div class="card">
+    <div class="section-label">1. Download the template</div>
+    <p class="page-desc" style="margin:-4px 0 12px;">One column decides everything: <b>asset_tag</b>. A row whose tag matches an existing asset updates it — no match creates a new one.</p>
+    <a class="btn" download="asset_bulk_template.csv" href="data:text/csv;charset=utf-8,asset_tag%2Cname%2Ctype%2Ccategory%2Cowner_email%2Cpurchase_date%2Clicense_expiry%2Ccost_center%0AAST-2041%2CMacBook%20Pro%2014%22%20M4%2Chardware%2Claptop%2Cjane%40company.com%2C2026-06-01%2C%2CENG-100%0AAST-1187%2CFigma%20Team%20License%2Csoftware%2Csaas%2Cdesign-team%40company.com%2C%2C2027-03-01%2CDES-200">Download CSV template</a>
+    <div class="field-note">Required: <code>asset_tag</code>, <code>name</code>, <code>type</code> (<code>hardware</code> / <code>software</code> / <code>saas</code>). Optional columns left blank on an update keep their current value — they don't get cleared.</div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">2. Upload your file</div>
+    <div class="drop-zone" id="drop-zone" onclick="selectFile()">
+      <div class="dz-icon">⬆</div>
+      <div>Click to choose a CSV file, or drag one here</div>
+      <div class="dz-name" id="dz-name">No file selected</div>
+    </div>
+    <input type="file" id="file-input" accept=".csv" style="display:none;" onchange="onFileChosen(event)">
+  </div>
+
+  <div class="card" id="preview-card" style="display:none;">
+    <div class="section-label">3. Preview — before anything is saved</div>
+    <table class="prev-table">
+      <thead><tr><th>Row</th><th>Asset tag</th><th>Name</th><th>Owner email</th><th>Action</th></tr></thead>
+      <tbody id="preview-body"></tbody>
+    </table>
+  </div>
+
+  <div class="card" id="run-card" style="display:none;">
+    <div class="section-label">4. Run bulk upload</div>
+    <div class="row-line"><div><div class="rname">Notify asset owners</div><div class="rdesc">Email the owner on record when their asset is created or reassigned</div></div><div class="switch" id="notify-switch"></div></div>
+    <button class="btn primary" id="run-btn" style="margin-top:16px;" onclick="runBulkUpload()">Run bulk upload</button>
+
+    <div class="trail" id="trail"></div>
+    <div id="result" style="display:none;">
+      <div class="result-strip">
+        <div class="mcard ok"><div class="mlabel">Created</div><div class="mval" id="res-created">0</div><div class="mdelta">new assets</div></div>
+        <div class="mcard info"><div class="mlabel">Updated</div><div class="mval" id="res-updated">0</div><div class="mdelta">matched by tag</div></div>
+        <div class="mcard crit"><div class="mlabel">Errors</div><div class="mval" id="res-errors">0</div><div class="mdelta">needs review</div></div>
+        <div class="mcard warn"><div class="mlabel">Duration</div><div class="mval" id="res-duration">0s</div><div class="mdelta">end to end</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Bulk upload history</div>
+    <div class="panel" style="box-shadow:none;">
+      <table>
+        <thead><tr><th>File</th><th>Created</th><th>Updated</th><th>Errors</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody id="history">
+          <tr><td>q3-laptop-refresh.csv</td><td class="id-mono">42</td><td class="id-mono">0</td><td class="id-mono">0</td><td><span class="badge ok">Completed</span></td><td class="id-mono">Jul 9</td></tr>
+          <tr><td>license-renewal-batch.csv</td><td class="id-mono">0</td><td class="id-mono">88</td><td class="id-mono">1</td><td><span class="badge warn">Completed with errors</span></td><td class="id-mono">Jun 28</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.switch').forEach(s => s.addEventListener('click', () => s.classList.toggle('on')));
+
+const sampleRows = [
+  { tag: 'AST-2041', name: 'MacBook Pro 14" M4', owner: 'jane@company.com', action: 'create' },
+  { tag: 'AST-1187', name: 'Figma Team License', owner: 'design-team@company.com', action: 'update' },
+  { tag: 'AST-0932', name: 'Dell Latitude 7440', owner: 'raj.k@company.com', action: 'update' },
+  { tag: 'AST-2077', name: 'Adobe Creative Cloud', owner: 'marketing@company.com', action: 'create' },
+  { tag: 'AST-0410', name: 'Standing desk', owner: 'unknown@company.com', action: 'error' }
+];
+
+function selectFile(){ document.getElementById('file-input').click(); }
+
+function onFileChosen(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  document.getElementById('dz-name').textContent = file.name;
+
+  const body = document.getElementById('preview-body');
+  body.innerHTML = sampleRows.map((r,i) => {
+    const badge = r.action === 'create' ? '<span class="badge info">Create</span>'
+      : r.action === 'update' ? '<span class="badge ok">Update</span>'
+      : '<span class="badge crit">Error — owner not found</span>';
+    return `<tr><td class="id-mono">${i+1}</td><td class="id-mono">${r.tag}</td><td>${r.name}</td><td>${r.owner}</td><td>${badge}</td></tr>`;
+  }).join('');
+
+  document.getElementById('preview-card').style.display = 'block';
+  document.getElementById('run-card').style.display = 'block';
+}
+
+function runBulkUpload(){
+  const btn = document.getElementById('run-btn');
+  btn.disabled = true; btn.style.opacity = .6;
+  const trail = document.getElementById('trail');
+  const result = document.getElementById('result');
+  trail.innerHTML = ''; result.style.display = 'none';
+
+  const created = sampleRows.filter(r => r.action === 'create').length;
+  const updated = sampleRows.filter(r => r.action === 'update').length;
+  const errors = sampleRows.filter(r => r.action === 'error').length;
+
+  const steps = [
+    `Validating ${sampleRows.length} rows against the asset schema…`,
+    `Matching rows to existing assets by asset_tag…`,
+    `Creating ${created} new asset(s)…`,
+    `Updating ${updated} existing asset(s)…`,
+    errors ? `${errors} row(s) failed — owner email not found in this workspace.` : `All rows validated cleanly.`,
+    `Bulk upload complete.`
+  ];
+
+  let i = 0;
+  const start = Date.now();
+  function next(){
+    if(i >= steps.length){
+      const duration = ((Date.now() - start) / 1000).toFixed(1);
+      document.getElementById('res-created').textContent = created;
+      document.getElementById('res-updated').textContent = updated;
+      document.getElementById('res-errors').textContent = errors;
+      document.getElementById('res-duration').textContent = duration + 's';
+      result.style.display = 'block';
+      const hist = document.getElementById('history');
+      const statusBadge = errors ? '<span class="badge warn">Completed with errors</span>' : '<span class="badge ok">Completed</span>';
+      const fname = document.getElementById('dz-name').textContent;
+      hist.insertAdjacentHTML('afterbegin', `<tr><td>${fname}</td><td class="id-mono">${created}</td><td class="id-mono">${updated}</td><td class="id-mono">${errors}</td><td>${statusBadge}</td><td class="id-mono">Just now</td></tr>`);
+      btn.disabled = false; btn.style.opacity = 1;
+      return;
+    }
+    const el = document.createElement('div');
+    el.className = 'trail-step';
+    el.innerHTML = `<div class="si">✓</div><div class="st">${steps[i]}</div>`;
+    trail.appendChild(el);
+    i++;
+    setTimeout(next, 500);
+  }
+  next();
+}
+</script>
+</body>
+</html>
