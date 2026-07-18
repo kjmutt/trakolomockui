@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — customer plans &amp; entitlements</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .plat-wrap{max-width:1080px;margin:0 auto;padding:32px 40px 60px;}
+  .cust-card{background:#151F1B;border:1px solid #26362F;border-radius:14px;padding:20px 22px;margin-bottom:16px;}
+  .cust-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:6px;}
+  .cust-name{font-family:var(--font-display);font-size:16px;font-weight:700;color:#fff;}
+  .cust-meta{font-size:12px;color:#8FA79C;margin-top:3px;font-family:var(--font-mono);}
+  .plan-pill{font-size:11px;font-weight:600;padding:4px 11px;border-radius:20px;background:#1B2E27;color:#5DCAA5;border:1px solid #2E4A3E;white-space:nowrap;}
+  .plan-pill.onprem{background:#2A2338;color:#B9A8ED;border-color:#453A61;}
+  .ent-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 32px;margin-top:12px;}
+  .ent-col-label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:#7C948A;font-family:var(--font-mono);font-weight:600;padding:8px 0 4px;border-bottom:1px solid #26362F;}
+  .ent-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #1E2B25;gap:12px;}
+  .ent-row:last-child{border-bottom:none;}
+  .ent-name{font-size:12.5px;color:#D6E4DE;}
+  .ent-note{font-size:11px;color:#7C948A;margin-top:1px;}
+  .cust-card .switch{background:#26362F;}
+  .cust-card .switch.on{background:#1D9E75;}
+  .cust-card .switch.locked{opacity:.45;cursor:not-allowed;}
+  .lic-badge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:6px;background:#332B1A;color:#DDA234;border:1px solid #52431F;}
+  .save-bar{position:sticky;bottom:0;background:#0E1613;border-top:1px solid #223028;margin:0 -40px;padding:12px 40px;display:none;justify-content:space-between;align-items:center;}
+  .save-bar.show{display:flex;}
+  .save-bar .msg{font-size:12.5px;color:#8FA79C;}
+  @media (max-width:800px){.ent-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body class="platform-body">
+<div class="platform-header">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#1B2E27" stroke="#5DCAA5" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#5DCAA5" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5"/><circle cx="100" cy="100" r="16" fill="#5DCAA5"/><circle cx="150" cy="50" r="21" fill="#5DCAA5"/></svg>
+    <span class="brand-name">Trakolo</span>
+    <span class="plat-tag">Platform</span>
+  </a>
+  <div class="top-right"><a href="saas-admin-login.html">Sign out</a></div>
+</div>
+<div style="display:flex;gap:22px;padding:0 40px;background:#0E1613;border-bottom:1px solid #223028;">
+  <a href="saas-admin-console.html" style="font-size:13px;color:#8FA79C;text-decoration:none;padding:11px 0;border-bottom:2px solid transparent;">Tenant workspaces</a>
+  <a href="saas-admin-services.html" style="font-size:13px;color:#8FA79C;text-decoration:none;padding:11px 0;border-bottom:2px solid transparent;">Services</a>
+  <a href="saas-admin-plans.html" style="font-size:13px;color:#fff;text-decoration:none;padding:11px 0;border-bottom:2px solid #5DCAA5;font-weight:500;">Plans &amp; entitlements</a>
+</div>
+
+<div class="plat-wrap">
+  <div style="margin-bottom:22px;">
+    <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;">Customer plans &amp; entitlements</div>
+    <div style="font-size:13px;color:#8FA79C;margin-top:4px;max-width:720px;">What each customer bought, and which features their workspace can see. Toggling here changes what that tenant's admins get on their next page load — every change is written to the platform audit log. On-premise customers are governed by their license file, not these switches.</div>
+  </div>
+
+  <div class="cust-card">
+    <div class="cust-head">
+      <div><div class="cust-name">Org1 — Acme Corp</div><div class="cust-meta">Cloud · us-east · 84 seats · customer since Mar 2026</div></div>
+      <span class="plan-pill">Team plan</span>
+    </div>
+    <div class="ent-grid">
+      <div>
+        <div class="ent-col-label">Products bought</div>
+        <div class="ent-row"><div><div class="ent-name">Service desk (ITSM)</div><div class="ent-note">Incl. change management</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Asset management (SAM)</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Dev boards &amp; sprints</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Reporting &amp; compliance</div><div class="ent-note">Business-tier feature, granted on Team as a trial</div></div><div class="switch on"></div></div>
+      </div>
+      <div>
+        <div class="ent-col-label">Feature flags</div>
+        <div class="ent-row"><div><div class="ent-name">AI agent (triage + auto-resolve)</div><div class="ent-note">Paid add-on · active</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">REST API &amp; bulk upload</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Data migration wizard</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Sandbox workspace</div><div class="ent-note">Not purchased</div></div><div class="switch"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cust-card">
+    <div class="cust-head">
+      <div><div class="cust-name">Org2 — Northwind Traders</div><div class="cust-meta">Cloud · eu-west · 412 seats · customer since Nov 2025</div></div>
+      <span class="plan-pill">Enterprise plan</span>
+    </div>
+    <div class="ent-grid">
+      <div>
+        <div class="ent-col-label">Products bought</div>
+        <div class="ent-row"><div><div class="ent-name">Service desk (ITSM)</div><div class="ent-note">Incl. change management</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Asset management (SAM)</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Dev boards &amp; sprints</div><div class="ent-note">Not bought — they use a separate tool</div></div><div class="switch"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Reporting &amp; compliance</div></div><div class="switch on"></div></div>
+      </div>
+      <div>
+        <div class="ent-col-label">Feature flags</div>
+        <div class="ent-row"><div><div class="ent-name">AI agent (triage + auto-resolve)</div><div class="ent-note">Included in Enterprise</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">REST API &amp; bulk upload</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Data migration wizard</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">SSO &amp; SCIM</div></div><div class="switch on"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cust-card">
+    <div class="cust-head">
+      <div><div class="cust-name">Org3 — Globex Industries</div><div class="cust-meta">On-premise · self-hosted · 1,204 seats · perpetual license</div></div>
+      <span class="plan-pill onprem">Standalone / On-premise</span>
+    </div>
+    <div class="ent-grid">
+      <div>
+        <div class="ent-col-label">Products bought — set by their .trklic license file</div>
+        <div class="ent-row"><div><div class="ent-name">Service desk (ITSM)</div></div><span class="lic-badge">In license</span></div>
+        <div class="ent-row"><div><div class="ent-name">Asset management (SAM)</div></div><span class="lic-badge">In license</span></div>
+        <div class="ent-row"><div><div class="ent-name">Dev boards &amp; sprints</div></div><span class="lic-badge">In license</span></div>
+        <div class="ent-row"><div><div class="ent-name">Reporting &amp; compliance</div></div><span class="lic-badge">In license</span></div>
+      </div>
+      <div>
+        <div class="ent-col-label">Feature flags — issue a new license to change</div>
+        <div class="ent-row"><div><div class="ent-name">AI agent (triage + auto-resolve)</div><div class="ent-note">Not in their license</div></div><div class="switch locked"></div></div>
+        <div class="ent-row"><div><div class="ent-name">REST API &amp; bulk upload</div></div><span class="lic-badge">In license</span></div>
+        <div class="ent-row"><div><div class="ent-name">Support &amp; upgrades plan</div><div class="ent-note">Renews Jan 2027</div></div><span class="lic-badge">Active</span></div>
+        <div class="ent-row"><div><div class="ent-name">Issue replacement license</div><div class="ent-note">Seats, modules, or support-date change</div></div><button class="btn sm" style="background:#1B2E27;border-color:#2E4A3E;color:#5DCAA5;">Generate .trklic</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cust-card">
+    <div class="cust-head">
+      <div><div class="cust-name">Initech</div><div class="cust-meta">Cloud · us-east · 18 seats · customer since Jun 2026</div></div>
+      <span class="plan-pill" style="background:#26362F;color:#8FA79C;border-color:#37473F;">Free plan</span>
+    </div>
+    <div class="ent-grid">
+      <div>
+        <div class="ent-col-label">Products bought</div>
+        <div class="ent-row"><div><div class="ent-name">Service desk (ITSM)</div><div class="ent-note">Free tier — portal + email channels only</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Asset management (SAM)</div><div class="ent-note">Not on Free — upgrade prompt shown in their admin</div></div><div class="switch"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Dev boards &amp; sprints</div><div class="ent-note">Basic kanban only on Free</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Reporting &amp; compliance</div></div><div class="switch"></div></div>
+      </div>
+      <div>
+        <div class="ent-col-label">Feature flags</div>
+        <div class="ent-row"><div><div class="ent-name">AI agent (triage + auto-resolve)</div></div><div class="switch"></div></div>
+        <div class="ent-row"><div><div class="ent-name">REST API &amp; bulk upload</div></div><div class="switch"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Data migration wizard</div><div class="ent-note">Free on every plan — helps them move in</div></div><div class="switch on"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cust-card">
+    <div class="cust-head">
+      <div><div class="cust-name">Umbrella Group</div><div class="cust-meta">On-premise · self-hosted · 2,880 seats · perpetual license</div></div>
+      <span class="plan-pill onprem">Standalone / On-premise</span>
+    </div>
+    <div class="ent-grid">
+      <div>
+        <div class="ent-col-label">Products bought — set by their .trklic license file</div>
+        <div class="ent-row"><div><div class="ent-name">Service desk (ITSM)</div></div><span class="lic-badge">In license</span></div>
+        <div class="ent-row"><div><div class="ent-name">Asset management (SAM)</div></div><span class="lic-badge">In license</span></div>
+        <div class="ent-row"><div><div class="ent-name">Dev boards &amp; sprints</div></div><span class="lic-badge">In license</span></div>
+        <div class="ent-row"><div><div class="ent-name">Reporting &amp; compliance</div></div><span class="lic-badge">In license</span></div>
+      </div>
+      <div>
+        <div class="ent-col-label">Feature flags — issue a new license to change</div>
+        <div class="ent-row"><div><div class="ent-name">AI agent (triage + auto-resolve)</div></div><span class="lic-badge">In license</span></div>
+        <div class="ent-row"><div><div class="ent-name">Support &amp; upgrades plan</div><div class="ent-note">Expires in 6 days — renewal quote sent</div></div><span class="lic-badge" style="background:#3A2018;color:#E07A5A;border-color:#5C3327;">Expiring</span></div>
+        <div class="ent-row"><div><div class="ent-name">Issue replacement license</div><div class="ent-note">Renewal extends the support date</div></div><button class="btn sm" style="background:#1B2E27;border-color:#2E4A3E;color:#5DCAA5;">Generate .trklic</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="save-bar" id="save-bar">
+    <span class="msg" id="save-msg">Unsaved entitlement changes</span>
+    <div style="display:flex;gap:10px;">
+      <button class="btn sm" style="background:transparent;border-color:#37473F;color:#8FA79C;" onclick="discardChanges()">Discard</button>
+      <button class="btn sm primary" style="background:#1D9E75;border-color:#1D9E75;" onclick="applyChanges()">Apply to tenant</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let dirty = 0;
+document.querySelectorAll('.cust-card .switch').forEach(s => {
+  s.addEventListener('click', () => {
+    if(s.classList.contains('locked')) return;
+    s.classList.toggle('on');
+    dirty++;
+    document.getElementById('save-msg').textContent = dirty + ' unsaved entitlement change' + (dirty>1?'s':'');
+    document.getElementById('save-bar').classList.add('show');
+  });
+});
+function applyChanges(){
+  const bar = document.getElementById('save-bar');
+  document.getElementById('save-msg').textContent = 'Applied — tenant picks this up on next page load. Logged to the platform audit trail.';
+  setTimeout(() => { bar.classList.remove('show'); dirty = 0; }, 2200);
+}
+function discardChanges(){
+  location.reload();
+}
+</script>
+</body>
+</html>
