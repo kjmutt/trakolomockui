@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — data migration</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .src-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .src-opt{border:1px solid var(--border);border-radius:var(--r-md);padding:14px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:border-color .15s,background .15s;}
+  .src-opt:hover{background:var(--surface-2);}
+  .src-opt.selected{border-color:var(--indigo);background:var(--indigo-bg);}
+  .src-opt .src-icon{width:30px;height:30px;border-radius:8px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:12px;color:var(--ink-2);flex-shrink:0;}
+  .src-opt.selected .src-icon{background:var(--surface);color:var(--indigo-text);}
+  .src-name{font-size:13px;font-weight:600;}
+  .src-meta{font-size:11px;color:var(--ink-muted);margin-top:1px;}
+  .type-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+  .type-row:last-child{border-bottom:none;}
+  .type-row input{width:auto;}
+  .map-table{width:100%;font-size:12.5px;}
+  .map-table th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-muted);font-family:var(--font-mono);font-weight:500;padding:8px 10px;border-bottom:1px solid var(--border);}
+  .map-table td{padding:8px 10px;border-bottom:1px solid var(--border);}
+  .map-table tr:last-child td{border-bottom:none;}
+  .map-arrow{color:var(--ink-muted);text-align:center;width:30px;}
+  .trail{display:flex;flex-direction:column;gap:10px;margin-top:18px;}
+  .trail-step{display:flex;gap:11px;align-items:flex-start;font-size:13px;opacity:0;animation:stepIn .25s ease forwards;}
+  @keyframes stepIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+  .trail-step .si{width:20px;height:20px;border-radius:50%;background:var(--indigo-bg);color:var(--indigo-text);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:11px;}
+  .trail-step .st{color:var(--ink-2);}
+  .result-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a class="active" href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+
+<div class="wrap" style="max-width:900px;">
+  <div class="page-head">
+    <div><div class="page-title">Data migration</div><div class="page-desc">Port tickets, assets, and backlog items from another system into Trakolo.</div></div>
+    <a href="admin.html" class="btn">← Back to Integrations</a>
+  </div>
+
+  <div class="card">
+    <div class="section-label">1. Choose a source</div>
+    <div class="src-grid" id="src-grid">
+      <div class="src-opt selected" data-src="Jira" data-count="286">
+        <div class="src-icon">JI</div>
+        <div><div class="src-name">Jira</div><div class="src-meta">Issues &amp; backlog</div></div>
+      </div>
+      <div class="src-opt" data-src="ServiceNow" data-count="512">
+        <div class="src-icon">SN</div>
+        <div><div class="src-name">ServiceNow</div><div class="src-meta">Incidents &amp; changes</div></div>
+      </div>
+      <div class="src-opt" data-src="Zendesk" data-count="194">
+        <div class="src-icon">ZD</div>
+        <div><div class="src-name">Zendesk</div><div class="src-meta">Tickets</div></div>
+      </div>
+      <div class="src-opt" data-src="Freshdesk" data-count="167">
+        <div class="src-icon">FD</div>
+        <div><div class="src-name">Freshdesk</div><div class="src-meta">Tickets</div></div>
+      </div>
+      <div class="src-opt" data-src="Trello" data-count="88">
+        <div class="src-icon">TR</div>
+        <div><div class="src-name">Trello</div><div class="src-meta">Boards &amp; cards</div></div>
+      </div>
+      <div class="src-opt" data-src="CSV file" data-count="—">
+        <div class="src-icon">CSV</div>
+        <div><div class="src-name">CSV file</div><div class="src-meta">Any exported spreadsheet</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">2. What to import</div>
+    <label class="type-row"><input type="checkbox" id="type-tickets" checked><span>Tickets &amp; requests → Service desk</span></label>
+    <label class="type-row"><input type="checkbox" id="type-assets"><span>Assets &amp; licenses → SAM</span></label>
+    <label class="type-row"><input type="checkbox" id="type-backlog" checked><span>Backlog items &amp; boards → Dev</span></label>
+    <label class="type-row"><input type="checkbox" id="type-users"><span>Users &amp; groups → Admin</span></label>
+  </div>
+
+  <div class="card">
+    <div class="section-label">3. Field mapping</div>
+    <div class="page-desc" style="margin:-6px 0 14px;">Auto-detected from <span id="map-source-name">Jira</span>. Review before importing — this only maps common fields, anything unmatched lands in a custom field.</div>
+    <table class="map-table">
+      <thead><tr><th id="map-source-col">Jira field</th><th></th><th>Trakolo field</th></tr></thead>
+      <tbody id="map-body"></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="section-label">4. Run migration</div>
+    <div class="row-line"><div><div class="rname">Skip duplicates</div><div class="rdesc">Matches on external ID, won't create the same record twice</div></div><div class="switch on" id="dup-switch"></div></div>
+    <div class="row-line"><div><div class="rname">Notify requesters of imported tickets</div><div class="rdesc">Otherwise imported silently, no emails sent</div></div><div class="switch" id="notify-switch"></div></div>
+    <button class="btn primary" id="run-btn" style="margin-top:16px;" onclick="runMigration()">Start import from <span id="run-source-name">Jira</span></button>
+
+    <div class="trail" id="trail"></div>
+    <div id="result" style="display:none;">
+      <div class="result-strip">
+        <div class="mcard ok"><div class="mlabel">Imported</div><div class="mval" id="res-imported">0</div><div class="mdelta">new records</div></div>
+        <div class="mcard warn"><div class="mlabel">Skipped</div><div class="mval" id="res-skipped">0</div><div class="mdelta">duplicates</div></div>
+        <div class="mcard crit"><div class="mlabel">Errors</div><div class="mval" id="res-errors">0</div><div class="mdelta">needs review</div></div>
+        <div class="mcard info"><div class="mlabel">Duration</div><div class="mval" id="res-duration">0s</div><div class="mdelta">end to end</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Import history</div>
+    <div class="panel" style="box-shadow:none;">
+      <table>
+        <thead><tr><th>Source</th><th>Imported</th><th>Skipped</th><th>Errors</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody id="history">
+          <tr><td>Jira</td><td class="id-mono">204</td><td class="id-mono">12</td><td class="id-mono">0</td><td><span class="badge ok">Completed</span></td><td class="id-mono">Jul 3</td></tr>
+          <tr><td>CSV file</td><td class="id-mono">58</td><td class="id-mono">0</td><td class="id-mono">2</td><td><span class="badge warn">Completed with errors</span></td><td class="id-mono">Jun 21</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const fieldMaps = {
+  "Jira": [["Summary","Subject"],["Issue type","Category"],["Priority","Priority"],["Assignee","Assignee"],["Status","Status"],["Reporter","Requester"],["Created","Created date"]],
+  "ServiceNow": [["Short description","Subject"],["Category","Category"],["Urgency","Priority"],["Assigned to","Assignee"],["State","Status"],["Caller","Requester"],["Opened","Created date"]],
+  "Zendesk": [["Subject","Subject"],["Type","Category"],["Priority","Priority"],["Assignee","Assignee"],["Status","Status"],["Requester","Requester"],["Created at","Created date"]],
+  "Freshdesk": [["Subject","Subject"],["Type","Category"],["Priority","Priority"],["Responder","Assignee"],["Status","Status"],["Requester","Requester"],["Created time","Created date"]],
+  "Trello": [["Card name","Subject"],["List","Status"],["Label","Category"],["Member","Assignee"],["Created","Created date"]],
+  "CSV file": [["Column A","Subject"],["Column B","Category"],["Column C","Priority"],["Column D","Assignee"],["Column E","Status"]]
+};
+
+let selectedSrc = "Jira";
+let selectedCount = 286;
+
+function renderMapping(){
+  document.getElementById('map-source-name').textContent = selectedSrc;
+  document.getElementById('map-source-col').textContent = selectedSrc + " field";
+  document.getElementById('run-source-name').textContent = selectedSrc;
+  document.getElementById('map-body').innerHTML = fieldMaps[selectedSrc].map(([a,b]) =>
+    `<tr><td class="id-mono">${a}</td><td class="map-arrow">→</td><td>${b}</td></tr>`).join('');
+}
+
+document.querySelectorAll('.src-opt').forEach(opt => {
+  opt.addEventListener('click', () => {
+    document.querySelectorAll('.src-opt').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+    selectedSrc = opt.dataset.src;
+    selectedCount = opt.dataset.count === "—" ? 40 + Math.floor(Math.random()*60) : parseInt(opt.dataset.count);
+    renderMapping();
+  });
+});
+document.querySelectorAll('.switch').forEach(s => s.addEventListener('click', () => s.classList.toggle('on')));
+
+function runMigration(){
+  const btn = document.getElementById('run-btn');
+  btn.disabled = true; btn.style.opacity = .6;
+  const trail = document.getElementById('trail');
+  const result = document.getElementById('result');
+  trail.innerHTML = ''; result.style.display = 'none';
+
+  const types = [];
+  if(document.getElementById('type-tickets').checked) types.push('tickets');
+  if(document.getElementById('type-assets').checked) types.push('assets');
+  if(document.getElementById('type-backlog').checked) types.push('backlog items');
+  if(document.getElementById('type-users').checked) types.push('users');
+  const typeLabel = types.length ? types.join(', ') : 'nothing selected';
+
+  const total = selectedCount;
+  const skipped = Math.max(0, Math.round(total * (0.03 + Math.random()*0.05)));
+  const errors = Math.random() < 0.4 ? Math.round(Math.random()*3) : 0;
+  const imported = total - skipped - errors;
+
+  const steps = [
+    `Connecting to ${selectedSrc}…`,
+    `Fetching ${typeLabel} (${total} records found)…`,
+    `Applying field mapping…`,
+    `Importing — ${imported} records created…`,
+    skipped ? `Skipped ${skipped} duplicates (matched on external ID).` : `No duplicates found.`,
+    errors ? `${errors} record(s) failed validation — flagged for manual review.` : `All records validated cleanly.`,
+    `Import complete.`
+  ];
+
+  let i = 0;
+  const start = Date.now();
+  function next(){
+    if(i >= steps.length){
+      const duration = ((Date.now() - start) / 1000).toFixed(1);
+      document.getElementById('res-imported').textContent = imported;
+      document.getElementById('res-skipped').textContent = skipped;
+      document.getElementById('res-errors').textContent = errors;
+      document.getElementById('res-duration').textContent = duration + 's';
+      result.style.display = 'block';
+      const hist = document.getElementById('history');
+      const statusBadge = errors ? '<span class="badge warn">Completed with errors</span>' : '<span class="badge ok">Completed</span>';
+      hist.insertAdjacentHTML('afterbegin', `<tr><td>${selectedSrc}</td><td class="id-mono">${imported}</td><td class="id-mono">${skipped}</td><td class="id-mono">${errors}</td><td>${statusBadge}</td><td class="id-mono">Just now</td></tr>`);
+      btn.disabled = false; btn.style.opacity = 1;
+      return;
+    }
+    const el = document.createElement('div');
+    el.className = 'trail-step';
+    el.innerHTML = `<div class="si">✓</div><div class="st">${steps[i]}</div>`;
+    trail.appendChild(el);
+    i++;
+    setTimeout(next, 500);
+  }
+  next();
+}
+
+renderMapping();
+</script>
+</body>
+</html>

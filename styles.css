@@ -107,6 +107,17 @@ tbody tr:hover{background:var(--surface-2);}
 .who{display:flex;align-items:center;gap:8px;}
 .who .av{width:22px;height:22px;border-radius:50%;background:var(--indigo-bg);color:var(--indigo-text);font-size:9.5px;display:flex;align-items:center;justify-content:center;font-weight:700;}
 
+/* settings rows (toggle switch pattern) */
+.row-line{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--border);gap:16px;}
+.row-line:last-child{border-bottom:none;}
+.row-line .rname{font-size:13px;font-weight:500;}
+.row-line .rdesc{font-size:12px;color:var(--ink-muted);margin-top:2px;}
+.switch{width:36px;height:20px;border-radius:12px;background:var(--border-strong);position:relative;cursor:pointer;flex-shrink:0;transition:background .15s;}
+.switch.on{background:var(--grad-primary);}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:var(--shadow-xs);}
+.switch.on::after{left:18px;}
+input.mini-input{width:64px;text-align:center;padding:6px 4px;}
+
 /* track (journey / stage motif) */
 .track{display:flex;align-items:center;}
 .track .seg-line{flex:1;height:2px;background:var(--border);}
