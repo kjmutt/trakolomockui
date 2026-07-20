@@ -33,7 +33,14 @@
 <div class="wrap">
   <div class="page-head">
     <div><div class="page-title">Sprint 34</div><div class="page-desc">Platform reliability workstream · Jul 7 – Jul 18 · click a card for its full detail.</div></div>
-    <button class="btn primary">Add card</button>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <div class="view-switch" id="view-switch">
+        <button class="active" data-view="board" onclick="setView('board')">▦ Board</button>
+        <button data-view="list" onclick="setView('list')">☰ List</button>
+        <button data-view="cal" onclick="setView('cal')">▤ Calendar</button>
+      </div>
+      <button class="btn primary">Add card</button>
+    </div>
   </div>
 
   <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-2);margin-bottom:8px;">
@@ -43,7 +50,20 @@
     <div style="width:68%;background:var(--indigo);"></div><div style="width:14%;background:var(--amber);"></div><div style="width:18%;background:var(--surface-2);"></div>
   </div>
 
-  <div class="board" id="board"></div>
+  <div class="board" id="view-board"></div>
+
+  <div class="panel" id="view-list" style="display:none;">
+    <table>
+      <thead><tr><th>Card</th><th>Title</th><th>Status</th><th>Tags</th><th>Assignee</th><th>Points</th><th>Due</th></tr></thead>
+      <tbody id="list-rows"></tbody>
+    </table>
+  </div>
+
+  <div class="cal" id="view-cal" style="display:none;">
+    <div class="cal-title"><span>July 2026 — sprint &amp; deploy calendar</span><span class="id-mono" style="font-size:11px;">cards by due date · deploy windows from change management</span></div>
+    <div class="cal-head"><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div></div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
 </div>
 
 <div class="overlay" id="overlay" onclick="closeSO()"></div>
@@ -67,32 +87,32 @@ const columns = [
 ];
 
 const cards = {
-  "DEV-1042":{title:"Rate-limit the assets sync webhook", tags:["backend","P2"], av:"TK", pts:3,
+  "DEV-1042":{due:24, title:"Rate-limit the assets sync webhook", tags:["backend","P2"], av:"TK", pts:3,
     desc:"Add rate limiting to the outbound webhook that syncs asset changes, so a burst of updates can't overload downstream systems.",
     subtasks:[["Define rate limit thresholds",false],["Add retry with backoff",false]], comments:[]},
-  "DEV-1039":{title:"Design SLA beam component states", tags:["design"], av:"NP", pts:2,
+  "DEV-1039":{due:23, title:"Design SLA beam component states", tags:["design"], av:"NP", pts:2,
     desc:"Cover empty, warning, and breached states for the SLA beam used across ticket, asset, and sprint views.",
     subtasks:[["Draft states in Figma",true],["Review with eng",false]], comments:[]},
-  "DEV-1031":{title:"Escalation routing for L2 → L3 handoff", tags:["backend","P1"], av:"RK", pts:5,
+  "DEV-1031":{due:22, title:"Escalation routing for L2 → L3 handoff", tags:["backend","P1"], av:"RK", pts:5,
     desc:"Build the auto-escalation rule that moves a ticket from L2 to L3 on-call once its SLA window closes without an assignment change. Should reuse the same beam/track components already used on the ticket detail page.",
     subtasks:[["Define escalation trigger rules",true],["Add on-call paging integration",true],["Surface escalation path on ticket detail",false],["Write tests for edge cases",false]],
     comments:[{av:"RK",name:"Raj K.",time:"yesterday",text:"Paging integration is live in staging — testing against the payroll SSO scenario from TS-4816 now."}]},
-  "DEV-1028":{title:"Asset renewal digest email job", tags:["backend"], av:"SM", pts:3,
+  "DEV-1028":{due:24, title:"Asset renewal digest email job", tags:["backend"], av:"SM", pts:3,
     desc:"Weekly digest email summarizing upcoming renewals, sent to the address configured in Admin → Reporting.",
     subtasks:[["Build digest template",true],["Schedule weekly job",false]], comments:[]},
-  "DEV-1019":{title:"Compliance report CSV export", tags:["frontend"], av:"TK", pts:2,
+  "DEV-1019":{due:21, title:"Compliance report CSV export", tags:["frontend"], av:"TK", pts:2,
     desc:"Add CSV export to the compliance audit page, matching the format already used for SLA reports.",
     subtasks:[["Build export button",true],["Match existing CSV schema",true]], comments:[]},
-  "DEV-1014":{title:"Kanban drag reorder + keyboard support", tags:["frontend","a11y"], av:"NP", pts:3,
+  "DEV-1014":{due:22, title:"Kanban drag reorder + keyboard support", tags:["frontend","a11y"], av:"NP", pts:3,
     desc:"Cards should be reorderable via drag, and via keyboard (arrow keys + enter) for accessibility.",
     subtasks:[["Drag reorder",true],["Keyboard support",false],["Screen reader labels",false]], comments:[]},
-  "DEV-1002":{title:"Ticket priority auto-scoring", tags:["backend"], av:"RK", pts:5,
+  "DEV-1002":{due:8, title:"Ticket priority auto-scoring", tags:["backend"], av:"RK", pts:5,
     desc:"Score incoming tickets on category, requester role, and keyword signals to suggest a starting priority.",
     subtasks:[["Build scoring model",true],["Wire into ticket creation",true]], comments:[]},
-  "DEV-0997":{title:"Unassigned license nightly scan", tags:["backend"], av:"SM", pts:3,
+  "DEV-0997":{due:10, title:"Unassigned license nightly scan", tags:["backend"], av:"SM", pts:3,
     desc:"Nightly job that flags software licenses with no login activity for 14+ days, feeding the Assets idle-license badge.",
     subtasks:[["Build scan job",true],["Wire into asset status",true]], comments:[]},
-  "DEV-1058":{title:"Bulk asset reassignment tool", tags:["backend","use-case"], av:"RK", pts:5, ticket:"TS-4830", sprint:"Sprint 34",
+  "DEV-1058":{due:17, title:"Bulk asset reassignment tool", tags:["backend","use-case"], av:"RK", pts:5, ticket:"TS-4830", sprint:"Sprint 34",
     desc:"Use case submitted through the self-service portal (TS-4830): reassigning laptops one at a time during offboarding doesn't scale. Adds a bulk reassignment endpoint and UI to Assets. Built and verified across DEV, INT, and UAT before merge — promotion to PROD goes through change management, not this board.",
     subtasks:[["Build &amp; unit test in DEV",true],["Verify in INT",true],["UAT sign-off",true],["Open PR",true],["Code review",true],["Merge PR",true]],
     comments:[
@@ -101,7 +121,7 @@ const cards = {
       {av:"SM",name:"Sara M.",time:"3 days ago",text:"Reviewed and approved PR #482 — reassignment logic looks solid, left a couple of naming nitpicks."},
       {av:"RK",name:"Raj K.",time:"3 days ago",text:"Verified in INT against integrated asset data. Promoting to UAT for sign-off."}
     ]},
-  "DEV-1063":{title:"Optimize asset list query performance", tags:["backend","tech-debt"], av:"TK", pts:3, changeRequest:"CR-0092", sprint:"Sprint 34",
+  "DEV-1063":{due:21, title:"Optimize asset list query performance", tags:["backend","tech-debt"], av:"TK", pts:3, changeRequest:"CR-0092", sprint:"Sprint 34",
     desc:"Self-initiated — no source ticket. The asset list endpoint was scanning the full table on every filter change; this adds a composite index and rewrites the query plan. Same DEV → INT → UAT → change management path applies even when the work starts on the board instead of from a ticket.",
     subtasks:[["Profile slow queries",true],["Add composite index &amp; rewrite query",true],["Verify in DEV",true],["Verify in INT",true],["UAT sign-off",true],["Open PR",true],["Code review",true],["Merge PR",true]],
     comments:[
@@ -112,7 +132,7 @@ const cards = {
 };
 
 function renderBoard(){
-  document.getElementById('board').innerHTML = columns.map(col => `
+  document.getElementById('view-board').innerHTML = columns.map(col => `
     <div>
       <div class="col-head"><span class="name">${col.name}</span><span class="count">${col.cards.length}</span></div>
       ${col.cards.map(id => { const c = cards[id]; return `
@@ -166,7 +186,48 @@ function closeSO(){
   document.getElementById('slideover').classList.remove('open');
 }
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSO(); });
+const statusOf = {};
+columns.forEach(col => col.cards.forEach(id => statusOf[id] = col.name));
+const statusBadge = n => n==='Done' ? 'ok' : n==='In progress' ? 'info' : n==='In review' ? 'warn' : 'neutral';
+
+function renderListView(){
+  document.getElementById('list-rows').innerHTML = columns.flatMap(col => col.cards).map(id => { const c = cards[id]; return `
+    <tr class="clickable" onclick="openCard('${id}')">
+      <td class="id-mono">${id}</td><td>${c.title}</td>
+      <td><span class="badge ${statusBadge(statusOf[id])}">${statusOf[id]}</span></td>
+      <td>${c.tags.map(t=>`<span class="tag-pill">${t}</span>`).join(' ')}</td>
+      <td><div class="who"><div class="av">${c.av}</div></div></td>
+      <td class="id-mono">${c.pts}</td><td class="id-mono">Jul ${c.due}</td>
+    </tr>`; }).join('');
+}
+
+function renderCalView(){
+  const byDay = {};
+  Object.entries(cards).forEach(([id,c]) => { (byDay[c.due] = byDay[c.due] || []).push([id,c]); });
+  const deploys = {20:['CR-0091 · deploy 02:00 UTC'], 22:['CR-0092 · window 03:00 UTC']};
+  let html = '';
+  for(let i=0;i<2;i++) html += '<div class="cal-day blank"></div>';
+  for(let d=1;d<=31;d++){
+    const today = d===20 ? ' today' : '';
+    let chips = (deploys[d]||[]).map(t => `<span class="cal-chip crit" onclick="location.href='desk.html'" title="${t}">🚀 ${t}</span>`).join('');
+    chips += (byDay[d]||[]).map(([id,c]) => `<span class="cal-chip ${statusOf[id]==='Done'?'ok':statusOf[id]==='In progress'?'info':'neutral'}" onclick="openCard('${id}')" title="${c.title}">${id} · ${c.title}</span>`).join('');
+    const sprint = (d>=7 && d<=25) ? '' : '';
+    html += `<div class="cal-day${today}"><div class="dnum">${d}${today?' · today':''}</div>${chips}</div>`;
+  }
+  for(let i=0;i<2;i++) html += '<div class="cal-day blank"></div>';
+  document.getElementById('cal-grid').innerHTML = html;
+}
+
+function setView(v){
+  document.querySelectorAll('#view-switch button').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+  document.getElementById('view-board').style.display = v==='board' ? '' : 'none';
+  document.getElementById('view-list').style.display = v==='list' ? '' : 'none';
+  document.getElementById('view-cal').style.display = v==='cal' ? '' : 'none';
+}
+
 renderBoard();
+renderListView();
+renderCalView();
 </script>
 </body>
 </html>

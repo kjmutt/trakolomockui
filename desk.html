@@ -35,7 +35,14 @@
 <div class="wrap">
   <div class="page-head">
     <div><div class="page-title">Service desk</div><div class="page-desc">Click any ticket to see full detail — no page change, no losing your place in the queue.</div></div>
-    <button class="btn primary">New ticket</button>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <div class="view-switch" id="view-switch">
+        <button class="active" data-view="list" onclick="setView('list')">☰ List</button>
+        <button data-view="cards" onclick="setView('cards')">▦ Cards</button>
+        <button data-view="cal" onclick="setView('cal')">▤ Calendar</button>
+      </div>
+      <button class="btn primary">New ticket</button>
+    </div>
   </div>
 
   <div class="strip">
@@ -45,7 +52,7 @@
     <div class="mcard ok"><div class="mlabel">Resolved today</div><div class="mval">41</div><div class="mdelta">avg 2h 14m</div></div>
   </div>
 
-  <div class="panel">
+  <div class="panel" id="view-list">
     <div class="filters">
       <div class="chip active">All queues</div>
       <div class="chip">Unassigned</div>
@@ -57,6 +64,14 @@
       <thead><tr><th>Ticket</th><th>Subject</th><th>Requester</th><th>Priority</th><th>SLA remaining</th><th>Assignee</th><th>Status</th></tr></thead>
       <tbody id="ticket-rows"></tbody>
     </table>
+  </div>
+
+  <div class="tcard-grid" id="view-cards" style="display:none;"></div>
+
+  <div class="cal" id="view-cal" style="display:none;">
+    <div class="cal-title"><span>July 2026</span><span class="id-mono" style="font-size:11px;">colored by priority · click a ticket to open it</span></div>
+    <div class="cal-head"><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div></div>
+    <div class="cal-grid" id="cal-grid"></div>
   </div>
 </div>
 
@@ -74,7 +89,7 @@
 
 <script>
 const tickets = {
-  "TS-4833": {subject:"Password reset — locked out after new phone", requester:"J. Okoye", priority:"neutral", priorityLabel:"Normal", category:"Account security", source:"Email · support@acme.com", slaLabel:"resolved in 3m", slaPct:100, slaColor:"var(--green)", assigneeAv:"AI", assignee:"Trakolo AI agent", status:"Resolved by AI", statusBadge:"ok", escalation:null,
+  "TS-4833": {due:20, subject:"Password reset — locked out after new phone", requester:"J. Okoye", priority:"neutral", priorityLabel:"Normal", category:"Account security", source:"Email · support@acme.com", slaLabel:"resolved in 3m", slaPct:100, slaColor:"var(--green)", assigneeAv:"AI", assignee:"Trakolo AI agent", status:"Resolved by AI", statusBadge:"ok", escalation:null,
     activity:[
       {av:"SY",name:"System",time:"11:55",text:"CSAT survey returned 5/5. Auto-closed with the full conversation transcript attached."},
       {av:"AI",name:"Trakolo AI agent",time:"11:49",text:"Requester confirmed access is restored. Resolving — no human touch needed. Noted for problem management: third MFA-device lockout this week, may warrant a how-to announcement."},
@@ -82,21 +97,21 @@ const tickets = {
       {av:"AI",name:"Trakolo AI agent",time:"11:46",text:"Classified as Account security → password reset (confidence 0.97). Within the auto-resolve policy — handling it without queueing for an agent."},
       {av:"SY",name:"System",time:"11:46",text:"Email received at support@acme.com — parsed by the email ingestion service and logged as a ticket. Requester sent the ticket ID by reply."}
     ]},
-  "TS-4821": {subject:"VPN drops on hybrid laptops", requester:"D. Ferreira", priority:"crit", priorityLabel:"Urgent", category:"Network & wifi", source:"Portal", slaLabel:"18m left", slaPct:12, slaColor:"var(--coral)", assigneeAv:"RK", assignee:"Raj K.", status:"In progress", statusBadge:"neutral", escalation:null,
+  "TS-4821": {due:20, subject:"VPN drops on hybrid laptops", requester:"D. Ferreira", priority:"crit", priorityLabel:"Urgent", category:"Network & wifi", source:"Portal", slaLabel:"18m left", slaPct:12, slaColor:"var(--coral)", assigneeAv:"RK", assignee:"Raj K.", status:"In progress", statusBadge:"neutral", escalation:null,
     activity:[{av:"RK",name:"Raj K.",time:"10m ago",text:"Reproduced on a test device — looks tied to an AP firmware update. Working with networking now."}]},
-  "TS-4819": {subject:"Shared drive permissions for Finance", requester:"L. Adeyemi", priority:"warn", priorityLabel:"High", category:"Software & access", source:"Email · support@acme.com", slaLabel:"1h 40m", slaPct:38, slaColor:"var(--amber)", assigneeAv:"SM", assignee:"Sara M.", status:"In progress", statusBadge:"neutral", escalation:null,
+  "TS-4819": {due:21, subject:"Shared drive permissions for Finance", requester:"L. Adeyemi", priority:"warn", priorityLabel:"High", category:"Software & access", source:"Email · support@acme.com", slaLabel:"1h 40m", slaPct:38, slaColor:"var(--amber)", assigneeAv:"SM", assignee:"Sara M.", status:"In progress", statusBadge:"neutral", escalation:null,
     activity:[{av:"SM",name:"Sara M.",time:"25m ago",text:"Confirmed with Finance lead which folders need access — applying group changes now."}]},
-  "TS-4816": {subject:"Escalation: payroll SSO outage", requester:"Payroll team", priority:"crit", priorityLabel:"Urgent", category:"Account security", source:"Phone · IVR", slaLabel:"7m left", slaPct:6, slaColor:"var(--coral)", assigneeAv:"L3", assignee:"L3 on-call", status:"Escalated", statusBadge:"crit", escalation:2,
+  "TS-4816": {due:20, subject:"Escalation: payroll SSO outage", requester:"Payroll team", priority:"crit", priorityLabel:"Urgent", category:"Account security", source:"Phone · IVR", slaLabel:"7m left", slaPct:6, slaColor:"var(--coral)", assigneeAv:"L3", assignee:"L3 on-call", status:"Escalated", statusBadge:"crit", escalation:2,
     activity:[
       {av:"SY",name:"System",time:"09:41",text:"Ticket escalated to L3 on-call after breaching the L2 response window."},
       {av:"SM",name:"Sara M.",time:"09:36",text:"Confirmed the SSO provider's status page shows a partial outage on their end. Escalating."},
       {av:"PT",name:"Payroll team",time:"09:21",text:"Nobody can log in to run this morning's payroll batch. Deadline is 11:00."}
     ]},
-  "TS-4812": {subject:"New starter laptop provisioning", requester:"People ops", priority:"neutral", priorityLabel:"Normal", category:"Hardware", source:"Portal", slaLabel:"1d 4h", slaPct:70, slaColor:"var(--green)", assigneeAv:"—", assignee:"Unassigned", status:"Open", statusBadge:"neutral", escalation:null,
+  "TS-4812": {due:22, subject:"New starter laptop provisioning", requester:"People ops", priority:"neutral", priorityLabel:"Normal", category:"Hardware", source:"Portal", slaLabel:"1d 4h", slaPct:70, slaColor:"var(--green)", assigneeAv:"—", assignee:"Unassigned", status:"Open", statusBadge:"neutral", escalation:null,
     activity:[{av:"SY",name:"System",time:"1h ago",text:"Ticket logged and routed to IT Ops. Awaiting assignment."}]},
-  "TS-4809": {subject:"Printer offline, 3rd floor east", requester:"M. Alvarez", priority:"neutral", priorityLabel:"Low", category:"Hardware", source:"Slack", slaLabel:"2d 1h", slaPct:82, slaColor:"var(--green)", assigneeAv:"RK", assignee:"Raj K.", status:"Open", statusBadge:"neutral", escalation:null,
+  "TS-4809": {due:23, subject:"Printer offline, 3rd floor east", requester:"M. Alvarez", priority:"neutral", priorityLabel:"Low", category:"Hardware", source:"Slack", slaLabel:"2d 1h", slaPct:82, slaColor:"var(--green)", assigneeAv:"RK", assignee:"Raj K.", status:"Open", statusBadge:"neutral", escalation:null,
     activity:[{av:"RK",name:"Raj K.",time:"3h ago",text:"Ordered a replacement toner cartridge, should arrive tomorrow."}]},
-  "TS-4830": {subject:"Use case: Bulk asset reassignment tool", requester:"IT Ops (self-service portal)", priority:"neutral", priorityLabel:"Normal", category:"Use case", source:"Portal", slaLabel:"on track", slaPct:70, slaColor:"var(--indigo)", assigneeAv:"RK", assignee:"Raj K.", status:"Awaiting deployment window", statusBadge:"info", escalation:null,
+  "TS-4830": {due:20, subject:"Use case: Bulk asset reassignment tool", requester:"IT Ops (self-service portal)", priority:"neutral", priorityLabel:"Normal", category:"Use case", source:"Portal", slaLabel:"on track", slaPct:70, slaColor:"var(--indigo)", assigneeAv:"RK", assignee:"Raj K.", status:"Awaiting deployment window", statusBadge:"info", escalation:null,
     linked:[["Sprint card","DEV-1058 · Sprint 34","dev.html"],["GitHub PR","#482 merged","dev.html"],["Change request","CR-0091 · approved","desk.html"]],
     activity:[
       {av:"RK",name:"Raj K.",time:"Jul 18",text:"Change request CR-0091 opened to promote the build from PRE to PROD."},
@@ -107,14 +122,14 @@ const tickets = {
       {av:"SY",name:"System",time:"Jul 15",text:"Added to Sprint 34 backlog as DEV-1058, estimated 5 points."},
       {av:"SY",name:"System",time:"Jul 14",text:"Use case submitted via the self-service portal — routed to Product & Engineering."}
     ]},
-  "CR-0091": {subject:"Change request: Promote bulk asset reassignment tool from PRE to PROD", requester:"Raj K.", priority:"warn", priorityLabel:"High", category:"Change request", source:"Change management", slaLabel:"Jul 20, 02:00 UTC", slaPct:70, slaColor:"var(--amber)", assigneeAv:"NP", assignee:"Nadia P. (manager)", status:"Approved", statusBadge:"ok", escalation:null,
+  "CR-0091": {due:20, subject:"Change request: Promote bulk asset reassignment tool from PRE to PROD", requester:"Raj K.", priority:"warn", priorityLabel:"High", category:"Change request", source:"Change management", slaLabel:"Jul 20, 02:00 UTC", slaPct:70, slaColor:"var(--amber)", assigneeAv:"NP", assignee:"Nadia P. (manager)", status:"Approved", statusBadge:"ok", escalation:null,
     linked:[["Use case ticket","TS-4830","desk.html"],["Sprint card","DEV-1058 · Sprint 34","dev.html"]],
     activity:[
       {av:"NP",name:"Nadia P.",time:"Jul 18",text:"Approved for the requested window: Jul 20, 02:00–03:00 UTC. Low risk, rollback plan on file."},
       {av:"RK",name:"Raj K.",time:"Jul 18",text:"Selected deployment window: Jul 20, 02:00–03:00 UTC — low-traffic slot for the PRE → PROD promotion."},
       {av:"RK",name:"Raj K.",time:"Jul 18",text:"Submitted after PR #482 merged and passed DEV, INT, and UAT. Risk: Low. Rollback: redeploy previous build, no schema changes."}
     ]},
-  "CR-0092": {subject:"Change request: Promote asset query optimization from PRE to PROD", requester:"Tomas K.", priority:"neutral", priorityLabel:"Normal", category:"Change request", source:"Change management", slaLabel:"awaiting approval", slaPct:35, slaColor:"var(--amber)", assigneeAv:"NP", assignee:"Nadia P. (manager)", status:"Pending approval", statusBadge:"warn", escalation:null,
+  "CR-0092": {due:22, subject:"Change request: Promote asset query optimization from PRE to PROD", requester:"Tomas K.", priority:"neutral", priorityLabel:"Normal", category:"Change request", source:"Change management", slaLabel:"awaiting approval", slaPct:35, slaColor:"var(--amber)", assigneeAv:"NP", assignee:"Nadia P. (manager)", status:"Pending approval", statusBadge:"warn", escalation:null,
     linked:[["Sprint card","DEV-1063 · Sprint 34","dev.html"]],
     activity:[
       {av:"TK",name:"Tomas K.",time:"Jul 19",text:"Selected deployment window: Jul 22, 03:00–04:00 UTC — off-peak slot for the index migration."},
@@ -181,7 +196,43 @@ function closeSO(){
   document.getElementById('slideover').classList.remove('open');
 }
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSO(); });
+function renderCardsView(){
+  document.getElementById('view-cards').innerHTML = Object.entries(tickets).map(([id,t]) => `
+    <div class="tcard" onclick="openTicket('${id}')">
+      <div class="tc-head"><span class="id-mono">${id}</span>${t.priorityLabel==="Urgent"?'<span class="badge crit">Urgent</span>':t.priorityLabel==="High"?'<span class="badge warn">High</span>':'<span class="badge neutral">'+t.priorityLabel+'</span>'}</div>
+      <div class="tc-title">${t.subject}</div>
+      <div style="font-size:11.5px;color:var(--ink-muted);margin-top:6px;">${t.category} · ${t.source || 'Portal'}</div>
+      <div class="beam" style="width:100%;height:6px;margin-top:10px;"><i style="width:${t.slaPct}%;background:${t.slaColor}"></i></div>
+      <div class="beam-label" style="margin-top:4px;">${t.slaLabel}</div>
+      <div class="tc-foot"><div class="who"><div class="av">${t.assigneeAv}</div><span style="font-size:12px;">${t.assignee}</span></div><span class="badge ${t.statusBadge}">${t.status}</span></div>
+    </div>`).join('');
+}
+
+function renderCalView(){
+  const chipClass = t => t.statusBadge === 'ok' ? 'ok' : (t.priority === 'crit' ? 'crit' : t.priority === 'warn' ? 'warn' : 'info');
+  const byDay = {};
+  Object.entries(tickets).forEach(([id,t]) => { (byDay[t.due] = byDay[t.due] || []).push([id,t]); });
+  let html = '';
+  for(let i=0;i<2;i++) html += '<div class="cal-day blank"></div>';
+  for(let d=1;d<=31;d++){
+    const today = d===20 ? ' today' : '';
+    const chips = (byDay[d]||[]).map(([id,t]) => `<span class="cal-chip ${chipClass(t)}" onclick="openTicket('${id}')" title="${t.subject}">${id} · ${t.subject}</span>`).join('');
+    html += `<div class="cal-day${today}"><div class="dnum">${d}${today?' · today':''}</div>${chips}</div>`;
+  }
+  for(let i=0;i<2;i++) html += '<div class="cal-day blank"></div>';
+  document.getElementById('cal-grid').innerHTML = html;
+}
+
+function setView(v){
+  document.querySelectorAll('#view-switch button').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+  document.getElementById('view-list').style.display = v==='list' ? '' : 'none';
+  document.getElementById('view-cards').style.display = v==='cards' ? '' : 'none';
+  document.getElementById('view-cal').style.display = v==='cal' ? '' : 'none';
+}
+
 renderRows();
+renderCardsView();
+renderCalView();
 </script>
 </body>
 </html>
