@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Trakolo — admin settings</title>
 <link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
 <style>
   .admin-shell{display:flex;max-width:1180px;margin:0 auto;padding:32px 40px 60px;gap:28px;align-items:flex-start;}
   .set-rail{width:216px;flex-shrink:0;position:sticky;top:78px;}
@@ -59,6 +60,9 @@
     <div class="set-nav-group">Workspace</div>
     <div class="set-item active" data-panel="general">
       <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.5v4l2.6 1.5"/></svg>General
+    </div>
+    <div class="set-item" data-panel="appearance">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.5"/><path d="M8 1.5v13M8 8c2.5-2 2.5-4.5 0-6.5M8 8c-2.5 2-2.5 4.5 0 6.5"/></svg>Appearance &amp; language
     </div>
     <div class="set-item" data-panel="users">
       <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5.5" r="2.3"/><path d="M2 14c0-2.4 1.8-4 4-4s4 1.6 4 4"/><circle cx="12" cy="6" r="1.8"/><path d="M10.5 14c.2-1.8 1.3-3 2.9-3.4"/></svg>Users &amp; roles
@@ -126,6 +130,58 @@
         <div class="row-line"><div><div class="rname">Asset tracking</div><div class="rdesc">Hardware &amp; software inventory</div></div><div class="switch on"></div></div>
         <div class="row-line"><div><div class="rname">Boards &amp; sprints</div><div class="rdesc">Kanban and sprint planning</div></div><div class="switch on"></div></div>
         <div class="row-line"><div><div class="rname">Reporting</div><div class="rdesc">Audit-ready exports</div></div><div class="switch on"></div></div>
+      </div>
+      <div class="card">
+        <div class="section-label">Features enabled</div>
+        <div class="page-desc" style="margin:-4px 0 8px;">Finer-grained than modules — turn individual features on or off for this workspace. Off means the pages and nav entries disappear for everyone.</div>
+        <div class="row-line"><div><div class="rname">Knowledge base</div><div class="rdesc">Portal search + the source the AI agent answers from</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Service catalog</div><div class="rdesc">Structured requests with approval paths</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Problem management</div><div class="rdesc">Link many incidents to one root cause</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Approvals inbox</div><div class="rdesc">Manager queue for change &amp; access requests</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">On-call &amp; paging</div><div class="rdesc">Rota behind the escalation rule</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Live chat</div><div class="rdesc">AI agent first, human handoff</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Asset discovery</div><div class="rdesc">Agent + network scan into SAM</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Epics &amp; roadmap</div><div class="rdesc">Quarter view over the sprint boards</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Change management</div><div class="rdesc">CRs, CAB approval, deployment windows</div></div><div class="switch on"></div></div>
+      </div>
+    </div>
+
+    <!-- APPEARANCE & LANGUAGE -->
+    <div class="set-panel" id="panel-appearance">
+      <div class="page-title" style="font-size:20px;margin-bottom:4px;">Appearance &amp; language</div>
+      <div class="page-desc" style="margin-bottom:20px;">Theme and language for this workspace. Everything below applies live — try it.</div>
+
+      <div class="card">
+        <div class="section-label">Theme mode</div>
+        <div style="display:flex;gap:10px;">
+          <div class="chip mode-chip active" data-mode="light">☀ Light</div>
+          <div class="chip mode-chip" data-mode="dark">☾ Dark</div>
+          <div class="chip mode-chip" data-mode="system">◐ Match system</div>
+        </div>
+        <div class="page-desc" style="margin-top:10px;">Applies across every app page and persists per browser. Users can override in their own profile.</div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Accent theme</div>
+        <div style="display:flex;flex-direction:column;gap:2px;" id="accent-list">
+          <div class="row-line accent-row" data-accent="default" style="cursor:pointer;"><div style="display:flex;align-items:center;gap:12px;"><span style="width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#0C8266,#127A93);"></span><div><div class="rname">Trakolo green</div><div class="rdesc">Default</div></div></div><span class="badge ok accent-badge">Active</span></div>
+          <div class="row-line accent-row" data-accent="ocean" style="cursor:pointer;"><div style="display:flex;align-items:center;gap:12px;"><span style="width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#4453D8,#127A93);"></span><div><div class="rname">Ocean</div><div class="rdesc">Indigo blue</div></div></div><span class="badge neutral accent-badge">Apply</span></div>
+          <div class="row-line accent-row" data-accent="sunset" style="cursor:pointer;"><div style="display:flex;align-items:center;gap:12px;"><span style="width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#C9862B,#D85A30);"></span><div><div class="rname">Sunset</div><div class="rdesc">Amber &amp; coral</div></div></div><span class="badge neutral accent-badge">Apply</span></div>
+          <div class="row-line accent-row" data-accent="orchid" style="cursor:pointer;"><div style="display:flex;align-items:center;gap:12px;"><span style="width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#7F77DD,#4453D8);"></span><div><div class="rname">Orchid</div><div class="rdesc">Violet</div></div></div><span class="badge neutral accent-badge">Apply</span></div>
+          <div class="row-line accent-row" data-accent="slate" style="cursor:pointer;"><div style="display:flex;align-items:center;gap:12px;"><span style="width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#4A5A54,#2E3A35);"></span><div><div class="rname">Slate</div><div class="rdesc">Muted mono</div></div></div><span class="badge neutral accent-badge">Apply</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Language &amp; region</div>
+        <label>Workspace language</label>
+        <select id="lang-select">
+          <option>English (US)</option><option>English (UK)</option><option>Deutsch</option><option>Français</option><option>Español</option><option>Português (BR)</option><option>हिन्दी</option><option>日本語</option>
+        </select>
+        <div class="row-line" style="margin-top:8px;"><div><div class="rname">Let each user pick their own language</div><div class="rdesc">Workspace language becomes the default, not a lock</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Auto-translate ticket replies</div><div class="rdesc">AI translates between the requester's and the agent's languages, both sides see their own</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Date &amp; number format</div><div class="rdesc">Follows the selected language unless overridden</div></div><select style="width:180px;"><option>DD/MM/YYYY · 1.234,56</option><option>MM/DD/YYYY · 1,234.56</option><option>YYYY-MM-DD · 1 234,56</option></select></div>
+        <div id="lang-note" class="page-desc" style="margin-top:8px;display:none;">Mock note: the UI copy in this prototype stays in English — in the real product every string ships translated.</div>
       </div>
     </div>
 
@@ -761,6 +817,37 @@
     s.classList.add('sel');
   }));
   document.querySelectorAll('.day-pill').forEach(d=>d.addEventListener('click', ()=>d.classList.toggle('on')));
+  const ACCENTS={
+    default:null,
+    ocean:{'--indigo':'#4453D8','--indigo-bg':'#EEEDFE','--indigo-text':'#3A3F9E','--grad-primary':'linear-gradient(135deg,#4453D8 0%,#127A93 100%)'},
+    sunset:{'--indigo':'#C9862B','--indigo-bg':'#FAEEDA','--indigo-text':'#854F0B','--grad-primary':'linear-gradient(135deg,#C9862B 0%,#D85A30 100%)'},
+    orchid:{'--indigo':'#7F77DD','--indigo-bg':'#EEEDFE','--indigo-text':'#534AB7','--grad-primary':'linear-gradient(135deg,#7F77DD 0%,#4453D8 100%)'},
+    slate:{'--indigo':'#4A5A54','--indigo-bg':'#E8EDEA','--indigo-text':'#33403A','--grad-primary':'linear-gradient(135deg,#4A5A54 0%,#2E3A35 100%)'}
+  };
+  function applyMode(m){
+    document.querySelectorAll('.mode-chip').forEach(c=>c.classList.toggle('active', c.dataset.mode===m));
+    const dark = m==='dark' || (m==='system' && matchMedia('(prefers-color-scheme: dark)').matches);
+    if(dark) document.documentElement.dataset.theme='dark'; else delete document.documentElement.dataset.theme;
+    localStorage.setItem('trakolo-theme', m);
+  }
+  document.querySelectorAll('.mode-chip').forEach(c=>c.addEventListener('click', e=>{e.stopPropagation();applyMode(c.dataset.mode);}));
+  function applyAccent(name){
+    document.querySelectorAll('.accent-row').forEach(r=>{
+      const active = r.dataset.accent===name;
+      const b=r.querySelector('.accent-badge');
+      b.className='badge accent-badge ' + (active?'ok':'neutral');
+      b.textContent = active?'Active':'Apply';
+    });
+    const vals = ACCENTS[name];
+    ['--indigo','--indigo-bg','--indigo-text','--grad-primary'].forEach(k=>document.documentElement.style.removeProperty(k));
+    if(vals){ for(const k in vals) document.documentElement.style.setProperty(k, vals[k]); localStorage.setItem('trakolo-accent', JSON.stringify(vals)); }
+    else localStorage.removeItem('trakolo-accent');
+  }
+  document.querySelectorAll('.accent-row').forEach(r=>r.addEventListener('click', ()=>applyAccent(r.dataset.accent)));
+  const savedMode = localStorage.getItem('trakolo-theme');
+  if(savedMode) document.querySelectorAll('.mode-chip').forEach(c=>c.classList.toggle('active', c.dataset.mode===savedMode));
+  try{ const sa = JSON.parse(localStorage.getItem('trakolo-accent')||'null'); if(sa){ for(const [n,v] of Object.entries(ACCENTS)){ if(v && v['--indigo']===sa['--indigo']) { document.querySelectorAll('.accent-row').forEach(r=>{const active=r.dataset.accent===n;const b=r.querySelector('.accent-badge');b.className='badge accent-badge '+(active?'ok':'neutral');b.textContent=active?'Active':'Apply';}); } } } }catch(e){}
+  document.getElementById('lang-select').addEventListener('change', ()=>{ document.getElementById('lang-note').style.display='block'; });
   document.querySelectorAll('.seg-opt').forEach(el=>{
     el.addEventListener('click', ()=>{
       el.parentElement.querySelectorAll('.seg-opt').forEach(c=>c.classList.remove('selected'));
