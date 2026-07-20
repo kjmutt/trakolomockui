@@ -87,6 +87,9 @@
     <div class="set-item" data-panel="desk">
       <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 5l6-3 6 3-6 3-6-3z"/><path d="M2 5v6l6 3 6-3V5"/></svg>Service desk
     </div>
+    <div class="set-item" data-panel="catalog">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><path d="M11 9.5v5M8.5 12h5"/></svg>Service catalog
+    </div>
     <div class="set-item" data-panel="assets">
       <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="3" width="12" height="8" rx="1"/><path d="M6 13h4M8 11v2"/></svg>Assets
     </div>
@@ -522,6 +525,68 @@
       </div>
     </div>
 
+    <!-- SERVICE CATALOG -->
+    <div class="set-panel" id="panel-catalog">
+      <div class="page-title" style="font-size:20px;margin-bottom:4px;">Service catalog</div>
+      <div class="page-desc" style="margin-bottom:20px;">The structured requests employees see on <a href="desk-catalog.html" style="color:var(--indigo-text);">the catalog page</a> — each with its own approval path and the group it's assigned to for fulfillment.</div>
+
+      <div class="card">
+        <div class="section-label">Catalog items</div>
+        <div class="panel" style="box-shadow:none;">
+          <table>
+            <thead><tr><th>Item</th><th>Category</th><th>Approval</th><th>Assigned to</th><th>Fulfillment SLA</th><th>Status</th><th></th></tr></thead>
+            <tbody id="catalog-rows">
+              <tr data-id="NS"><td><div class="who"><div class="av">NS</div>New starter onboarding</div></td><td>Onboarding</td><td><span class="badge ok">Automated</span></td><td>AI agent (Azure AD automation)</td><td class="id-mono">~2 min</td><td><span class="badge ok">Active</span></td><td><button class="btn sm" onclick="toggleCatalogItem(this)">Disable</button></td></tr>
+              <tr data-id="LP"><td><div class="who"><div class="av">LP</div>Laptop request</div></td><td>Hardware</td><td><span class="badge warn">Manager</span></td><td>IT Ops</td><td class="id-mono">2–3 days</td><td><span class="badge ok">Active</span></td><td><button class="btn sm" onclick="toggleCatalogItem(this)">Disable</button></td></tr>
+              <tr data-id="SW"><td><div class="who"><div class="av">SW</div>Software license</div></td><td>Software</td><td><span class="badge info">Manager if not pre-approved</span></td><td>AI agent → IT Ops</td><td class="id-mono">instant–1 day</td><td><span class="badge ok">Active</span></td><td><button class="btn sm" onclick="toggleCatalogItem(this)">Disable</button></td></tr>
+              <tr data-id="AC"><td><div class="who"><div class="av">AC</div>Access request</div></td><td>Access</td><td><span class="badge info">Data owner if not pre-approved</span></td><td>AI agent → Security</td><td class="id-mono">instant–1 day</td><td><span class="badge ok">Active</span></td><td><button class="btn sm" onclick="toggleCatalogItem(this)">Disable</button></td></tr>
+              <tr data-id="MB"><td><div class="who"><div class="av">MB</div>Mobile device</div></td><td>Hardware</td><td><span class="badge warn">Cost-center owner</span></td><td>IT Ops</td><td class="id-mono">3–5 days</td><td><span class="badge ok">Active</span></td><td><button class="btn sm" onclick="toggleCatalogItem(this)">Disable</button></td></tr>
+              <tr data-id="GW"><td><div class="who"><div class="av">GW</div>Guest wifi</div></td><td>Network</td><td><span class="badge ok">None</span></td><td>AI agent (automated)</td><td class="id-mono">instant</td><td><span class="badge ok">Active</span></td><td><button class="btn sm" onclick="toggleCatalogItem(this)">Disable</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Create a catalog item</div>
+        <div class="page-desc" style="margin:-4px 0 8px;">Published items appear on the catalog page immediately for every employee.</div>
+        <label>Item name</label>
+        <input type="text" id="cat-name" placeholder="e.g. Standing desk request">
+        <label>Short code <span class="id-mono" style="color:var(--ink-muted);">2–3 letters, shown as the icon</span></label>
+        <input type="text" id="cat-code" maxlength="3" placeholder="e.g. SD" style="text-transform:uppercase;width:100px;">
+        <label>Description</label>
+        <input type="text" id="cat-desc" placeholder="What the employee sees on the catalog card">
+        <label>Category</label>
+        <select id="cat-category"><option>Onboarding</option><option>Hardware</option><option>Software</option><option>Access</option><option>Network</option><option>Facilities</option></select>
+
+        <label style="margin-top:18px;">Approval path</label>
+        <select id="cat-approval">
+          <option value="none">None — fulfilled automatically</option>
+          <option value="manager">Requester's manager</option>
+          <option value="dataowner">Data or system owner</option>
+          <option value="costcenter">Cost-center owner</option>
+          <option value="cab">Change Advisory Board</option>
+        </select>
+
+        <label>Assign fulfillment to</label>
+        <select id="cat-assignee">
+          <option value="ai">AI agent (automated, no human touch)</option>
+          <option value="itops">IT Ops</option>
+          <option value="infra">Infrastructure</option>
+          <option value="security">Security</option>
+        </select>
+        <div class="page-desc" style="margin:6px 0 0;">Matches the groups on <a href="desk-workload.html" style="color:var(--indigo-text);">Team workload</a> — requests land in that group's queue, or a specific person's if you reassign them there.</div>
+
+        <label>Fulfillment SLA</label>
+        <input type="text" id="cat-sla" placeholder="e.g. 1–2 days" style="width:160px;">
+
+        <div class="row-line" style="margin-top:16px;"><div><div class="rname">Publish immediately</div><div class="rdesc">Off saves as a draft, hidden from the catalog page</div></div><div class="switch on" id="cat-publish"></div></div>
+
+        <button class="btn primary" style="margin-top:16px;" onclick="createCatalogItem()">+ Add to catalog</button>
+        <div id="cat-toast" style="display:none;margin-top:12px;font-size:12.5px;color:var(--indigo-text);background:var(--indigo-bg);border-radius:var(--r-sm);padding:9px 12px;"></div>
+      </div>
+    </div>
+
     <!-- ASSETS -->
     <div class="set-panel" id="panel-assets">
       <div class="page-title" style="font-size:20px;margin-bottom:4px;">Asset configuration</div>
@@ -799,14 +864,19 @@
 </div>
 
 <script>
+  function showPanel(name){
+    const item = document.querySelector('.set-item[data-panel="'+name+'"]');
+    const panel = document.getElementById('panel-'+name);
+    if(!item || !panel) return;
+    document.querySelectorAll('.set-item').forEach(n=>n.classList.remove('active'));
+    item.classList.add('active');
+    document.querySelectorAll('.set-panel').forEach(p=>p.classList.remove('active'));
+    panel.classList.add('active');
+  }
   document.querySelectorAll('.set-item').forEach(item=>{
-    item.addEventListener('click', ()=>{
-      document.querySelectorAll('.set-item').forEach(n=>n.classList.remove('active'));
-      item.classList.add('active');
-      document.querySelectorAll('.set-panel').forEach(p=>p.classList.remove('active'));
-      document.getElementById('panel-'+item.dataset.panel).classList.add('active');
-    });
+    item.addEventListener('click', ()=>showPanel(item.dataset.panel));
   });
+  if(location.hash) showPanel(location.hash.slice(1));
   document.querySelectorAll('.switch').forEach(s=>s.addEventListener('click', ()=>s.classList.toggle('on')));
   document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click', ()=>{
     c.parentElement.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
@@ -854,6 +924,61 @@
       el.classList.add('selected');
     });
   });
+
+  const APPROVAL_LABEL = {
+    none:['badge ok','None'],
+    manager:['badge warn','Manager'],
+    dataowner:['badge info','Data owner if not pre-approved'],
+    costcenter:['badge warn','Cost-center owner'],
+    cab:['badge crit','Change Advisory Board']
+  };
+  const ASSIGNEE_LABEL = {
+    ai:'AI agent (automated)',
+    itops:'IT Ops',
+    infra:'Infrastructure',
+    security:'Security'
+  };
+  function toggleCatalogItem(btn){
+    const row = btn.closest('tr');
+    const statusCell = row.children[5];
+    const active = statusCell.querySelector('.badge').classList.contains('ok');
+    statusCell.innerHTML = active ? '<span class="badge neutral">Disabled</span>' : '<span class="badge ok">Active</span>';
+    btn.textContent = active ? 'Enable' : 'Disable';
+  }
+  function createCatalogItem(){
+    const name = document.getElementById('cat-name').value.trim();
+    let code = document.getElementById('cat-code').value.trim().toUpperCase();
+    const desc = document.getElementById('cat-desc').value.trim();
+    const category = document.getElementById('cat-category').value;
+    const approval = document.getElementById('cat-approval').value;
+    const assignee = document.getElementById('cat-assignee').value;
+    const sla = document.getElementById('cat-sla').value.trim() || '—';
+    const published = document.getElementById('cat-publish').classList.contains('on');
+    const toast = document.getElementById('cat-toast');
+
+    if(!name){
+      toast.style.display = 'block';
+      toast.style.color = 'var(--coral-text)'; toast.style.background = 'var(--coral-bg)';
+      toast.textContent = 'Give the item a name before adding it to the catalog.';
+      return;
+    }
+    if(!code) code = name.slice(0,2).toUpperCase();
+    const [cls, label] = APPROVAL_LABEL[approval];
+    const statusBadge = published ? '<span class="badge ok">Active</span>' : '<span class="badge neutral">Draft</span>';
+
+    const tr = document.createElement('tr');
+    tr.dataset.id = code;
+    tr.innerHTML = `<td><div class="who"><div class="av">${code}</div>${name}</div></td><td>${category}</td><td><span class="${cls}">${label}</span></td><td>${ASSIGNEE_LABEL[assignee]}</td><td class="id-mono">${sla}</td><td>${statusBadge}</td><td><button class="btn sm" onclick="toggleCatalogItem(this)">${published?'Disable':'Enable'}</button></td>`;
+    document.getElementById('catalog-rows').appendChild(tr);
+
+    toast.style.display = 'block';
+    toast.style.color = 'var(--indigo-text)'; toast.style.background = 'var(--indigo-bg)';
+    toast.textContent = published
+      ? `"${name}" is live on the catalog page — requests route to ${ASSIGNEE_LABEL[assignee]}${approval!=='none' ? ', pending ' + label.toLowerCase() + ' approval' : ''}.`
+      : `"${name}" saved as a draft — toggle it Active from the table above when you're ready to publish.`;
+
+    ['cat-name','cat-code','cat-desc','cat-sla'].forEach(id => document.getElementById(id).value = '');
+  }
 </script>
 <script src="app-chrome.js" defer></script>
 </body>
