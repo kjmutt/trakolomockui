@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — site map</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .sm-section{margin-bottom:26px;}
+  .sm-label{display:flex;align-items:center;gap:10px;margin:0 0 10px;}
+  .sm-label .name{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--ink-muted);font-family:var(--font-mono);font-weight:600;}
+  .sm-label .rule{flex:1;height:1px;background:var(--border);}
+  .sm-label .count{font-size:11px;color:var(--ink-muted);font-family:var(--font-mono);}
+  table.sm td:first-child{width:280px;}
+  table.sm td:last-child{color:var(--ink-2);}
+  table.sm a{color:var(--indigo-text);font-weight:600;text-decoration:none;}
+  table.sm a:hover{text-decoration:underline;}
+  table.sm .path{font-family:var(--font-mono);font-size:11px;color:var(--ink-muted);margin-top:2px;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+
+<div class="wrap" style="max-width:960px;">
+  <div class="page-head">
+    <div><div class="page-title">Site map</div><div class="page-desc">Every page in the mockup — 33 pages across 10 areas, as one flat list.</div></div>
+    <a href="index.html" class="btn">← Tile view</a>
+  </div>
+
+  <div class="sm-section">
+    <div class="sm-label"><span class="name">Website · public marketing site</span><span class="rule"></span><span class="count">7 pages</span></div>
+    <div class="panel">
+      <table class="sm">
+        <thead><tr><th>Page</th><th>What's on it</th></tr></thead>
+        <tbody>
+          <tr><td><a href="site/index.html">Homepage</a><div class="path">site/index.html</div></td><td>Hero, how it works, feature grid, pipeline dashboard mock</td></tr>
+          <tr><td><a href="site/how-it-works.html">How it works</a><div class="path">site/how-it-works.html</div></td><td>The five stages — log it, track it, resolve it, ship it safely, report on it</td></tr>
+          <tr><td><a href="site/features.html">Features</a><div class="path">site/features.html</div></td><td>By module — ticket channels, AI agent, business rules, bulk data, change management</td></tr>
+          <tr><td><a href="site/use-cases.html">Use cases</a><div class="path">site/use-cases.html</div></td><td>12 scenarios, each linked into the live app pages below</td></tr>
+          <tr><td><a href="site/integrations.html">Integrations</a><div class="path">site/integrations.html</div></td><td>Communication, identity, dev, and business tools, plus built-in AI</td></tr>
+          <tr><td><a href="site/pricing.html">Pricing</a><div class="path">site/pricing.html</div></td><td>Cloud plans, standalone/on-premise perpetual license, full feature comparison, FAQ</td></tr>
+          <tr><td><a href="site/docs.html">Docs</a><div class="path">site/docs.html</div></td><td>Quickstart, API access &amp; reference, bulk upload spec, on-premise install &amp; license guides</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sm-section">
+    <div class="sm-label"><span class="name">IT · service desk</span><span class="rule"></span><span class="count">2 pages</span></div>
+    <div class="panel">
+      <table class="sm">
+        <thead><tr><th>Page</th><th>What's on it</th></tr></thead>
+        <tbody>
+          <tr><td><a href="desk-log-ticket.html">Log a ticket</a><div class="path">desk-log-ticket.html</div></td><td>Employee submission flow, incl. the use case / idea category</td></tr>
+          <tr><td><a href="desk.html">Service desk</a><div class="path">desk.html</div></td><td>Queue + slide-over detail, source field on every ticket; TS-4833 is resolved end-to-end by the AI agent</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sm-section">
+    <div class="sm-label"><span class="name">SAM · asset tracking</span><span class="rule"></span><span class="count">3 pages</span></div>
+    <div class="panel">
+      <table class="sm">
+        <thead><tr><th>Page</th><th>What's on it</th></tr></thead>
+        <tbody>
+          <tr><td><a href="sam.html">Asset inventory</a><div class="path">sam.html</div></td><td>Hardware, software &amp; licenses with owner, status, and renewal beams</td></tr>
+          <tr><td><a href="sam-renewals.html">Renewals &amp; compliance</a><div class="path">sam-renewals.html</div></td><td>Upcoming spend, idle licenses, audit score</td></tr>
+          <tr><td><a href="sam-bulk-upload.html">Bulk upload assets</a><div class="path">sam-bulk-upload.html</div></td><td>CSV template, create-vs-update preview keyed on asset tag, run history</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sm-section">
+    <div class="sm-label"><span class="name">Dev · boards &amp; sprints</span><span class="rule"></span><span class="count">4 pages</span></div>
+    <div class="panel">
+      <table class="sm">
+        <thead><tr><th>Page</th><th>What's on it</th></tr></thead>
+        <tbody>
+          <tr><td><a href="dev.html">Sprint board</a><div class="path">dev.html</div></td><td>Kanban + card detail; DEV-1058 and DEV-1063 carry the change-management story</td></tr>
+          <tr><td><a href="dev-backlog.html">Backlog &amp; planning</a><div class="path">dev-backlog.html</div></td><td>Prioritized backlog, sprint capacity, team load</td></tr>
+          <tr><td><a href="dev-ownership.html">Team ownership</a><div class="path">dev-ownership.html</div></td><td>Infra, environments (DEV→PROD), and versions per team, plus the product-ownership table</td></tr>
+          <tr><td><a href="dev-product-tree.html">Product tree</a><div class="path">dev-product-tree.html</div></td><td>Expandable drill-down: product → environment → infrastructure</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sm-section">
+    <div class="sm-label"><span class="name">Ops · reporting</span><span class="rule"></span><span class="count">2 pages</span></div>
+    <div class="panel">
+      <table class="sm">
+        <thead><tr><th>Page</th><th>What's on it</th></tr></thead>
+        <tbody>
+          <tr><td><a href="ops.html">Reports</a><div class="path">ops.html</div></td><td>Grouped by module — SLA compliance, P1s &amp; incidents last month, fleet changes, sprint velocity, delivery &amp; change</td></tr>
+          <tr><td><a href="ops-compliance-audit.html">Compliance audit</a><div class="path">ops-compliance-audit.html</div></td><td>Control checklist with sign-off</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sm-section">
+    <div class="sm-label"><span class="name">Cross-module · lifecycle</span><span class="rule"></span><span class="count">1 page</span></div>
+    <div class="panel">
+      <table class="sm">
+        <thead><tr><th>Page</th><th>What's on it</th></tr></thead>
+        <tbody>
+          <tr><td><a href="use-case-journey.html">Use case journey</a><div class="path">use-case-journey.html</div></td><td>8-stage tracker from portal submission to production deploy, linking every step</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sm-section">
+    <div class="sm-label"><span class="name">Sign in</span><span class="rule"></span><span class="count">5 pages</span></div>
+    <div class="panel">
+      <table class="sm">
+        <thead><tr><th>Page</th><th>What's on it</th></tr></thead>
+        <tbody>
+          <tr><td><a href="login.html">Sign-in chooser</a><div class="path">login.html</div></td><td>Picks the right login for each role</td></tr>
+          <tr><td><a href="ssp-login.html">Employee (SSP) login</a><div class="path">ssp-login.html</div></td><td>SSO or email → self-service portal</td></tr>
+          <tr><td><a href="agent-login.html">Agent login</a><div class="path">agent-login.html</div></td><td>Workspace + SSO → service desk</td></tr>
+          <tr><td><a href="portal-admin-login.html">Portal admin login</a><div class="path">portal-admin-login.html</div></td><td>SSO + 2FA → admin settings</td></tr>
+          <tr><td><a href="saas-admin-login.html">Platform admin login</a><div class="path">saas-admin-login.html</div></td><td>Trakolo staff → tenant console</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sm-section">
+    <div class="sm-label"><span class="name">Platform · Trakolo staff only</span><span class="rule"></span><span class="count">3 pages</span></div>
+    <div class="panel">
+      <table class="sm">
+        <thead><tr><th>Page</th><th>What's on it</th></tr></thead>
+        <tbody>
+          <tr><td><a href="saas-admin-console.html">Tenant workspaces</a><div class="path">saas-admin-console.html</div></td><td>Every org on Trakolo cloud — plan, seats, region, health</td></tr>
+          <tr><td><a href="saas-admin-services.html">Platform services</a><div class="path">saas-admin-services.html</div></td><td>Start, stop, restart infrastructure with confirmations and a protected database</td></tr>
+          <tr><td><a href="saas-admin-plans.html">Plans &amp; entitlements</a><div class="path">saas-admin-plans.html</div></td><td>What each customer bought — product toggles and feature flags per tenant, license files for on-premise</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sm-section">
+    <div class="sm-label"><span class="name">Portal · self-service</span><span class="rule"></span><span class="count">2 pages</span></div>
+    <div class="panel">
+      <table class="sm">
+        <thead><tr><th>Page</th><th>What's on it</th></tr></thead>
+        <tbody>
+          <tr><td><a href="contact.html">Contact support</a><div class="path">contact.html</div></td><td>Channels — ticket, chat, email-to-ticket, phone with voicemail-to-ticket</td></tr>
+          <tr><td><a href="track.html">Track a ticket</a><div class="path">track.html</div></td><td>Status lookup, no login needed</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sm-section">
+    <div class="sm-label"><span class="name">Admin · settings</span><span class="rule"></span><span class="count">3 pages</span></div>
+    <div class="panel">
+      <table class="sm">
+        <thead><tr><th>Page</th><th>What's on it</th></tr></thead>
+        <tbody>
+          <tr><td><a href="admin.html">Admin settings</a><div class="path">admin.html</div></td><td>Ticket sources, AI agent, business rules, SLAs, routing, license, per-module config, system status</td></tr>
+          <tr><td><a href="azure-onboarding.html">Azure AD onboarding</a><div class="path">azure-onboarding.html</div></td><td>Request a new starter account and watch the provisioning automation run</td></tr>
+          <tr><td><a href="data-migration.html">Data migration</a><div class="path">data-migration.html</div></td><td>Import from Jira, ServiceNow, Zendesk, Freshdesk, Trello, or CSV with field mapping</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sm-section">
+    <div class="sm-label"><span class="name">This page</span><span class="rule"></span><span class="count">1 page</span></div>
+    <div class="panel">
+      <table class="sm">
+        <thead><tr><th>Page</th><th>What's on it</th></tr></thead>
+        <tbody>
+          <tr><td><a href="sitemap.html">Site map</a><div class="path">sitemap.html</div></td><td>This list — every page with its link and a one-line note</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>
