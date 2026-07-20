@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — team workload</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .wl-grid{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:16px;align-items:start;}
+  .wl-col-label{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink-muted);font-family:var(--font-mono);font-weight:600;margin:0 0 10px;}
+  .tchip{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 12px;box-shadow:var(--shadow-xs);cursor:grab;margin-bottom:8px;transition:box-shadow .15s,transform .15s,opacity .15s;}
+  .tchip:active{cursor:grabbing;}
+  .tchip:hover{box-shadow:var(--shadow-md);transform:translateY(-1px);}
+  .tchip.dragging{opacity:.45;}
+  .tchip .tc-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px;}
+  .tchip .tc-t{font-size:12.5px;font-weight:600;line-height:1.35;}
+  .tchip .tc-people{display:flex;align-items:center;margin-top:7px;gap:2px;}
+  .tchip .avx{width:20px;height:20px;border-radius:50%;background:var(--indigo-bg);color:var(--indigo-text);font-size:8.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--surface);position:relative;}
+  .tchip .avx + .avx{margin-left:-7px;}
+  .tchip .avx .rm{position:absolute;top:-6px;right:-6px;width:12px;height:12px;border-radius:50%;background:var(--coral);color:#fff;font-size:8px;line-height:12px;text-align:center;cursor:pointer;display:none;}
+  .tchip:hover .avx .rm{display:block;}
+  .tchip .pair-tag{font-size:9.5px;font-family:var(--font-mono);color:var(--violet-text);background:var(--violet-bg);border-radius:5px;padding:2px 6px;margin-left:6px;}
+  .dropzone{border:2px dashed var(--border-strong);border-radius:var(--r-lg);padding:14px;min-height:120px;transition:border-color .15s,background .15s;}
+  .dropzone.over{border-color:var(--indigo);background:var(--indigo-bg);}
+  .dz-empty{font-size:12px;color:var(--ink-muted);text-align:center;padding:22px 8px;}
+  .person-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px dashed transparent;border-radius:var(--r-md);transition:border-color .15s,background .15s;}
+  .person-row.over{border-color:var(--indigo);background:var(--indigo-bg);}
+  .person-row .who{flex:1;}
+  .pcount{font-family:var(--font-mono);font-size:11px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:2px 9px;}
+  .group-head{display:flex;justify-content:space-between;align-items:center;margin:14px 0 4px;}
+  .group-head:first-child{margin-top:0;}
+  .group-head .gname{font-size:13px;font-weight:700;}
+  .wl-toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-size:12.5px;padding:9px 16px;border-radius:20px;box-shadow:var(--shadow-lg);opacity:0;transition:opacity .2s;pointer-events:none;z-index:95;}
+  .wl-toast.show{opacity:1;}
+  @media (max-width:980px){.wl-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a class="active" href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="desk-log-ticket.html">Log a ticket</a>
+  <a href="desk-catalog.html">Service catalog</a>
+  <a href="desk.html">Service desk</a>
+  <a class="active" href="desk-workload.html">Workload</a>
+  <a href="desk-approvals.html">Approvals</a>
+  <a href="desk-problems.html">Problems</a>
+  <a href="desk-kb.html">Knowledge base</a>
+  <a href="desk-oncall.html">On-call</a>
+</div>
+
+<div class="wrap">
+  <div class="page-head">
+    <div><div class="page-title">Team workload</div><div class="page-desc">Drag a ticket onto a person to assign it, onto a <b>second</b> person to pair them, or into your to-do to take it yourself. Counts update live.</div></div>
+    <span class="badge info" id="pair-badge">1 pair active</span>
+  </div>
+
+  <div class="strip">
+    <div class="mcard info"><div class="mlabel">New today</div><div class="mval" id="stat-new">6</div><div class="mdelta">4 in the group queue · 2 assigned to you</div></div>
+    <div class="mcard warn"><div class="mlabel">Unassigned</div><div class="mval" id="stat-unassigned">4</div><div class="mdelta">IT Ops group queue</div></div>
+    <div class="mcard ok"><div class="mlabel">My to-do</div><div class="mval" id="stat-mine">0</div><div class="mdelta">drag tickets here to claim them</div></div>
+    <div class="mcard crit"><div class="mlabel">Heaviest load</div><div class="mval" id="stat-heavy">—</div><div class="mdelta">rebalance by dragging between people</div></div>
+  </div>
+
+  <div class="wl-grid">
+    <div>
+      <div class="wl-col-label">My new tickets</div>
+      <div class="card" style="padding:14px;">
+        <div id="zone-mynew"></div>
+      </div>
+      <div class="wl-col-label" style="margin-top:16px;">My group's new tickets — IT Ops queue</div>
+      <div class="card" style="padding:14px;">
+        <div id="zone-groupnew"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="wl-col-label">My to-do <span style="text-transform:none;letter-spacing:0;">(E. Moreau)</span></div>
+      <div class="dropzone" id="zone-todo" data-drop="todo">
+        <div id="todo-list"></div>
+      </div>
+      <div class="wl-col-label" style="margin-top:16px;">Back to group queue</div>
+      <div class="dropzone" id="zone-unassign" data-drop="unassign" style="min-height:64px;">
+        <div class="dz-empty">Drop here to unassign — the ticket returns to its group's queue</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="wl-col-label">Groups &amp; people — drop to assign or pair</div>
+      <div class="card" style="padding:16px;" id="groups"></div>
+    </div>
+  </div>
+</div>
+
+<div class="wl-toast" id="toast"></div>
+
+<script>
+const ME = 'EM';
+const PEOPLE = {
+  EM:{name:'E. Moreau', group:'IT Ops'},
+  RK:{name:'Raj K.', group:'IT Ops'},
+  SM:{name:'Sara M.', group:'IT Ops'},
+  DF:{name:'D. Ferreira', group:'Infrastructure'},
+  NP:{name:'Nadia P.', group:'Security'}
+};
+const GROUPS = ['IT Ops','Infrastructure','Security'];
+
+/* assignees: [] = in group queue; [x] = assigned; [x,y] = pair */
+let tickets = {
+  'TS-4834':{t:'Follow-up: MFA lockout pattern (3rd this week)', pr:'warn', prL:'High', group:'IT Ops', assignees:[ME], fresh:true},
+  'TS-4839':{t:'Quarterly access review kickoff', pr:'warn', prL:'High', group:'IT Ops', assignees:[ME], fresh:true},
+  'TS-4835':{t:'Second monitor flickering — dock suspected', pr:'neutral', prL:'Normal', group:'IT Ops', assignees:[], fresh:true},
+  'TS-4836':{t:'Install Tableau for finance analyst', pr:'neutral', prL:'Normal', group:'IT Ops', assignees:[], fresh:true},
+  'TS-4837':{t:'Guest wifi for vendor visit Thursday', pr:'ok', prL:'Low', group:'IT Ops', assignees:[], fresh:true},
+  'TS-4838':{t:'Laptop fan noise, 2nd floor', pr:'ok', prL:'Low', group:'IT Ops', assignees:[], fresh:true},
+  'TS-4821':{t:'VPN drops on hybrid laptops', pr:'crit', prL:'Urgent', group:'IT Ops', assignees:['RK']},
+  'TS-4809':{t:'Printer offline, 3rd floor east', pr:'ok', prL:'Low', group:'IT Ops', assignees:['RK']},
+  'TS-4819':{t:'Shared drive permissions for Finance', pr:'warn', prL:'High', group:'IT Ops', assignees:['SM']},
+  'TS-4816':{t:'Escalation: payroll SSO outage', pr:'crit', prL:'Urgent', group:'Infrastructure', assignees:['DF','SM']}
+};
+let myTodo = [];   /* ticket ids in my to-do order */
+
+function chip(id){
+  const x = tickets[id];
+  const badge = `<span class="badge ${x.pr==='ok'?'neutral':x.pr}">${x.prL}</span>`;
+  const avatars = x.assignees.map(a =>
+    `<span class="avx" title="${PEOPLE[a].name}">${a}<span class="rm" onclick="removeAssignee(event,'${id}','${a}')" title="Remove ${PEOPLE[a].name}">×</span></span>`).join('');
+  const pair = x.assignees.length === 2 ? '<span class="pair-tag">pair</span>' : '';
+  return `<div class="tchip" draggable="true" data-id="${id}" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
+    <div class="tc-top"><span class="id-mono">${id}</span>${badge}</div>
+    <div class="tc-t">${x.t}</div>
+    ${x.assignees.length ? `<div class="tc-people">${avatars}${pair}</div>` : ''}
+  </div>`;
+}
+
+function render(){
+  const myNew = Object.keys(tickets).filter(id => tickets[id].fresh && tickets[id].assignees.includes(ME) && !myTodo.includes(id));
+  const groupNew = Object.keys(tickets).filter(id => tickets[id].fresh && tickets[id].assignees.length === 0);
+  document.getElementById('zone-mynew').innerHTML = myNew.length ? myNew.map(chip).join('') : '<div class="dz-empty">Nothing new assigned to you.</div>';
+  document.getElementById('zone-groupnew').innerHTML = groupNew.length ? groupNew.map(chip).join('') : '<div class="dz-empty">Group queue is clear 🎉</div>';
+  document.getElementById('todo-list').innerHTML = myTodo.length ? myTodo.map(chip).join('') : '<div class="dz-empty">Drag any ticket here to put it on your list.</div>';
+
+  const counts = {};
+  Object.keys(PEOPLE).forEach(p => counts[p] = 0);
+  Object.values(tickets).forEach(x => x.assignees.forEach(a => counts[a]++));
+  document.getElementById('groups').innerHTML = GROUPS.map(g => {
+    const members = Object.keys(PEOPLE).filter(p => PEOPLE[p].group === g);
+    const gTotal = Object.values(tickets).filter(x => x.group === g).length;
+    return `<div class="group-head"><span class="gname">${g}</span><span class="pcount">${gTotal} tickets</span></div>` +
+      members.map(p => {
+        const theirs = Object.keys(tickets).filter(id => tickets[id].assignees[0] === p || (tickets[id].assignees[1] === p));
+        return `
+        <div class="person-row" data-drop="person" data-person="${p}">
+          <div class="who"><div class="av">${p}</div>${PEOPLE[p].name}${p===ME?' <span class="id-mono" style="font-size:10px;">(you)</span>':''}</div>
+          <span class="pcount">${counts[p]} ticket${counts[p]===1?'':'s'}</span>
+        </div>
+        ${theirs.length ? `<div style="margin:0 0 6px 40px;">${theirs.map(chip).join('')}</div>` : ''}`;
+      }).join('');
+  }).join('');
+
+  document.getElementById('stat-unassigned').textContent = groupNew.length;
+  document.getElementById('stat-mine').textContent = myTodo.length;
+  const heavy = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('stat-heavy').textContent = PEOPLE[heavy[0]].name + ' · ' + heavy[1];
+  const pairs = Object.values(tickets).filter(x => x.assignees.length === 2).length;
+  document.getElementById('pair-badge').textContent = pairs + ' pair' + (pairs===1?'':'s') + ' active';
+  wireDropzones();
+}
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+function dragStart(e){
+  e.dataTransfer.setData('text/plain', e.currentTarget.dataset.id);
+  e.currentTarget.classList.add('dragging');
+}
+function dragEnd(e){ e.currentTarget.classList.remove('dragging'); }
+
+function wireDropzones(){
+  document.querySelectorAll('[data-drop]').forEach(z => {
+    z.ondragover = e => { e.preventDefault(); z.classList.add('over'); };
+    z.ondragleave = () => z.classList.remove('over');
+    z.ondrop = e => {
+      e.preventDefault(); z.classList.remove('over');
+      const id = e.dataTransfer.getData('text/plain');
+      if(!id || !tickets[id]) return;
+      const x = tickets[id];
+      if(z.dataset.drop === 'todo'){
+        if(!x.assignees.includes(ME)){
+          if(x.assignees.length >= 2) x.assignees = [ME]; else x.assignees.push(ME);
+        }
+        if(!myTodo.includes(id)) myTodo.push(id);
+        toast(id + ' → your to-do' + (x.assignees.length===2 ? ' · paired with ' + PEOPLE[x.assignees.find(a=>a!==ME)].name : ''));
+      } else if(z.dataset.drop === 'unassign'){
+        x.assignees = [];
+        myTodo = myTodo.filter(t => t !== id);
+        toast(id + ' returned to the ' + x.group + ' queue');
+      } else if(z.dataset.drop === 'person'){
+        const p = z.dataset.person;
+        if(x.assignees.includes(p)){ toast(PEOPLE[p].name + ' is already on ' + id); return; }
+        if(x.assignees.length === 0){
+          x.assignees = [p];
+          toast(id + ' assigned to ' + PEOPLE[p].name);
+        } else if(x.assignees.length === 1){
+          x.assignees.push(p);
+          toast(id + ' — ' + PEOPLE[x.assignees[0]].name + ' + ' + PEOPLE[p].name + ' are now pairing');
+        } else {
+          x.assignees = [x.assignees[0], p];
+          toast(id + ' pair updated: ' + PEOPLE[x.assignees[0]].name + ' + ' + PEOPLE[p].name);
+        }
+        if(!x.assignees.includes(ME)) myTodo = myTodo.filter(t => t !== id);
+        x.group = PEOPLE[p].group === x.group ? x.group : x.group; /* group stays with the ticket */
+      }
+      render();
+    };
+  });
+}
+
+function removeAssignee(e, id, p){
+  e.stopPropagation();
+  const x = tickets[id];
+  x.assignees = x.assignees.filter(a => a !== p);
+  if(p === ME) myTodo = myTodo.filter(t => t !== id);
+  toast(PEOPLE[p].name + ' removed from ' + id + (x.assignees.length ? '' : ' — back in the ' + x.group + ' queue'));
+  render();
+}
+
+render();
+</script>
+<script src="app-chrome.js" defer></script>
+</body>
+</html>

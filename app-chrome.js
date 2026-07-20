@@ -22,6 +22,7 @@
     {label:'SW-01188 · Figma — Full seat', sub:'Asset · Idle 40d, reclaim suggested', href:'sam.html', tag:'asset'},
     {label:'Service desk', sub:'Page · queue & tickets', href:'desk.html', tag:'page'},
     {label:'Service catalog', sub:'Page · structured requests', href:'desk-catalog.html', tag:'page'},
+    {label:'Team workload', sub:'Page · drag to assign, pair, or claim', href:'desk-workload.html', tag:'page'},
     {label:'Approvals', sub:'Page · waiting on you', href:'desk-approvals.html', tag:'page'},
     {label:'Problems', sub:'Page · problem management', href:'desk-problems.html', tag:'page'},
     {label:'Knowledge base', sub:'Page · articles & deflection', href:'desk-kb.html', tag:'page'},

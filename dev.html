@@ -93,7 +93,7 @@ const cards = {
   "DEV-1039":{due:23, title:"Design SLA beam component states", tags:["design"], av:"NP", pts:2,
     desc:"Cover empty, warning, and breached states for the SLA beam used across ticket, asset, and sprint views.",
     subtasks:[["Draft states in Figma",true],["Review with eng",false]], comments:[]},
-  "DEV-1031":{due:22, title:"Escalation routing for L2 → L3 handoff", tags:["backend","P1"], av:"RK", pts:5,
+  "DEV-1031":{due:22, title:"Escalation routing for L2 → L3 handoff", tags:["backend","P1"], av:"RK", av2:"SM", pair:"Raj K. + Sara M.", pts:5,
     desc:"Build the auto-escalation rule that moves a ticket from L2 to L3 on-call once its SLA window closes without an assignment change. Should reuse the same beam/track components already used on the ticket detail page.",
     subtasks:[["Define escalation trigger rules",true],["Add on-call paging integration",true],["Surface escalation path on ticket detail",false],["Write tests for edge cases",false]],
     comments:[{av:"RK",name:"Raj K.",time:"yesterday",text:"Paging integration is live in staging — testing against the payroll SSO scenario from TS-4816 now."}]},
@@ -140,7 +140,7 @@ function renderBoard(){
           <div class="cid">${id}</div>
           <div class="ctitle">${c.title}</div>
           <div class="ctags">${c.tags.map(t=>`<span class="tag-pill">${t}</span>`).join('')}</div>
-          <div class="cfoot"><div class="who"><div class="av">${c.av}</div></div><div class="pts">${c.pts}</div></div>
+          <div class="cfoot"><div class="who"><div class="av">${c.av}</div>${c.av2?`<div class="av" style="margin-left:-9px;border:1.5px solid var(--surface);">${c.av2}</div><span style="font-size:9.5px;font-family:var(--font-mono);color:var(--violet-text);background:var(--violet-bg);border-radius:5px;padding:1px 6px;margin-left:5px;">pair</span>`:''}</div><div class="pts">${c.pts}</div></div>
         </div>`; }).join('')}
     </div>`).join('');
 }
@@ -168,6 +168,7 @@ function openCard(id){
       <tr><td style="color:var(--ink-2);padding:6px 0;">Points</td><td style="text-align:right;">${c.pts}</td></tr>
       <tr><td style="color:var(--ink-2);padding:6px 0;">Tags</td><td style="text-align:right;">${c.tags.join(', ')}</td></tr>
       <tr><td style="color:var(--ink-2);padding:6px 0;">Sprint</td><td style="text-align:right;">${c.sprint || 'Sprint 34'}</td></tr>
+      ${c.pair ? `<tr><td style="color:var(--ink-2);padding:6px 0;">Assignees</td><td style="text-align:right;">${c.pair} · <span style="color:var(--violet-text);font-weight:600;">pairing</span></td></tr>` : ''}
       ${c.ticket ? `<tr><td style="color:var(--ink-2);padding:6px 0;">Source ticket</td><td style="text-align:right;"><a href="desk.html" style="color:var(--indigo-text);">${c.ticket} →</a></td></tr>` : (c.changeRequest ? `<tr><td style="color:var(--ink-2);padding:6px 0;">Source ticket</td><td style="text-align:right;color:var(--ink-muted);">None — created directly on the board</td></tr>` : '')}
       ${c.changeRequest ? `<tr><td style="color:var(--ink-2);padding:6px 0;">Change request</td><td style="text-align:right;"><a href="desk.html" style="color:var(--indigo-text);">${c.changeRequest} →</a></td></tr>` : ''}
     </table>
@@ -196,7 +197,7 @@ function renderListView(){
       <td class="id-mono">${id}</td><td>${c.title}</td>
       <td><span class="badge ${statusBadge(statusOf[id])}">${statusOf[id]}</span></td>
       <td>${c.tags.map(t=>`<span class="tag-pill">${t}</span>`).join(' ')}</td>
-      <td><div class="who"><div class="av">${c.av}</div></div></td>
+      <td><div class="who"><div class="av">${c.av}</div>${c.av2?`<div class="av" style="margin-left:-9px;border:1.5px solid var(--surface);">${c.av2}</div>`:''}</div></td>
       <td class="id-mono">${c.pts}</td><td class="id-mono">Jul ${c.due}</td>
     </tr>`; }).join('');
 }
