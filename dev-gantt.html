@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — gantt</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .gg{--label:250px;--days:21;position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);overflow-x:auto;}
+  .gg-inner{min-width:900px;position:relative;}
+  .gg-head{display:grid;grid-template-columns:var(--label) repeat(var(--days),1fr);border-bottom:1px solid var(--border);background:var(--surface-2);}
+  .gg-head .gh{font-size:9.5px;font-family:var(--font-mono);color:var(--ink-muted);text-align:center;padding:7px 0 6px;border-left:1px solid var(--border);}
+  .gg-head .gh b{display:block;font-size:10.5px;color:var(--ink-2);}
+  .gg-head .gh.wknd{background:var(--surface);opacity:.75;}
+  .gg-head .gh.today{background:var(--indigo-bg);color:var(--indigo-text);}
+  .gg-head .gh.today b{color:var(--indigo-text);}
+  .gg-row{display:grid;grid-template-columns:var(--label) repeat(var(--days),1fr);align-items:center;border-bottom:1px solid var(--border);min-height:46px;}
+  .gg-row:last-child{border-bottom:none;}
+  .gg-row:hover{background:var(--surface-2);}
+  .gg-label{padding:8px 12px;font-size:12px;display:flex;align-items:center;gap:8px;}
+  .gg-label .id-mono{flex-shrink:0;}
+  .gg-label .t{font-weight:600;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;}
+  .gg-label .avm{width:18px;height:18px;border-radius:50%;background:var(--indigo-bg);color:var(--indigo-text);font-size:8px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;border:1.5px solid var(--surface);}
+  .gg-label .avm + .avm{margin-left:-7px;}
+  .gg-bar{height:18px;border-radius:9px;position:relative;margin:0 1px;box-shadow:var(--shadow-xs);cursor:default;}
+  .gg-bar .pct{position:absolute;inset:0;border-radius:9px;background:rgba(255,255,255,.35);right:auto;}
+  .gg-bar .bl{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:9px;color:#fff;font-weight:700;white-space:nowrap;font-family:var(--font-mono);}
+  .gg-bar.done{background:var(--indigo);}
+  .gg-bar.active{background:var(--grad-primary);}
+  .gg-bar.review{background:var(--amber);}
+  .gg-bar.planned{background:var(--border-strong);}
+  .gg-bar.planned .bl{color:var(--ink-2);}
+  .gg-dep{font-size:10px;font-family:var(--font-mono);color:var(--ink-muted);margin-left:6px;white-space:nowrap;flex-shrink:0;}
+  .gg-mile{position:relative;height:100%;}
+  .gg-mile .dia{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(45deg);width:12px;height:12px;background:var(--coral);border-radius:3px;box-shadow:var(--shadow-sm);}
+  .gg-mile .dia.ok{background:var(--green);}
+  .gg-today-line{position:absolute;top:0;bottom:0;width:2px;background:var(--indigo);opacity:.55;pointer-events:none;z-index:5;}
+  .gg-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-2);margin-top:12px;align-items:center;}
+  .gg-legend .sw{display:inline-block;width:22px;height:10px;border-radius:5px;margin-right:6px;vertical-align:middle;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a class="active" href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="dev.html">Sprint board</a>
+  <a href="dev-backlog.html">Backlog &amp; planning</a>
+  <a href="dev-roadmap.html">Epics &amp; roadmap</a>
+  <a class="active" href="dev-gantt.html">Gantt</a>
+  <a href="dev-ownership.html">Team ownership</a>
+  <a href="dev-product-tree.html">Product tree</a>
+</div>
+
+<div class="wrap" style="max-width:1120px;">
+  <div class="page-head">
+    <div><div class="page-title">Gantt — Sprint 34 &amp; spillover</div><div class="page-desc">Jul 6 – 26 · bars are sprint cards, diamonds are change-management deploy milestones. Same data as the board, on a timeline.</div></div>
+    <button class="btn primary">Add task</button>
+  </div>
+
+  <div class="gg" id="gg">
+    <div class="gg-inner" id="gg-inner">
+      <div class="gg-head" id="gg-head"></div>
+      <div id="gg-rows"></div>
+    </div>
+  </div>
+
+  <div class="gg-legend">
+    <span><span class="sw" style="background:var(--indigo);"></span>Done</span>
+    <span><span class="sw" style="background:var(--grad-primary);"></span>In progress <span class="id-mono" style="font-size:10px;">(lighter overlay = % complete)</span></span>
+    <span><span class="sw" style="background:var(--amber);"></span>In review</span>
+    <span><span class="sw" style="background:var(--border-strong);"></span>Planned</span>
+    <span><span class="sw" style="background:var(--coral);width:10px;height:10px;border-radius:3px;transform:rotate(45deg);"></span> Deploy milestone</span>
+    <span><span class="sw" style="background:var(--indigo);width:2px;height:14px;border-radius:0;"></span> Today (Jul 20)</span>
+  </div>
+</div>
+
+<script>
+/* timeline: Jul 6 (Mon) … Jul 26 (Sun) = 21 days; day index = date - 6 */
+const DAYS = 21, START = 6;
+const TODAY = 20;
+const DOW = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+const tasks = [
+  {id:'DEV-1058', t:'Bulk asset reassignment tool', s:7,  e:17, st:'done',    who:['RK'], dep:'', note:'deployed via CR-0091'},
+  {id:'DEV-1063', t:'Optimize asset list query',    s:9,  e:19, st:'done',    who:['TK'], dep:'', note:'awaiting CR-0092 window'},
+  {id:'DEV-1031', t:'Escalation routing L2 → L3',   s:13, e:23, st:'active',  who:['RK','SM'], pct:60, dep:''},
+  {id:'DEV-1028', t:'Asset renewal digest email',   s:15, e:24, st:'active',  who:['SM'], pct:40, dep:''},
+  {id:'DEV-1019', t:'Compliance report CSV export', s:16, e:21, st:'review',  who:['TK'], dep:''},
+  {id:'DEV-1014', t:'Kanban drag + keyboard a11y',  s:17, e:24, st:'active',  who:['NP'], pct:35, dep:''},
+  {id:'DEV-1039', t:'SLA beam component states',    s:21, e:23, st:'planned', who:['NP'], dep:''},
+  {id:'DEV-1042', t:'Rate-limit assets webhook',    s:22, e:25, st:'planned', who:['TK'], dep:'after DEV-1063'}
+];
+const milestones = [
+  {d:20, cls:'ok',  label:'CR-0091 → PROD (done 02:00)'},
+  {d:22, cls:'',    label:'CR-0092 window 03:00 UTC'}
+];
+
+function col(d){ return d - START + 2; } /* +2: col 1 is the label */
+
+/* header */
+let head = '<div></div>';
+for(let i=0;i<DAYS;i++){
+  const date = START + i, dow = DOW[i % 7];
+  const cls = (date===TODAY?'today':(dow==='Sat'||dow==='Sun')?'wknd':'');
+  head += `<div class="gh ${cls}">${dow}<b>${date}</b></div>`;
+}
+document.getElementById('gg-head').innerHTML = head;
+
+/* milestone row */
+let rows = `<div class="gg-row" style="min-height:34px;background:var(--surface-2);">
+  <div class="gg-label"><span class="id-mono">MILESTONES</span></div>
+  ${milestones.map(m => `<div class="gg-mile" style="grid-column:${col(m.d)};" title="${m.label}"><span class="dia ${m.cls}"></span></div>`).join('')}
+</div>`;
+
+/* task rows */
+rows += tasks.map(x => {
+  const avs = x.who.map(w => `<span class="avm">${w}</span>`).join('');
+  const pair = x.who.length===2 ? '<span class="gg-dep" style="color:var(--violet-text);">pair</span>' : '';
+  const pct = x.st==='active' && x.pct ? `<span class="pct" style="width:${100-x.pct}%;right:0;left:auto;border-radius:0 9px 9px 0;background:rgba(255,255,255,.45);"></span>` : '';
+  const label = x.st==='active' && x.pct ? `<span class="bl">${x.pct}%</span>` : '';
+  return `<div class="gg-row">
+    <div class="gg-label" title="${x.t}${x.dep?' — '+x.dep:''}">${avs}<span class="id-mono">${x.id}</span><span class="t">${x.t}</span>${pair}${x.dep?`<span class="gg-dep" title="${x.dep}">⛓</span>`:''}</div>
+    <div class="gg-bar ${x.st}" style="grid-column:${col(x.s)} / ${col(x.e)+1};" title="${x.id} · ${x.t} · Jul ${x.s}–${x.e}${x.note?' · '+x.note:''}">${pct}${label}</div>
+  </div>`;
+}).join('');
+document.getElementById('gg-rows').innerHTML = rows;
+
+/* today line */
+(function(){
+  const inner = document.getElementById('gg-inner');
+  function place(){
+    const head = document.getElementById('gg-head');
+    const labelW = head.firstElementChild.getBoundingClientRect().width;
+    const total = inner.getBoundingClientRect().width;
+    const dayW = (total - labelW) / DAYS;
+    const x = labelW + dayW * (TODAY - START + 0.5);
+    let line = document.getElementById('gg-today');
+    if(!line){ line = document.createElement('div'); line.id='gg-today'; line.className='gg-today-line'; inner.appendChild(line); }
+    line.style.left = x + 'px';
+  }
+  place();
+  window.addEventListener('resize', place);
+})();
+</script>
+<script src="app-chrome.js" defer></script>
+</body>
+</html>

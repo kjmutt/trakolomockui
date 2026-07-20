@@ -32,6 +32,7 @@
     {label:'Asset discovery', sub:'Page · agent & network scan', href:'sam-discovery.html', tag:'page'},
     {label:'Sprint board', sub:'Page · Sprint 34', href:'dev.html', tag:'page'},
     {label:'Epics & roadmap', sub:'Page · quarter view', href:'dev-roadmap.html', tag:'page'},
+    {label:'Gantt', sub:'Page · sprint timeline with milestones', href:'dev-gantt.html', tag:'page'},
     {label:'Reports', sub:'Page · P1s, incidents, CSAT, velocity', href:'ops.html', tag:'page'},
     {label:'Admin settings', sub:'Page · config, license, audit log', href:'admin.html', tag:'page'},
     {label:'Data migration', sub:'Page · import from Jira, ServiceNow…', href:'data-migration.html', tag:'page'},
