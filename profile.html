@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — my profile</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+
+<div class="wrap" style="max-width:820px;">
+  <div class="page-head">
+    <div><div class="page-title">My profile</div><div class="page-desc">Personal preferences — these override the workspace defaults set in Admin, for you only.</div></div>
+    <a href="home.html" class="btn">← My day</a>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Identity</div>
+    <div style="display:flex;gap:16px;align-items:center;margin-bottom:6px;">
+      <div class="avatar" style="width:52px;height:52px;font-size:18px;">EM</div>
+      <div>
+        <div style="font-size:16px;font-weight:700;font-family:var(--font-display);">E. Moreau</div>
+        <div style="font-size:12.5px;color:var(--ink-muted);margin-top:2px;">e.moreau@acme.com · Workspace admin · Acme Corp</div>
+      </div>
+    </div>
+    <div class="row-line"><div><div class="rname">Signed in via</div><div class="rdesc">Okta SSO + 2FA · portal admin login</div></div><span class="badge ok">Verified</span></div>
+    <div class="row-line"><div><div class="rname">Groups</div></div><span style="font-size:12.5px;">IT Ops · Change Advisory Board</span></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">My appearance</div>
+    <div class="row-line"><div><div class="rname">Theme</div><div class="rdesc">Applies on this browser — same options as the workspace setting</div></div>
+      <div style="display:flex;gap:8px;">
+        <div class="chip mode-chip" data-mode="light">☀ Light</div>
+        <div class="chip mode-chip" data-mode="dark">☾ Dark</div>
+        <div class="chip mode-chip" data-mode="system">◐ System</div>
+      </div>
+    </div>
+    <div class="row-line"><div><div class="rname">My language</div><div class="rdesc">Overrides the workspace default (English US)</div></div>
+      <select style="width:180px;"><option>Workspace default</option><option>English (UK)</option><option>Deutsch</option><option>Français</option><option>Español</option><option>Português (BR)</option><option>हिन्दी</option><option>日本語</option></select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">My notifications</div>
+    <div class="row-line"><div><div class="rname">Approvals assigned to me</div><div class="rdesc">In-app + Slack DM, immediately</div></div><div class="switch on"></div></div>
+    <div class="row-line"><div><div class="rname">SLA warnings on my team's tickets</div><div class="rdesc">At 80% of the window</div></div><div class="switch on"></div></div>
+    <div class="row-line"><div><div class="rname">On-call handoffs</div><div class="rdesc">24h before my rotation starts</div></div><div class="switch on"></div></div>
+    <div class="row-line"><div><div class="rname">Daily digest email</div><div class="rdesc">My day summary at 08:30</div></div><div class="switch"></div></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">My API tokens</div>
+    <div class="page-desc" style="margin:-4px 0 8px;">Personal tokens act as you, limited by your role. Workspace-level keys live in <a href="admin.html" style="color:var(--indigo-text);">Admin → Integrations</a>.</div>
+    <div class="row-line"><div><div class="rname">cli-scripts</div><div class="rdesc">read-write · created Jun 12 · last used 2h ago</div></div><button class="btn sm">Revoke</button></div>
+    <div class="row-line"><div><div class="rname">grafana-readonly</div><div class="rdesc">read-only · created Mar 4 · last used yesterday</div></div><button class="btn sm">Revoke</button></div>
+    <button class="btn sm" style="margin-top:10px;">+ New personal token</button>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Sessions</div>
+    <div class="row-line"><div><div class="rname">This browser · Chrome on macOS</div><div class="rdesc">London · active now</div></div><span class="badge ok">Current</span></div>
+    <div class="row-line"><div><div class="rname">Mobile · Safari on iOS</div><div class="rdesc">Last active 3d ago</div></div><button class="btn sm">Sign out</button></div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.switch').forEach(s=>s.addEventListener('click', ()=>s.classList.toggle('on')));
+function syncChips(){
+  const m = localStorage.getItem('trakolo-theme') || 'light';
+  document.querySelectorAll('.mode-chip').forEach(c=>c.classList.toggle('active', c.dataset.mode===m));
+}
+document.querySelectorAll('.mode-chip').forEach(c=>c.addEventListener('click', ()=>{
+  const m = c.dataset.mode;
+  localStorage.setItem('trakolo-theme', m);
+  const dark = m==='dark' || (m==='system' && matchMedia('(prefers-color-scheme: dark)').matches);
+  if(dark) document.documentElement.dataset.theme='dark'; else delete document.documentElement.dataset.theme;
+  syncChips();
+}));
+syncChips();
+</script>
+<script src="app-chrome.js" defer></script>
+</body>
+</html>

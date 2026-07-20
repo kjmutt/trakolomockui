@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — my day</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .day-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:start;}
+  .todo-row{display:flex;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);text-decoration:none;}
+  .todo-row:last-child{border-bottom:none;}
+  .todo-row:hover .tr-title{color:var(--indigo-text);}
+  .tr-title{display:block;font-size:13px;font-weight:600;}
+  .tr-sub{display:block;font-size:11.5px;color:var(--ink-muted);margin-top:2px;}
+  .agenda-time{font-family:var(--font-mono);font-size:11px;color:var(--ink-muted);width:52px;flex-shrink:0;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+
+<div class="wrap" style="max-width:1040px;">
+  <div class="page-head">
+    <div><div class="page-title">Good morning, E. Moreau</div><div class="page-desc">Monday, July 20 — here's what's waiting on you across every module.</div></div>
+    <a href="desk.html" class="btn primary">Open the queue</a>
+  </div>
+
+  <div class="strip">
+    <div class="mcard warn"><div class="mlabel">Waiting on you</div><div class="mval">4</div><div class="mdelta">2 approvals · 2 tickets</div></div>
+    <div class="mcard crit"><div class="mlabel">SLA at risk</div><div class="mval">2</div><div class="mdelta">TS-4821 breaches in 18m</div></div>
+    <div class="mcard info"><div class="mlabel">Deploy today</div><div class="mval">02:00</div><div class="mdelta">CR-0091 · PRE → PROD window</div></div>
+    <div class="mcard ok"><div class="mlabel">On-call</div><div class="mval">Not you</div><div class="mdelta">D. Ferreira until Mon 09:00 · you're L3 next week</div></div>
+  </div>
+
+  <div class="day-grid">
+    <div>
+      <div class="card">
+        <div class="section-label">Waiting on you</div>
+        <a class="todo-row" href="desk-approvals.html"><span class="badge warn">Approval</span><span><span class="tr-title">CR-0092 · Promote asset query optimization</span><span class="tr-sub">Tomas K. requested Jul 19 · window Jul 22, 03:00 UTC · risk low</span></span></a>
+        <a class="todo-row" href="desk-approvals.html"><span class="badge warn">Approval</span><span><span class="tr-title">AR-0233 · Finance shared drive write access</span><span class="tr-sub">M. Alvarez · routed to you as data owner · auto-expires in 30 days</span></span></a>
+        <a class="todo-row" href="desk.html"><span class="badge crit">SLA</span><span><span class="tr-title">TS-4821 · VPN drops on hybrid laptops</span><span class="tr-sub">Urgent · 18m left · Raj K. is on it — you're the escalation manager</span></span></a>
+        <a class="todo-row" href="desk.html"><span class="badge neutral">Assign</span><span><span class="tr-title">TS-4812 · New starter laptop provisioning</span><span class="tr-sub">Unassigned in IT Ops for 1h · routing rule suggests Raj K.</span></span></a>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Your workspace at a glance</div>
+        <a class="todo-row" href="desk-problems.html"><span class="badge info">Problem</span><span><span class="tr-title">PRB-0007 workaround holding</span><span class="tr-sub">VPN incident rate dropped from ~6/day to 0 since Jul 18</span></span></a>
+        <a class="todo-row" href="ops.html"><span class="badge info">Report</span><span><span class="tr-title">84 P1 tickets last month, 81% within SLA</span><span class="tr-sub">P1s &amp; incidents report · weekly breakdown ready for the ops review</span></span></a>
+        <a class="todo-row" href="sam-discovery.html"><span class="badge warn">Discovery</span><span><span class="tr-title">3 unreconciled devices, 2 unmanaged installs</span><span class="tr-sub">Last scan 02:00 · Raspberry Pi on the lab subnet still unidentified</span></span></a>
+        <a class="todo-row" href="desk-kb.html"><span class="badge ok">AI agent</span><span><span class="tr-title">118 tickets resolved by AI last month</span><span class="tr-sub">CSAT 4.7 · 241 more deflected by the knowledge base</span></span></a>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="section-label">Today — Mon, Jul 20</div>
+        <div class="todo-row"><span class="agenda-time">02:00</span><span><span class="tr-title">CR-0091 deployed to PROD ✓</span><span class="tr-sub">Bulk asset reassignment tool · completed in window, no rollback</span></span></div>
+        <div class="todo-row"><span class="agenda-time">09:30</span><span><span class="tr-title">Ops weekly review</span><span class="tr-sub">P1 trend + CSAT — reports are ready</span></span></div>
+        <div class="todo-row"><span class="agenda-time">14:00</span><span><span class="tr-title">CAB — review CR-0092</span><span class="tr-sub">Decide before the Jul 22 window</span></span></div>
+        <div class="todo-row"><span class="agenda-time">Sat</span><span><span class="tr-title">Planned maintenance — email</span><span class="tr-sub">Jul 26, 22:00–23:00 · announcement live on the portal</span></span></div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Quick actions</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <a href="desk-log-ticket.html" class="btn" style="text-align:center;text-decoration:none;">+ Log a ticket</a>
+          <a href="desk-catalog.html" class="btn" style="text-align:center;text-decoration:none;">Request from the catalog</a>
+          <a href="sam-bulk-upload.html" class="btn" style="text-align:center;text-decoration:none;">Bulk upload assets</a>
+          <a href="azure-onboarding.html" class="btn" style="text-align:center;text-decoration:none;">Onboard a new starter</a>
+        </div>
+        <div style="font-size:11.5px;color:var(--ink-muted);margin-top:12px;">Tip: press <span class="chrome-kbd" style="font-family:var(--font-mono);border:1px solid var(--border-strong);border-radius:5px;padding:1px 5px;">Ctrl K</span> anywhere to search tickets, assets, and pages.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="app-chrome.js" defer></script>
+</body>
+</html>
