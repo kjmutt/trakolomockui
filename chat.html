@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — live chat</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .chat-shell{max-width:560px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);overflow:hidden;display:flex;flex-direction:column;height:640px;}
+  .chat-head{background:var(--grad-primary);color:#fff;padding:14px 18px;display:flex;align-items:center;gap:10px;}
+  .chat-head .st{font-size:11.5px;opacity:.85;}
+  .chat-body{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:10px;background:var(--surface-2);}
+  .msg{max-width:78%;padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.5;opacity:0;animation:msgIn .25s ease forwards;}
+  @keyframes msgIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+  .msg.bot{background:var(--surface);border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px;}
+  .msg.user{background:var(--indigo);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
+  .msg.sys{background:transparent;border:none;align-self:center;font-size:11.5px;color:var(--ink-muted);padding:2px;}
+  .msg .tag{font-size:10px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.5px;color:var(--indigo-text);margin-bottom:4px;}
+  .chat-actions{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;background:var(--surface);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="contact.html">Contact</a>
+    <a href="track.html">Track a ticket</a>
+  </div>
+  <div class="top-right"><a href="ssp-login.html" class="btn sm">Sign in</a></div>
+</div>
+
+<div class="wrap" style="max-width:760px;">
+  <div class="page-head">
+    <div><div class="page-title">Live chat</div><div class="page-desc">The AI agent answers first — from the same knowledge base and policies as everywhere else. A human is one click away, always.</div></div>
+    <a href="contact.html" class="btn">← All support channels</a>
+  </div>
+
+  <div class="chat-shell">
+    <div class="chat-head">
+      <div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;" id="chat-av">AI</div>
+      <div><div style="font-size:14px;font-weight:600;" id="chat-who">Trakolo AI agent</div><div class="st" id="chat-st">Online · answers in seconds</div></div>
+    </div>
+    <div class="chat-body" id="chat-body">
+      <div class="msg bot"><div class="tag">AI agent</div>Hi! I can reset passwords, grant pre-approved access, and answer how-to questions myself — or get you to a person. What's going on?</div>
+    </div>
+    <div class="chat-actions" id="chat-actions">
+      <button class="btn sm" onclick="scenario('locked')">I'm locked out of my account</button>
+      <button class="btn sm" onclick="scenario('vpn')">My VPN keeps dropping</button>
+      <button class="btn sm" onclick="human()">Talk to a human</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const body = document.getElementById('chat-body');
+const actions = document.getElementById('chat-actions');
+
+function push(cls, html, delay){
+  return new Promise(res => setTimeout(() => {
+    const el = document.createElement('div');
+    el.className = 'msg ' + cls;
+    el.innerHTML = html;
+    body.appendChild(el);
+    body.scrollTop = body.scrollHeight;
+    res();
+  }, delay));
+}
+
+async function scenario(which){
+  actions.style.visibility = 'hidden';
+  if(which === 'locked'){
+    await push('user', "I'm locked out of my account", 100);
+    await push('bot', '<div class="tag">AI agent</div>That\'s something I can fix myself. I\'ve sent a verification challenge to your registered backup email — click it and I\'ll reset your password and re-enroll MFA.', 900);
+    await push('sys', 'Identity verified via SSO challenge', 1600);
+    await push('bot', '<div class="tag">AI agent</div>Done — reset link sent, MFA re-enrolled on your new device. I\'ve logged this as ticket <b>TS-4834</b> for the record, already marked resolved. Anything else?', 1200);
+    await push('sys', 'Resolved by AI agent · CSAT survey sent · transcript attached to TS-4834', 1200);
+  } else {
+    await push('user', 'My VPN keeps dropping', 100);
+    await push('bot', '<div class="tag">AI agent</div>There\'s a known problem for this — <b>PRB-0007</b>, VPN drops after an access-point firmware update. A workaround went in on Jul 18 and most people are fine now.', 900);
+    await push('bot', '<div class="tag">AI agent</div>Try: disconnect, toggle wifi off and on, reconnect to <b>corp-secure</b>. (From KB-0041.) If it still drops, I\'ll link a ticket to the open problem for you.', 1300);
+    await push('sys', 'Answer cited knowledge base article KB-0041', 900);
+  }
+  actions.innerHTML = '<button class="btn sm" onclick="human()">Talk to a human</button><button class="btn sm primary" onclick="location.reload()">Start over</button>';
+  actions.style.visibility = 'visible';
+}
+
+async function human(){
+  actions.style.visibility = 'hidden';
+  await push('user', 'Talk to a human', 100);
+  await push('bot', '<div class="tag">AI agent</div>Of course — connecting you now. I\'ve passed along the full conversation so you won\'t repeat yourself.', 800);
+  await push('sys', 'Sara M. joined the chat · transcript shared', 1400);
+  await push('bot', '<div class="tag" style="color:var(--amber-text);">Sara M. · IT Ops</div>Hi, I\'m Sara — I can see the whole thread. What can I do for you?', 1000);
+  document.getElementById('chat-av').textContent = 'SM';
+  document.getElementById('chat-who').textContent = 'Sara M. · IT Ops';
+  document.getElementById('chat-st').textContent = 'Live · escalated from AI agent';
+  actions.innerHTML = '<button class="btn sm primary" onclick="location.reload()">Start over</button>';
+  actions.style.visibility = 'visible';
+}
+</script>
+</body>
+</html>

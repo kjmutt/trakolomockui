@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — service catalog</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+  .cat-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:8px;transition:box-shadow .15s ease,transform .15s ease;}
+  .cat-item:hover{box-shadow:var(--shadow-md);transform:translateY(-1px);}
+  .cat-item .ci-icon{width:34px;height:34px;border-radius:9px;background:var(--indigo-bg);color:var(--indigo-text);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;font-family:var(--font-display);}
+  .cat-item h3{font-size:14px;font-weight:600;}
+  .cat-item p{font-size:12.5px;color:var(--ink-2);flex:1;}
+  .ci-meta{display:flex;gap:6px;flex-wrap:wrap;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a class="active" href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="desk-log-ticket.html">Log a ticket</a>
+  <a class="active" href="desk-catalog.html">Service catalog</a>
+  <a href="desk.html">Service desk</a>
+  <a href="desk-approvals.html">Approvals</a>
+  <a href="desk-problems.html">Problems</a>
+  <a href="desk-kb.html">Knowledge base</a>
+  <a href="desk-oncall.html">On-call</a>
+</div>
+
+<div class="wrap">
+  <div class="page-head">
+    <div><div class="page-title">Service catalog</div><div class="page-desc">Structured requests with a form, an approval path, and a fulfillment time — not a blank ticket box.</div></div>
+  </div>
+
+  <div class="cat-grid">
+    <div class="cat-item">
+      <div class="ci-icon">NS</div>
+      <h3>New starter onboarding</h3>
+      <p>Azure AD account, license, temporary password posted to the ticket and emailed to the new hire's personal address — fully automated.</p>
+      <div class="ci-meta"><span class="badge ok">Automated</span><span class="badge neutral">~2 min</span></div>
+      <a href="azure-onboarding.html" class="btn sm primary" style="align-self:flex-start;">Request →</a>
+    </div>
+    <div class="cat-item">
+      <div class="ci-icon">LP</div>
+      <h3>Laptop request</h3>
+      <p>Standard build (Dell Latitude) or engineering build (MacBook Pro). Manager approval, then fulfilled from stock by IT Ops.</p>
+      <div class="ci-meta"><span class="badge warn">Manager approval</span><span class="badge neutral">2–3 days</span></div>
+      <button class="btn sm" style="align-self:flex-start;">Request →</button>
+    </div>
+    <div class="cat-item">
+      <div class="ci-icon">SW</div>
+      <h3>Software license</h3>
+      <p>Pick from the approved software list. Pre-approved titles are granted instantly by the AI agent; everything else routes to your manager.</p>
+      <div class="ci-meta"><span class="badge info">AI-fulfilled if pre-approved</span><span class="badge neutral">instant–1 day</span></div>
+      <button class="btn sm" style="align-self:flex-start;">Request →</button>
+    </div>
+    <div class="cat-item">
+      <div class="ci-icon">AC</div>
+      <h3>Access request</h3>
+      <p>Shared drives, internal apps, and groups. Pre-approved group memberships are auto-granted with an audit entry; sensitive ones need the data owner.</p>
+      <div class="ci-meta"><span class="badge info">AI-fulfilled if pre-approved</span><span class="badge neutral">instant–1 day</span></div>
+      <button class="btn sm" style="align-self:flex-start;">Request →</button>
+    </div>
+    <div class="cat-item">
+      <div class="ci-icon">MB</div>
+      <h3>Mobile device</h3>
+      <p>Company phone with managed profile. Requires cost-center owner approval; ships to the office or your remote address.</p>
+      <div class="ci-meta"><span class="badge warn">Cost-center approval</span><span class="badge neutral">3–5 days</span></div>
+      <button class="btn sm" style="align-self:flex-start;">Request →</button>
+    </div>
+    <div class="cat-item">
+      <div class="ci-icon">GW</div>
+      <h3>Guest wifi</h3>
+      <p>Time-boxed guest network credentials for visitors and events. No approval needed — generated instantly, expires automatically.</p>
+      <div class="ci-meta"><span class="badge ok">Automated</span><span class="badge neutral">instant</span></div>
+      <button class="btn sm" style="align-self:flex-start;">Request →</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:22px;">
+    <div class="section-label">How catalog items differ from tickets</div>
+    <div class="page-desc" style="margin-top:2px;">A catalog request carries a structured form, a defined approval path, and a fulfillment SLA. Anything that doesn't fit a catalog item still goes through <a href="desk-log-ticket.html" style="color:var(--indigo-text);">Log a ticket</a> — and lands in the same queue either way.</div>
+  </div>
+</div>
+</body>
+</html>

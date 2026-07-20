@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — knowledge base</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .kb-layout{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
+  .kb-article{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 22px;box-shadow:var(--shadow-sm);position:sticky;top:78px;}
+  .kb-article h3{font-size:15px;font-weight:700;margin-bottom:4px;}
+  .kb-article .ka-meta{font-size:11.5px;color:var(--ink-muted);font-family:var(--font-mono);margin-bottom:12px;}
+  .kb-article ol{font-size:13px;color:var(--ink-2);line-height:1.7;padding-left:18px;}
+  .kb-article ol li{margin-bottom:6px;}
+  tr.kb-row{cursor:pointer;}
+  tr.kb-row.sel{background:var(--indigo-bg);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a class="active" href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="desk-log-ticket.html">Log a ticket</a>
+  <a href="desk-catalog.html">Service catalog</a>
+  <a href="desk.html">Service desk</a>
+  <a href="desk-approvals.html">Approvals</a>
+  <a href="desk-problems.html">Problems</a>
+  <a class="active" href="desk-kb.html">Knowledge base</a>
+  <a href="desk-oncall.html">On-call</a>
+</div>
+
+<div class="wrap">
+  <div class="page-head">
+    <div><div class="page-title">Knowledge base</div><div class="page-desc">Searchable by employees on the portal, and the source the AI agent answers from — every deflected ticket started here.</div></div>
+    <button class="btn primary">New article</button>
+  </div>
+
+  <div class="strip">
+    <div class="mcard info"><div class="mlabel">Published articles</div><div class="mval">86</div><div class="mdelta">4 drafts in review</div></div>
+    <div class="mcard ok"><div class="mlabel">Deflections, last month</div><div class="mval">241</div><div class="mdelta">answered before a ticket was logged</div></div>
+    <div class="mcard info"><div class="mlabel">Used by AI agent</div><div class="mval">118</div><div class="mdelta">resolutions cited an article</div></div>
+    <div class="mcard warn"><div class="mlabel">Stale</div><div class="mval">7</div><div class="mdelta">not reviewed in 6+ months</div></div>
+  </div>
+
+  <div class="kb-layout">
+    <div class="panel">
+      <div class="filters">
+        <div class="chip active">All</div>
+        <div class="chip">Access &amp; accounts</div>
+        <div class="chip">Network &amp; VPN</div>
+        <div class="chip">Hardware</div>
+        <div class="chip">How-to</div>
+      </div>
+      <table>
+        <thead><tr><th>Article</th><th>Category</th><th>Views (30d)</th><th>Helpful</th><th>Updated</th></tr></thead>
+        <tbody>
+          <tr class="kb-row sel"><td>Fix VPN drops when moving between floors</td><td>Network &amp; VPN</td><td class="id-mono">412</td><td class="id-mono">94%</td><td class="id-mono">Jul 18</td></tr>
+          <tr class="kb-row"><td>Reset your password &amp; re-enroll MFA</td><td>Access &amp; accounts</td><td class="id-mono">388</td><td class="id-mono">97%</td><td class="id-mono">Jul 2</td></tr>
+          <tr class="kb-row"><td>Request software from the approved list</td><td>How-to</td><td class="id-mono">201</td><td class="id-mono">91%</td><td class="id-mono">Jun 30</td></tr>
+          <tr class="kb-row"><td>Set up your laptop on day one</td><td>Hardware</td><td class="id-mono">178</td><td class="id-mono">96%</td><td class="id-mono">Jun 24</td></tr>
+          <tr class="kb-row"><td>Guest wifi for visitors</td><td>Network &amp; VPN</td><td class="id-mono">130</td><td class="id-mono">89%</td><td class="id-mono">Jun 12</td></tr>
+          <tr class="kb-row"><td>Shared drive access — who approves what</td><td>Access &amp; accounts</td><td class="id-mono">96</td><td class="id-mono">88%</td><td class="id-mono">May 30</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="kb-article">
+      <h3>Fix VPN drops when moving between floors</h3>
+      <div class="ka-meta">KB-0041 · Network &amp; VPN · updated Jul 18 from PRB-0007</div>
+      <ol>
+        <li>This affects laptops roaming between 3rd-floor access points after the recent firmware update.</li>
+        <li>A network-side workaround is already in place — most users need no action since Jul 18.</li>
+        <li>If your VPN still drops: disconnect, turn wifi off and on, and reconnect to the <b>corp-secure</b> network.</li>
+        <li>Still dropping? Log a ticket and mention <b>PRB-0007</b> — it will be linked to the open problem automatically.</li>
+      </ol>
+      <div style="display:flex;gap:8px;margin-top:14px;align-items:center;">
+        <span class="badge ok">Published</span>
+        <span class="badge info">Cited by AI agent 38×</span>
+      </div>
+      <div style="font-size:11.5px;color:var(--ink-muted);margin-top:12px;">Sourced from the problem record's workaround — updating the problem prompts a review of this article.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.kb-row').forEach(r => r.addEventListener('click', () => {
+  document.querySelectorAll('.kb-row').forEach(x => x.classList.remove('sel'));
+  r.classList.add('sel');
+}));
+</script>
+</body>
+</html>

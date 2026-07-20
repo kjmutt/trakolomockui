@@ -75,6 +75,9 @@
     <div class="set-item" data-panel="license">
       <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="6" r="3.5"/><path d="M6 9l-1.5 5 3.5-2 3.5 2L10 9"/></svg>License
     </div>
+    <div class="set-item" data-panel="auditlog">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 2h8v12H4z"/><path d="M6 5h4M6 8h4M6 11h2"/></svg>Audit log
+    </div>
 
     <div class="set-nav-group">Modules</div>
     <div class="set-item" data-panel="desk">
@@ -180,6 +183,15 @@
         <div class="section-label">Data migration</div>
         <div class="row-line"><div><div class="rname">Port data from another system</div><div class="rdesc">Jira, ServiceNow, Zendesk, Freshdesk, Trello, or a CSV export</div></div><a href="data-migration.html" class="btn sm">Import data →</a></div>
       </div>
+
+      <div class="card">
+        <div class="section-label">Webhooks</div>
+        <div class="page-desc" style="margin:-4px 0 8px;">Outbound events for your own systems — the other half of the REST API. Signed with a per-endpoint secret.</div>
+        <div class="row-line"><div><div class="rname">https://ops.acme.com/hooks/trakolo</div><div class="rdesc">ticket.created, ticket.resolved, change.approved</div></div><span class="badge ok">Healthy · 1,204 sent</span></div>
+        <div class="row-line"><div><div class="rname">https://siem.acme.com/ingest</div><div class="rdesc">audit.* — feeds the security team's SIEM</div></div><span class="badge ok">Healthy · 8,911 sent</span></div>
+        <div class="row-line"><div><div class="rname">https://old-dashboard.acme.com/wh</div><div class="rdesc">asset.updated — endpoint returning 410</div></div><span class="badge warn">Paused after 25 failures</span></div>
+        <button class="btn sm" style="margin-top:10px;">+ Add webhook endpoint</button>
+      </div>
     </div>
 
     <!-- PORTAL -->
@@ -216,6 +228,14 @@
         <div class="section-label">Public ticket tracking</div>
         <div class="row-line"><div><div class="rname">Allow tracking without login</div><div class="rdesc">Anyone with a ticket ID or email can view status</div></div><div class="switch on"></div></div>
         <div class="row-line"><div><div class="rname">Show assignee name on track page</div><div class="rdesc">Otherwise shows "IT team"</div></div><div class="switch on"></div></div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Announcements</div>
+        <div class="page-desc" style="margin:-4px 0 8px;">Banner shown on the portal pages — heads off ticket floods during planned work.</div>
+        <div class="row-line"><div><div class="rname">Planned maintenance — email, Sat Jul 26, 22:00–23:00</div><div class="rdesc">Live on contact &amp; track pages · auto-expires after the window</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Suppress new-ticket prompts for known issues</div><div class="rdesc">Links the announcement to PRB-0007 so VPN reports get the workaround first</div></div><div class="switch on"></div></div>
+        <button class="btn sm" style="margin-top:10px;">+ New announcement</button>
       </div>
     </div>
 
@@ -257,6 +277,35 @@
         <div class="row-line"><div><div class="rname">Dev boards &amp; sprints</div></div><span class="badge ok">Licensed</span></div>
         <div class="row-line"><div><div class="rname">Reporting &amp; compliance</div></div><span class="badge ok">Licensed</span></div>
         <div class="row-line"><div><div class="rname">AI features</div><div class="rdesc">Triage, AI agent auto-resolution, predictive alerts</div></div><span class="badge ok">Licensed</span></div>
+      </div>
+    </div>
+
+    <!-- AUDIT LOG -->
+    <div class="set-panel" id="panel-auditlog">
+      <div class="page-title" style="font-size:20px;margin-bottom:4px;">Audit log</div>
+      <div class="page-desc" style="margin-bottom:20px;">Every admin action and privileged change in this workspace — who, what, when. Exportable for compliance reviews.</div>
+      <div class="card">
+        <div class="filters" style="margin-bottom:10px;">
+          <div class="chip active">All</div><div class="chip">Settings</div><div class="chip">Users &amp; access</div><div class="chip">Approvals</div><div class="chip">License</div>
+        </div>
+        <div class="panel" style="box-shadow:none;">
+          <table>
+            <thead><tr><th>When</th><th>Actor</th><th>Action</th><th>Target</th></tr></thead>
+            <tbody>
+              <tr><td class="id-mono">Today 14:02</td><td><div class="who"><div class="av">EM</div>E. Moreau</div></td><td>Enabled feature</td><td>AI agent auto-resolution</td></tr>
+              <tr><td class="id-mono">Today 11:55</td><td><div class="who"><div class="av">AI</div>AI agent</div></td><td>Resolved ticket</td><td class="id-mono">TS-4833 · policy: password reset</td></tr>
+              <tr><td class="id-mono">Jul 19 16:40</td><td><div class="who"><div class="av">EM</div>E. Moreau</div></td><td>Edited business rule</td><td>VIP fast lane — enabled</td></tr>
+              <tr><td class="id-mono">Jul 18 09:12</td><td><div class="who"><div class="av">NP</div>Nadia P.</div></td><td>Approved change</td><td class="id-mono">CR-0091 · window Jul 20 02:00 UTC</td></tr>
+              <tr><td class="id-mono">Jul 17 15:30</td><td><div class="who"><div class="av">EM</div>E. Moreau</div></td><td>Ran data import</td><td>Jira · 204 records, 12 skipped</td></tr>
+              <tr><td class="id-mono">Jul 15 10:05</td><td><div class="who"><div class="av">EM</div>E. Moreau</div></td><td>Invited user</td><td>j.okoye@acme.com · role: Employee</td></tr>
+              <tr><td class="id-mono">Jul 12 08:44</td><td><div class="who"><div class="av">EM</div>E. Moreau</div></td><td>Uploaded license file</td><td class="id-mono">TRK-ACME-····-9F2C</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+          <span style="font-size:12px;color:var(--ink-muted);">Retained 400 days · streamed to your SIEM via webhook</span>
+          <button class="btn sm">Export CSV</button>
+        </div>
       </div>
     </div>
 

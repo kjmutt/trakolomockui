@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — approvals</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .appr-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 20px;box-shadow:var(--shadow-sm);margin-bottom:12px;}
+  .appr-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;}
+  .appr-title{font-size:14px;font-weight:600;}
+  .appr-meta{font-size:12px;color:var(--ink-muted);margin-top:3px;font-family:var(--font-mono);}
+  .appr-body{font-size:13px;color:var(--ink-2);margin-top:10px;line-height:1.55;}
+  .appr-facts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px;}
+  .appr-fact{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 10px;}
+  .appr-fact .fl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-muted);font-family:var(--font-mono);}
+  .appr-fact .fv{font-size:12.5px;font-weight:600;margin-top:3px;}
+  .appr-actions{display:flex;gap:10px;margin-top:14px;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a class="active" href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">NP</div></div>
+</div>
+<div class="subnav">
+  <a href="desk-log-ticket.html">Log a ticket</a>
+  <a href="desk-catalog.html">Service catalog</a>
+  <a href="desk.html">Service desk</a>
+  <a class="active" href="desk-approvals.html">Approvals</a>
+  <a href="desk-problems.html">Problems</a>
+  <a href="desk-kb.html">Knowledge base</a>
+  <a href="desk-oncall.html">On-call</a>
+</div>
+
+<div class="wrap" style="max-width:900px;">
+  <div class="page-head">
+    <div><div class="page-title">Approvals</div><div class="page-desc">Signed in as Nadia P. — everything waiting on you, in one queue. Approve here or from the Slack notification.</div></div>
+    <span class="badge warn" id="pending-badge" style="font-size:12px;">2 pending</span>
+  </div>
+
+  <div id="pending-list">
+    <div class="appr-card" id="appr-cr92">
+      <div class="appr-head">
+        <div><div class="appr-title">Change request: Promote asset query optimization from PRE to PROD</div>
+        <div class="appr-meta">CR-0092 · requested by Tomas K. · Jul 19</div></div>
+        <span class="badge warn" id="badge-cr92">Pending approval</span>
+      </div>
+      <div class="appr-body">PR #486 merged after DEV, INT, and UAT. Adds a covering index and rewrites the asset list query. Started as a board item (DEV-1063), no source ticket. Risk: Low. Rollback: drop the new index, revert the query.</div>
+      <div class="appr-facts">
+        <div class="appr-fact"><div class="fl">Window</div><div class="fv">Jul 22, 03:00–04:00 UTC</div></div>
+        <div class="appr-fact"><div class="fl">Risk</div><div class="fv">Low</div></div>
+        <div class="appr-fact"><div class="fl">Sprint card</div><div class="fv"><a href="dev.html" style="color:var(--indigo-text);">DEV-1063</a></div></div>
+        <div class="appr-fact"><div class="fl">Rollback plan</div><div class="fv">On file</div></div>
+      </div>
+      <div class="appr-actions" id="actions-cr92">
+        <button class="btn primary sm" onclick="decide('cr92', true)">Approve for this window</button>
+        <button class="btn sm" onclick="decide('cr92', false)">Reject with comment</button>
+      </div>
+    </div>
+
+    <div class="appr-card" id="appr-ar233">
+      <div class="appr-head">
+        <div><div class="appr-title">Access request: Finance shared drive — write access</div>
+        <div class="appr-meta">AR-0233 · requested by M. Alvarez · today, 10:12</div></div>
+        <span class="badge warn" id="badge-ar233">Pending approval</span>
+      </div>
+      <div class="appr-body">Not in a pre-approved group, so the AI agent routed it to you as data owner. Requested for the Q3 close — access auto-expires in 30 days unless renewed.</div>
+      <div class="appr-facts">
+        <div class="appr-fact"><div class="fl">Scope</div><div class="fv">/Finance/Q3-close</div></div>
+        <div class="appr-fact"><div class="fl">Duration</div><div class="fv">30 days, auto-expiry</div></div>
+        <div class="appr-fact"><div class="fl">Requested via</div><div class="fv">Service catalog</div></div>
+        <div class="appr-fact"><div class="fl">Manager</div><div class="fv">L. Adeyemi</div></div>
+      </div>
+      <div class="appr-actions" id="actions-ar233">
+        <button class="btn primary sm" onclick="decide('ar233', true)">Approve — 30 days</button>
+        <button class="btn sm" onclick="decide('ar233', false)">Reject with comment</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Decided recently</div>
+    <div class="panel" style="box-shadow:none;">
+      <table>
+        <thead><tr><th>Item</th><th>Type</th><th>Requester</th><th>Decision</th><th>By</th><th>When</th></tr></thead>
+        <tbody id="history">
+          <tr><td class="id-mono">CR-0091</td><td>Change request</td><td>Raj K.</td><td><span class="badge ok">Approved</span></td><td>Nadia P.</td><td class="id-mono">Jul 18</td></tr>
+          <tr><td class="id-mono">CR-0088</td><td>Change request</td><td>Sara M.</td><td><span class="badge ok">Approved</span></td><td>Nadia P.</td><td class="id-mono">Jul 3</td></tr>
+          <tr><td class="id-mono">AR-0229</td><td>Access request</td><td>Contractor (ext)</td><td><span class="badge crit">Rejected</span></td><td>Nadia P.</td><td class="id-mono">Jul 1</td></tr>
+          <tr><td class="id-mono">CR-0087</td><td>Change request</td><td>D. Ferreira</td><td><span class="badge ok">Approved</span></td><td>R. Okafor</td><td class="id-mono">Jun 26</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+let pending = 2;
+const meta = {
+  cr92:{label:"CR-0092", type:"Change request", requester:"Tomas K."},
+  ar233:{label:"AR-0233", type:"Access request", requester:"M. Alvarez"}
+};
+function decide(id, approved){
+  const badge = document.getElementById('badge-'+id);
+  badge.className = 'badge ' + (approved ? 'ok' : 'crit');
+  badge.textContent = approved ? 'Approved' : 'Rejected';
+  const actions = document.getElementById('actions-'+id);
+  actions.innerHTML = '<span style="font-size:12.5px;color:var(--ink-muted);">' +
+    (approved
+      ? 'Approved just now — the requester and the change calendar have been notified.'
+      : 'Rejected just now — the requester has been asked to revise and resubmit.') + '</span>';
+  document.getElementById('appr-'+id).style.opacity = .75;
+  const m = meta[id];
+  document.getElementById('history').insertAdjacentHTML('afterbegin',
+    `<tr><td class="id-mono">${m.label}</td><td>${m.type}</td><td>${m.requester}</td><td><span class="badge ${approved?'ok':'crit'}">${approved?'Approved':'Rejected'}</span></td><td>Nadia P.</td><td class="id-mono">Just now</td></tr>`);
+  pending--;
+  const pb = document.getElementById('pending-badge');
+  pb.textContent = pending + ' pending';
+  if(pending === 0){ pb.className = 'badge ok'; pb.textContent = 'All clear'; }
+}
+</script>
+</body>
+</html>

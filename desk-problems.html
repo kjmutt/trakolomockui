@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — problem management</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .prb-detail{display:none;}
+  .prb-detail.open{display:table-row;}
+  .prb-detail>td{background:var(--surface-2);padding:18px 20px;}
+  .linked-inc{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+  .linked-inc .id-mono{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 9px;}
+  tr.prb-row{cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a class="active" href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="desk-log-ticket.html">Log a ticket</a>
+  <a href="desk-catalog.html">Service catalog</a>
+  <a href="desk.html">Service desk</a>
+  <a href="desk-approvals.html">Approvals</a>
+  <a class="active" href="desk-problems.html">Problems</a>
+  <a href="desk-kb.html">Knowledge base</a>
+  <a href="desk-oncall.html">On-call</a>
+</div>
+
+<div class="wrap">
+  <div class="page-head">
+    <div><div class="page-title">Problem management</div><div class="page-desc">One problem, many incidents. Fix the cause once instead of closing the same ticket twelve times.</div></div>
+    <button class="btn primary">New problem</button>
+  </div>
+
+  <div class="strip">
+    <div class="mcard warn"><div class="mlabel">Open problems</div><div class="mval">2</div><div class="mdelta">1 with workaround posted</div></div>
+    <div class="mcard info"><div class="mlabel">Linked incidents</div><div class="mval">35</div><div class="mdelta">held against open problems</div></div>
+    <div class="mcard ok"><div class="mlabel">Closed this quarter</div><div class="mval">6</div><div class="mdelta">root cause on file for all</div></div>
+    <div class="mcard crit"><div class="mlabel">Auto-detected</div><div class="mval">1</div><div class="mdelta">by the outage-clustering rule</div></div>
+  </div>
+
+  <div class="panel">
+    <table>
+      <thead><tr><th>Problem</th><th>Title</th><th>Status</th><th>Linked incidents</th><th>Owner</th><th>Age</th></tr></thead>
+      <tbody>
+        <tr class="prb-row" onclick="togglePrb('p7')">
+          <td class="id-mono">PRB-0007</td><td>VPN drops after AP firmware update</td>
+          <td><span class="badge warn">Workaround posted</span></td><td class="id-mono">12</td>
+          <td><div class="who"><div class="av">RK</div>Raj K.</div></td><td class="id-mono">3 days</td>
+        </tr>
+        <tr class="prb-detail" id="detail-p7"><td colspan="6">
+          <div class="section-label">Root cause investigation</div>
+          <div style="font-size:13px;color:var(--ink-2);line-height:1.6;margin-top:6px;">Firmware 4.2.1 on the 3rd-floor access points drops 802.11r fast-transition handshakes, killing VPN tunnels on roaming laptops. Confirmed by reproducing on a test device. Vendor ticket open; 4.2.2 beta fixes it in the lab.</div>
+          <div class="section-label" style="margin-top:14px;">Workaround (posted to all linked tickets &amp; the knowledge base)</div>
+          <div style="font-size:13px;color:var(--ink-2);line-height:1.6;margin-top:6px;">Disable fast transition on the affected SSID — applied Jul 18. New occurrences dropped from ~6/day to 0. Permanent fix ships with the 4.2.2 rollout, tracked as a change request.</div>
+          <div class="section-label" style="margin-top:14px;">Linked incidents (12)</div>
+          <div class="linked-inc"><span class="id-mono">TS-4821</span><span class="id-mono">TS-4818</span><span class="id-mono">TS-4815</span><span class="id-mono">TS-4811</span><span class="id-mono">TS-4808</span><span class="id-mono">TS-4806</span><span class="id-mono">+ 6 more</span></div>
+        </td></tr>
+
+        <tr class="prb-row" onclick="togglePrb('p6')">
+          <td class="id-mono">PRB-0006</td><td>SSO provider intermittent latency</td>
+          <td><span class="badge info">Monitoring</span></td><td class="id-mono">23</td>
+          <td><div class="who"><div class="av">SM</div>Sara M.</div></td><td class="id-mono">2 weeks</td>
+        </tr>
+        <tr class="prb-detail" id="detail-p6"><td colspan="6">
+          <div class="section-label">Status</div>
+          <div style="font-size:13px;color:var(--ink-2);line-height:1.6;margin-top:6px;">Upstream provider issue — spikes correlate with their us-east region. Provider claims a fix deployed Jul 12; we're holding this open in Monitoring for two clean weeks before closing. A fallback provider was added via CR-0087, which cut user impact during spikes to near zero. The Jul 9 payroll outage (TS-4816) is linked here.</div>
+          <div class="section-label" style="margin-top:14px;">Linked incidents (23)</div>
+          <div class="linked-inc"><span class="id-mono">TS-4816</span><span class="id-mono">TS-4790</span><span class="id-mono">TS-4788</span><span class="id-mono">+ 20 more</span></div>
+        </td></tr>
+
+        <tr class="prb-row" onclick="togglePrb('p5')">
+          <td class="id-mono">PRB-0005</td><td>Printer fleet firmware paper-feed fault</td>
+          <td><span class="badge ok">Closed — root cause fixed</span></td><td class="id-mono">9</td>
+          <td><div class="who"><div class="av">RK</div>Raj K.</div></td><td class="id-mono">closed Jul 6</td>
+        </tr>
+        <tr class="prb-detail" id="detail-p5"><td colspan="6">
+          <div class="section-label">Resolution</div>
+          <div style="font-size:13px;color:var(--ink-2);line-height:1.6;margin-top:6px;">Fleet-wide firmware update pushed Jul 5 after the vendor confirmed the fault. All 9 linked tickets closed with the fix; no recurrence since. Root-cause note archived to the knowledge base.</div>
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:18px;">
+    <div class="section-label">How problems get created</div>
+    <div class="row-line"><div><div class="rname">Manually, from any incident</div><div class="rdesc">"Promote to problem" links the incident and any siblings</div></div><span class="badge neutral">Always on</span></div>
+    <div class="row-line"><div><div class="rname">Automatically, by the outage-clustering business rule</div><div class="rdesc">3+ similar tickets within 10 minutes → problem opened, incidents linked — configured in <a href="admin.html" style="color:var(--indigo-text);">Admin → Service desk → Business rules</a></div></div><span class="badge ok">Enabled</span></div>
+  </div>
+</div>
+
+<script>
+function togglePrb(id){
+  document.querySelectorAll('.prb-detail').forEach(d => { if(d.id !== 'detail-'+id) d.classList.remove('open'); });
+  document.getElementById('detail-'+id).classList.toggle('open');
+}
+</script>
+</body>
+</html>

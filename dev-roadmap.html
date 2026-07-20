@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — epics &amp; roadmap</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .epic{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;box-shadow:var(--shadow-sm);margin-bottom:12px;}
+  .epic-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;}
+  .epic-title{font-size:14px;font-weight:600;}
+  .epic-meta{font-size:11.5px;color:var(--ink-muted);font-family:var(--font-mono);margin-top:3px;}
+  .epic-cards{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+  .epic-cards .id-mono{background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:11px;}
+  .gantt{display:grid;grid-template-columns:220px repeat(6,1fr);gap:4px 0;align-items:center;font-size:12px;margin-top:8px;}
+  .gantt .g-head{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-muted);font-family:var(--font-mono);text-align:center;padding-bottom:6px;}
+  .gantt .g-label{font-size:12.5px;padding-right:12px;color:var(--ink-2);}
+  .g-bar{height:16px;border-radius:8px;margin:5px 2px;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a class="active" href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="dev.html">Sprint board</a>
+  <a href="dev-backlog.html">Backlog &amp; planning</a>
+  <a href="dev-roadmap.html" class="active">Epics &amp; roadmap</a>
+  <a href="dev-ownership.html">Team ownership</a>
+  <a href="dev-product-tree.html">Product tree</a>
+</div>
+
+<div class="wrap" style="max-width:960px;">
+  <div class="page-head">
+    <div><div class="page-title">Epics &amp; roadmap</div><div class="page-desc">Sprint cards roll up into epics; epics roll up into the quarter view. Same data as the board, one level up.</div></div>
+    <button class="btn primary">New epic</button>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Quarter view</div>
+    <div class="gantt">
+      <div></div>
+      <div class="g-head">Jun</div><div class="g-head">Jul</div><div class="g-head">Aug</div><div class="g-head">Sep</div><div class="g-head">Oct</div><div class="g-head">Nov</div>
+      <div class="g-label">Asset tooling &amp; bulk ops</div>
+      <div class="g-bar" style="grid-column:2/span 2;background:var(--grad-primary);"></div><div style="grid-column:span 4;"></div>
+      <div class="g-label">Asset query performance</div>
+      <div style="grid-column:span 1;"></div><div class="g-bar" style="grid-column:3/span 2;background:#7F77DD;"></div><div style="grid-column:span 3;"></div>
+      <div class="g-label">Self-service revamp</div>
+      <div style="grid-column:span 2;"></div><div class="g-bar" style="grid-column:4/span 3;background:var(--border-strong);"></div><div style="grid-column:span 1;"></div>
+      <div class="g-label">Compliance automation</div>
+      <div style="grid-column:span 3;"></div><div class="g-bar" style="grid-column:5/span 3;background:var(--border-strong);"></div>
+    </div>
+  </div>
+
+  <div class="epic">
+    <div class="epic-head">
+      <div><div class="epic-title">Asset tooling &amp; bulk operations</div><div class="epic-meta">EP-12 · Platform Reliability · target: end of Jul</div></div>
+      <span class="badge ok">On track — 80%</span>
+    </div>
+    <div class="beam" style="width:100%;height:7px;margin-top:10px;"><i style="width:80%;background:var(--indigo)"></i></div>
+    <div class="epic-cards"><span class="id-mono">DEV-1058 ✓</span><span class="id-mono">DEV-1051 ✓</span><span class="id-mono">DEV-1060 · in progress</span><span class="id-mono">DEV-1064 · todo</span></div>
+  </div>
+
+  <div class="epic">
+    <div class="epic-head">
+      <div><div class="epic-title">Asset query performance</div><div class="epic-meta">EP-13 · Platform Reliability · target: mid Aug</div></div>
+      <span class="badge info">In progress — 45%</span>
+    </div>
+    <div class="beam" style="width:100%;height:7px;margin-top:10px;"><i style="width:45%;background:#7F77DD"></i></div>
+    <div class="epic-cards"><span class="id-mono">DEV-1063 · awaiting CR-0092</span><span class="id-mono">DEV-1066 · todo</span></div>
+  </div>
+
+  <div class="epic">
+    <div class="epic-head">
+      <div><div class="epic-title">Self-service revamp</div><div class="epic-meta">EP-14 · Self-Service Experience · target: Q4</div></div>
+      <span class="badge neutral">Planned</span>
+    </div>
+    <div class="beam" style="width:100%;height:7px;margin-top:10px;"><i style="width:8%;background:var(--border-strong)"></i></div>
+    <div class="epic-cards"><span class="id-mono">DEV-1048 · macros</span><span class="id-mono">DEV-1046 · velocity chart</span><span class="id-mono">DEV-1044 · dark mode</span></div>
+  </div>
+
+  <div class="epic">
+    <div class="epic-head">
+      <div><div class="epic-title">Compliance automation</div><div class="epic-meta">EP-15 · Compliance &amp; Reporting · target: Q4</div></div>
+      <span class="badge neutral">Planned</span>
+    </div>
+    <div class="beam" style="width:100%;height:7px;margin-top:10px;"><i style="width:0%;background:var(--border-strong)"></i></div>
+    <div class="epic-cards"><span class="id-mono">scoping with the Ops team</span></div>
+  </div>
+</div>
+</body>
+</html>

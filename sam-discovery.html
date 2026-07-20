@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — asset discovery</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .trail{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+  .trail-step{display:flex;gap:11px;align-items:flex-start;font-size:13px;opacity:0;animation:stepIn .25s ease forwards;}
+  @keyframes stepIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+  .trail-step .si{width:20px;height:20px;border-radius:50%;background:var(--indigo-bg);color:var(--indigo-text);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;font-size:11px;}
+  .trail-step .st{color:var(--ink-2);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a class="active" href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="sam.html">Asset inventory</a>
+  <a href="sam-renewals.html">Renewals &amp; compliance</a>
+  <a href="sam-bulk-upload.html">Bulk upload</a>
+  <a class="active" href="sam-discovery.html">Discovery</a>
+</div>
+
+<div class="wrap" style="max-width:960px;">
+  <div class="page-head">
+    <div><div class="page-title">Asset discovery</div><div class="page-desc">The agent and network scan find what's actually out there — so the inventory reflects reality, not just what someone remembered to add.</div></div>
+    <button class="btn primary" id="scan-btn" onclick="runScan()">Run discovery scan</button>
+  </div>
+
+  <div class="strip">
+    <div class="mcard info"><div class="mlabel">Agent coverage</div><div class="mval">96%</div><div class="mdelta">812 of 842 managed devices</div></div>
+    <div class="mcard ok"><div class="mlabel">Last scan</div><div class="mval">02:00</div><div class="mdelta">nightly, completed clean</div></div>
+    <div class="mcard warn"><div class="mlabel">Unreconciled</div><div class="mval" id="stat-new">3</div><div class="mdelta">discovered, not in inventory</div></div>
+    <div class="mcard crit"><div class="mlabel">Unmanaged software</div><div class="mval">2</div><div class="mdelta">installs outside the approved list</div></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Scan</div>
+    <div class="row-line"><div><div class="rname">Nightly network scan</div><div class="rdesc">Subnets 10.20.0.0/16 and vpn-pool · runs 02:00 local</div></div><div class="switch on"></div></div>
+    <div class="row-line"><div><div class="rname">Endpoint agent reporting</div><div class="rdesc">Installed software, specs, and last-seen — every 4 hours</div></div><div class="switch on"></div></div>
+    <div class="row-line"><div><div class="rname">Auto-add matched devices</div><div class="rdesc">Devices matching a known owner &amp; naming pattern skip manual review</div></div><div class="switch"></div></div>
+    <div class="trail" id="trail"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Discovered — needs reconciling</div>
+    <div class="panel" style="box-shadow:none;">
+      <table>
+        <thead><tr><th>Device / software</th><th>Seen on</th><th>Match</th><th>Status</th><th></th></tr></thead>
+        <tbody id="disc-rows">
+          <tr><td>MacBook Air M3 <span class="id-mono" style="margin-left:4px;">mba-jokoye-2</span></td><td class="id-mono">wifi · 3rd floor</td><td>J. Okoye — naming pattern</td><td><span class="badge info">New device</span></td><td><button class="btn sm" onclick="addRow(this)">Add to inventory</button></td></tr>
+          <tr><td>Raspberry Pi <span class="id-mono" style="margin-left:4px;">10.20.14.88</span></td><td class="id-mono">lan · lab subnet</td><td>No owner match</td><td><span class="badge warn">Unknown device</span></td><td><button class="btn sm" onclick="addRow(this)">Investigate</button></td></tr>
+          <tr><td>Dell U2723 monitor <span class="id-mono" style="margin-left:4px;">via agent, docked</span></td><td class="id-mono">HW-00392's dock</td><td>Sara M. — peripheral</td><td><span class="badge info">New peripheral</span></td><td><button class="btn sm" onclick="addRow(this)">Add to inventory</button></td></tr>
+          <tr><td>Figma desktop app <span class="id-mono" style="margin-left:4px;">unlicensed install</span></td><td class="id-mono">HW-00417</td><td>D. Ferreira — no seat assigned</td><td><span class="badge crit">Unmanaged software</span></td><td><button class="btn sm" onclick="addRow(this)">Assign seat</button></td></tr>
+          <tr><td>TeamViewer <span class="id-mono" style="margin-left:4px;">not on approved list</span></td><td class="id-mono">HW-00288</td><td>L. Adeyemi</td><td><span class="badge crit">Unmanaged software</span></td><td><button class="btn sm" onclick="addRow(this)">Open ticket</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Recently reconciled</div>
+    <div class="audit-row"><span>Jul 19 · 4 laptops from the Q3 refresh matched to their bulk-upload rows automatically</span><span class="badge ok">Auto-matched</span></div>
+    <div class="audit-row"><span>Jul 18 · iPhone 16 (L. Adeyemi) enrolled via MDM, added as HW-00288</span><span class="badge ok">Added</span></div>
+    <div class="audit-row"><span>Jul 16 · Unknown NAS on lab subnet — ticket TS-4808 opened, traced to a vendor demo unit</span><span class="badge warn">Ticketed</span></div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.switch').forEach(s => s.addEventListener('click', () => s.classList.toggle('on')));
+
+function addRow(btn){
+  const tr = btn.closest('tr');
+  btn.parentElement.innerHTML = '<span style="font-size:12px;color:var(--ink-muted);">Done — logged just now</span>';
+  tr.style.opacity = .55;
+  const stat = document.getElementById('stat-new');
+  stat.textContent = Math.max(0, parseInt(stat.textContent) - 1);
+}
+
+function runScan(){
+  const btn = document.getElementById('scan-btn');
+  btn.disabled = true; btn.style.opacity = .6;
+  const trail = document.getElementById('trail');
+  trail.innerHTML = '';
+  const steps = [
+    'Sweeping 10.20.0.0/16 and the VPN pool…',
+    'Collecting agent check-ins (812 devices reporting)…',
+    'Matching discovered hardware to inventory by MAC, hostname, and serial…',
+    'Diffing installed software against license seats…',
+    'Scan complete — 1 new device found since last night.'
+  ];
+  let i = 0;
+  function next(){
+    if(i >= steps.length){
+      document.getElementById('disc-rows').insertAdjacentHTML('afterbegin',
+        `<tr><td>ThinkPad X1 <span class="id-mono" style="margin-left:4px;">tp-contractor-1</span></td><td class="id-mono">vpn-pool</td><td>No owner match</td><td><span class="badge warn">Unknown device</span></td><td><button class="btn sm" onclick="addRow(this)">Investigate</button></td></tr>`);
+      const stat = document.getElementById('stat-new');
+      stat.textContent = parseInt(stat.textContent) + 1;
+      btn.disabled = false; btn.style.opacity = 1;
+      return;
+    }
+    const el = document.createElement('div');
+    el.className = 'trail-step';
+    el.innerHTML = `<div class="si">✓</div><div class="st">${steps[i]}</div>`;
+    trail.appendChild(el);
+    i++;
+    setTimeout(next, 550);
+  }
+  next();
+}
+</script>
+</body>
+</html>

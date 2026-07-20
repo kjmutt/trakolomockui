@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — on-call</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .oncall-now{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 20px;box-shadow:var(--shadow-sm);margin-bottom:18px;}
+  .oncall-now .big-av{width:44px;height:44px;border-radius:50%;background:var(--indigo-bg);color:var(--indigo-text);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;}
+  .rota td:first-child{width:130px;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a class="active" href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="desk-log-ticket.html">Log a ticket</a>
+  <a href="desk-catalog.html">Service catalog</a>
+  <a href="desk.html">Service desk</a>
+  <a href="desk-approvals.html">Approvals</a>
+  <a href="desk-problems.html">Problems</a>
+  <a href="desk-kb.html">Knowledge base</a>
+  <a class="active" href="desk-oncall.html">On-call</a>
+</div>
+
+<div class="wrap" style="max-width:900px;">
+  <div class="page-head">
+    <div><div class="page-title">On-call</div><div class="page-desc">Who gets paged when an Urgent ticket escalates to L3 — the schedule behind the "page on-call" escalation rule.</div></div>
+    <button class="btn">Request override</button>
+  </div>
+
+  <div class="oncall-now">
+    <div class="big-av">DF</div>
+    <div style="flex:1;">
+      <div style="font-size:14px;font-weight:600;">D. Ferreira is on-call right now</div>
+      <div style="font-size:12.5px;color:var(--ink-muted);margin-top:2px;">L3 · Infrastructure · until Mon 09:00 · paged via phone + Slack</div>
+    </div>
+    <span class="badge ok">Reachable — ack'd test page 2h ago</span>
+  </div>
+
+  <div class="card">
+    <div class="section-label">This week (Jul 14 – Jul 20)</div>
+    <div class="panel" style="box-shadow:none;">
+      <table class="rota">
+        <thead><tr><th>Tier</th><th>Weekdays 09:00–18:00</th><th>Nights &amp; weekend</th><th>Escalates after</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge info">L1 triage</span></td><td><div class="who"><div class="av">RK</div>Raj K.</div></td><td><div class="who"><div class="av">AI</div>AI agent + queue</div></td><td class="id-mono">10 min unassigned</td></tr>
+          <tr><td><span class="badge warn">L2 investigation</span></td><td><div class="who"><div class="av">SM</div>Sara M.</div></td><td><div class="who"><div class="av">RK</div>Raj K.</div></td><td class="id-mono">15 min unassigned</td></tr>
+          <tr><td><span class="badge crit">L3 on-call</span></td><td><div class="who"><div class="av">DF</div>D. Ferreira</div></td><td><div class="who"><div class="av">DF</div>D. Ferreira</div></td><td class="id-mono">pages immediately</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Next week (Jul 21 – Jul 27)</div>
+    <div class="panel" style="box-shadow:none;">
+      <table class="rota">
+        <thead><tr><th>Tier</th><th>Weekdays 09:00–18:00</th><th>Nights &amp; weekend</th><th></th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge info">L1 triage</span></td><td><div class="who"><div class="av">SM</div>Sara M.</div></td><td><div class="who"><div class="av">AI</div>AI agent + queue</div></td><td></td></tr>
+          <tr><td><span class="badge warn">L2 investigation</span></td><td><div class="who"><div class="av">RK</div>Raj K.</div></td><td><div class="who"><div class="av">SM</div>Sara M.</div></td><td></td></tr>
+          <tr><td><span class="badge crit">L3 on-call</span></td><td><div class="who"><div class="av">NP</div>Nadia P.</div></td><td><div class="who"><div class="av">NP</div>Nadia P.</div></td><td><span class="badge neutral">covers deploy window Jul 22</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Paging rules</div>
+    <div class="row-line"><div><div class="rname">Urgent tickets page L3 immediately on escalation</div><div class="rdesc">Set in Admin → Service desk → Escalation rule</div></div><span class="badge ok">Enabled</span></div>
+    <div class="row-line"><div><div class="rname">Page acknowledgment window</div><div class="rdesc">Unacknowledged pages retry, then fall through to the backup</div></div><span class="id-mono">5 min</span></div>
+    <div class="row-line"><div><div class="rname">Backup on-call</div><div class="rdesc">If the primary doesn't ack</div></div><div class="who"><div class="av">NP</div>Nadia P.</div></div>
+    <div class="row-line"><div><div class="rname">Recent pages</div><div class="rdesc">Jul 9 · TS-4816 payroll SSO outage — acknowledged in 40s</div></div><span class="badge ok">1 this month</span></div>
+  </div>
+</div>
+</body>
+</html>
