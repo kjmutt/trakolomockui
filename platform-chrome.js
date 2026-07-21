@@ -6,7 +6,7 @@
 
   var NOTIFS = [
     {icon:'⚠', cls:'crit', title:'Acme Corp — email ingestion service degraded', sub:'Retry queue backing up · 2nd occurrence this week', href:'saas-admin-services.html', time:'8m'},
-    {icon:'💳', cls:'warn', title:'Globex Inc — payment failed on renewal', sub:'Business plan · retry scheduled in 24h', href:'saas-admin-plans.html', time:'1h'},
+    {icon:'💳', cls:'warn', title:'Northwind Traders — payment failed on renewal', sub:'Enterprise plan · annual · retry scheduled in 24h', href:'saas-admin-billing.html', time:'1h'},
     {icon:'✓', cls:'ok', title:'New tenant provisioned — Initech LLC', sub:'Team plan · 12 seats · onboarding email sent', href:'saas-admin-console.html', time:'5h'}
   ];
 
@@ -32,6 +32,7 @@
       '<a class="chrome-menu-item" href="saas-admin-console.html">🏢 Tenant workspaces</a>' +
       '<a class="chrome-menu-item" href="saas-admin-services.html">⚙ Platform services</a>' +
       '<a class="chrome-menu-item" href="saas-admin-plans.html">💳 Plans &amp; entitlements</a>' +
+      '<a class="chrome-menu-item" href="saas-admin-billing.html">🧾 Billing &amp; payments</a>' +
       '<a class="chrome-menu-item" href="' + signOutHref + '">→ Sign out</a>' +
     '</div>';
   document.body.appendChild(root);

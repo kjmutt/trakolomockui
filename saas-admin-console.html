@@ -29,6 +29,7 @@
   <a href="saas-admin-console.html" style="font-size:13px;color:#fff;text-decoration:none;padding:11px 0;border-bottom:2px solid #5DCAA5;font-weight:500;">Tenant workspaces</a>
   <a href="saas-admin-services.html" style="font-size:13px;color:#8FA79C;text-decoration:none;padding:11px 0;border-bottom:2px solid transparent;">Services</a>
   <a href="saas-admin-plans.html" style="font-size:13px;color:#8FA79C;text-decoration:none;padding:11px 0;border-bottom:2px solid transparent;">Plans &amp; entitlements</a>
+  <a href="saas-admin-billing.html" style="font-size:13px;color:#8FA79C;text-decoration:none;padding:11px 0;border-bottom:2px solid transparent;">Billing &amp; payments</a>
 </div>
 
 <div class="plat-wrap">
@@ -53,38 +54,48 @@
 
   <div class="plat-card" style="overflow-x:auto;">
     <table>
-      <thead><tr><th>Org</th><th>Plan</th><th>Seats</th><th>Region</th><th>DB size</th><th>Files &amp; docs</th><th>Health</th><th>Deployment</th><th></th></tr></thead>
+      <thead><tr><th>Org</th><th>Plan</th><th>Billing</th><th>Seats</th><th>Region</th><th>DB size</th><th>Files &amp; docs</th><th>Health</th><th>Deployment</th><th></th></tr></thead>
       <tbody>
         <tr>
-          <td><b style="color:#fff;">Org1 — Acme Corp</b></td><td>Team</td><td>84</td><td>us-east</td>
+          <td><b style="color:#fff;">Org1 — Acme Corp</b></td><td>Team</td>
+          <td>Monthly · <a href="saas-admin-billing.html" style="color:#5DCAA5;text-decoration:none;">$529.20/mo</a></td>
+          <td>84</td><td>us-east</td>
           <td>4.8 GB <span style="color:#7C948A;">/ 20 GB</span></td>
           <td>62 GB <span style="color:#7C948A;">/ 100 GB</span></td>
           <td><span class="tenant-health"><span class="hdot" style="background:#5DCAA5;"></span>Healthy</span></td>
           <td>Cloud</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
         </tr>
         <tr>
-          <td><b style="color:#fff;">Org2 — Northwind Traders</b></td><td>Enterprise</td><td>412</td><td>eu-west</td>
+          <td><b style="color:#fff;">Org2 — Northwind Traders</b></td><td>Enterprise</td>
+          <td>Annual · <a href="saas-admin-billing.html" style="color:#E8795A;text-decoration:none;">payment failed</a></td>
+          <td>412</td><td>eu-west</td>
           <td>84 GB <span style="color:#7C948A;">/ 500 GB</span></td>
           <td>340 GB <span style="color:#7C948A;">/ 2 TB</span></td>
           <td><span class="tenant-health"><span class="hdot" style="background:#5DCAA5;"></span>Healthy</span></td>
           <td>Cloud</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
         </tr>
         <tr>
-          <td><b style="color:#fff;">Org3 — Globex Industries</b></td><td>Enterprise</td><td>1,204</td><td>on-prem</td>
+          <td><b style="color:#fff;">Org3 — Globex Industries</b></td><td>Enterprise</td>
+          <td>Perpetual <span style="color:#7C948A;">+ support</span></td>
+          <td>1,204</td><td>on-prem</td>
           <td>210 GB <span style="color:#7C948A;">(self-hosted)</span></td>
           <td>512 GB <span style="color:#7C948A;">(self-hosted)</span></td>
           <td><span class="tenant-health"><span class="hdot" style="background:#DDA234;"></span>Degraded — sync delayed</span></td>
           <td>On-premise</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
         </tr>
         <tr>
-          <td><b style="color:#fff;">Initech</b></td><td>Starter</td><td>18</td><td>us-east</td>
+          <td><b style="color:#fff;">Initech</b></td><td>Starter</td>
+          <td style="color:#7C948A;">— (Free)</td>
+          <td>18</td><td>us-east</td>
           <td>0.4 GB <span style="color:#7C948A;">/ 1 GB</span></td>
           <td>1.1 GB <span style="color:#7C948A;">/ 2 GB</span></td>
           <td><span class="tenant-health"><span class="hdot" style="background:#5DCAA5;"></span>Healthy</span></td>
           <td>Cloud</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
         </tr>
         <tr>
-          <td><b style="color:#fff;">Umbrella Group</b></td><td>Enterprise</td><td>2,880</td><td>ap-south</td>
+          <td><b style="color:#fff;">Umbrella Group</b></td><td>Enterprise</td>
+          <td>Perpetual <span style="color:#DDA234;">· renewal in 6d</span></td>
+          <td>2,880</td><td>ap-south</td>
           <td>480 GB <span style="color:#7C948A;">(self-hosted)</span></td>
           <td>1.8 TB <span style="color:#7C948A;">(self-hosted)</span></td>
           <td><span class="tenant-health"><span class="hdot" style="background:#D85A30;"></span>License expiring in 6 days</span></td>

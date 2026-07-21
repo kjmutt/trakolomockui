@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — billing &amp; payments</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .plat-wrap{max-width:1080px;margin:0 auto;padding:32px 40px 60px;}
+  .plat-card{background:#151F1B;border:1px solid #26362F;border-radius:14px;}
+  .plat-card table{width:100%;border-collapse:collapse;}
+  .plat-card th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:#7C948A;font-family:var(--font-mono);font-weight:500;padding:12px 18px;border-bottom:1px solid #26362F;background:#151F1B;}
+  .plat-card td{padding:14px 18px;border-bottom:1px solid #26362F;font-size:13px;color:#D6E4DE;vertical-align:middle;}
+  .plat-card tbody tr:last-child td{border-bottom:none;}
+  .plat-card tbody tr:hover{background:#1B2620;}
+  .plat-mcard{background:#151F1B;border:1px solid #26362F;border-radius:12px;padding:16px 18px;}
+  .plat-mcard .mlabel{font-size:11px;color:#7C948A;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.5px;}
+  .plat-mcard .mval{font-family:var(--font-display);font-size:23px;font-weight:700;margin-top:6px;color:#fff;}
+  .plat-section-title{font-family:var(--font-display);font-size:16px;font-weight:700;color:#fff;margin:26px 0 12px;}
+  .plat-section-title:first-of-type{margin-top:0;}
+  .cycle-pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#1B2E27;color:#5DCAA5;border:1px solid #2E4A3E;white-space:nowrap;}
+  .cycle-pill.annual{background:#1B2E38;color:#5DA9E0;border-color:#2E4457;}
+  .cycle-pill.perpetual{background:#2A2338;color:#B9A8ED;border-color:#453A61;}
+  .pay-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
+  .pay-badge.paid{background:rgba(93,202,165,.14);color:#5DCAA5;}
+  .pay-badge.failed{background:rgba(216,90,48,.14);color:#E8795A;}
+  .pay-badge.upcoming{background:rgba(143,167,156,.14);color:#8FA79C;}
+  .svc-btn{font-family:var(--font-body);font-size:11.5px;font-weight:600;padding:6px 12px;border-radius:7px;border:1px solid #2B3B33;background:#1B2620;color:#D6E4DE;cursor:pointer;white-space:nowrap;transition:background .15s;}
+  .svc-btn:hover{background:#26362F;}
+  .svc-btn.primary{background:#1D9E75;border-color:#1D9E75;color:#fff;}
+  .svc-btn.primary:hover{background:#22B583;}
+  @media (max-width:800px){
+    .plat-mgrid{grid-template-columns:1fr 1fr !important;}
+  }
+</style>
+</head>
+<body class="platform-body">
+<div class="platform-header">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#1B2E27" stroke="#5DCAA5" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#5DCAA5" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5"/><circle cx="100" cy="100" r="16" fill="#5DCAA5"/><circle cx="150" cy="50" r="21" fill="#5DCAA5"/></svg>
+    <span class="brand-name">Trakolo</span>
+    <span class="plat-tag">Platform</span>
+  </a>
+  <div class="top-right"><a href="saas-admin-login.html">Sign out</a></div>
+</div>
+<div style="display:flex;gap:22px;padding:0 40px;background:#0E1613;border-bottom:1px solid #223028;">
+  <a href="saas-admin-console.html" style="font-size:13px;color:#8FA79C;text-decoration:none;padding:11px 0;border-bottom:2px solid transparent;">Tenant workspaces</a>
+  <a href="saas-admin-services.html" style="font-size:13px;color:#8FA79C;text-decoration:none;padding:11px 0;border-bottom:2px solid transparent;">Services</a>
+  <a href="saas-admin-plans.html" style="font-size:13px;color:#8FA79C;text-decoration:none;padding:11px 0;border-bottom:2px solid transparent;">Plans &amp; entitlements</a>
+  <a href="saas-admin-billing.html" style="font-size:13px;color:#fff;text-decoration:none;padding:11px 0;border-bottom:2px solid #5DCAA5;font-weight:500;">Billing &amp; payments</a>
+</div>
+
+<div class="plat-wrap">
+  <div style="margin-bottom:22px;">
+    <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;">Billing &amp; payments</div>
+    <div style="font-size:13px;color:#8FA79C;margin-top:4px;max-width:720px;">Every customer's billing cycle — monthly or annual — and the full payment history behind it. On-premise customers pay a one-time perpetual fee plus an optional annual support &amp; upgrades renewal, not a recurring subscription.</div>
+  </div>
+
+  <div class="plat-mgrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px;">
+    <div class="plat-mcard"><div class="mlabel">Monthly recurring revenue</div><div class="mval">$20,701</div><div style="font-size:11.5px;color:#7C948A;margin-top:4px;">Monthly-cycle Cloud customers only</div></div>
+    <div class="plat-mcard"><div class="mlabel">Active annual contracts</div><div class="mval">$242,064</div><div style="font-size:11.5px;color:#7C948A;margin-top:4px;">Total value, annual-cycle Cloud customers</div></div>
+    <div class="plat-mcard"><div class="mlabel">Failed payments (30d)</div><div class="mval" style="color:#E8795A;">1</div><div style="font-size:11.5px;color:#7C948A;margin-top:4px;">Auto-retry in progress</div></div>
+    <div class="plat-mcard"><div class="mlabel">Renewals due (30d)</div><div class="mval">2</div><div style="font-size:11.5px;color:#7C948A;margin-top:4px;">Subscription charges + support renewals</div></div>
+  </div>
+
+  <div class="plat-section-title">Customer billing</div>
+  <div class="plat-card" style="overflow-x:auto;margin-bottom:26px;">
+    <table>
+      <thead><tr><th>Org</th><th>Plan</th><th>Deployment</th><th>Billing cycle</th><th>Amount</th><th>Next charge / renewal</th><th>Last payment</th><th></th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b style="color:#fff;">Org1 — Acme Corp</b></td><td>Team</td><td>Cloud</td>
+          <td><span class="cycle-pill">Monthly</span></td>
+          <td>$529.20 <span style="color:#7C948A;">/ mo (84 seats)</span></td>
+          <td>Aug 1, 2026</td>
+          <td><span class="pay-badge paid">Paid</span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><b style="color:#fff;">Org2 — Northwind Traders</b></td><td>Enterprise</td><td>Cloud</td>
+          <td><span class="cycle-pill annual">Annual</span></td>
+          <td>$242,064.00 <span style="color:#7C948A;">/ yr (412 seats)</span></td>
+          <td>Jul 15, 2026 <span style="color:#E8795A;">— overdue</span></td>
+          <td><span class="pay-badge failed">Failed — retrying</span></td>
+          <td><button class="svc-btn primary">Retry payment</button></td>
+        </tr>
+        <tr>
+          <td><b style="color:#fff;">Org3 — Globex Industries</b></td><td>Enterprise</td><td>On-premise</td>
+          <td><span class="cycle-pill perpetual">Perpetual</span></td>
+          <td>Support &amp; upgrades — 18% of license</td>
+          <td>Jan 2027</td>
+          <td><span class="pay-badge paid">Active</span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><b style="color:#fff;">Initech</b></td><td>Free</td><td>Cloud</td>
+          <td>—</td>
+          <td>$0.00</td>
+          <td>—</td>
+          <td><span class="pay-badge upcoming">No billing on Free</span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><b style="color:#fff;">Umbrella Group</b></td><td>Enterprise</td><td>On-premise</td>
+          <td><span class="cycle-pill perpetual">Perpetual</span></td>
+          <td>Support &amp; upgrades — 18% of license</td>
+          <td>Jul 27, 2026 <span style="color:#DDA234;">— in 6 days</span></td>
+          <td><span class="pay-badge upcoming">Renewal quote sent</span></td>
+          <td><button class="svc-btn">Send reminder</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="plat-section-title">Payment history</div>
+  <div class="plat-card" style="overflow-x:auto;">
+    <table>
+      <thead><tr><th>Date</th><th>Org</th><th>Description</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="id-mono" style="color:#8FA79C;">Jul 15, 2026</td><td>Northwind Traders</td>
+          <td>Enterprise plan · annual renewal · 412 seats — card declined</td>
+          <td>$242,064.00</td>
+          <td><span class="pay-badge failed">Failed</span></td>
+          <td><a href="#" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">Details →</a></td>
+        </tr>
+        <tr>
+          <td class="id-mono" style="color:#8FA79C;">Jul 1, 2026</td><td>Acme Corp</td>
+          <td>Team plan · monthly · 84 seats</td>
+          <td>$529.20</td>
+          <td><span class="pay-badge paid">Paid</span></td>
+          <td><a href="#" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">Download ↓</a></td>
+        </tr>
+        <tr>
+          <td class="id-mono" style="color:#8FA79C;">Jun 1, 2026</td><td>Acme Corp</td>
+          <td>Team plan · monthly · 76 seats</td>
+          <td>$478.80</td>
+          <td><span class="pay-badge paid">Paid</span></td>
+          <td><a href="#" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">Download ↓</a></td>
+        </tr>
+        <tr>
+          <td class="id-mono" style="color:#8FA79C;">May 1, 2026</td><td>Acme Corp</td>
+          <td>Team plan · monthly · 70 seats</td>
+          <td>$441.00</td>
+          <td><span class="pay-badge paid">Paid</span></td>
+          <td><a href="#" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">Download ↓</a></td>
+        </tr>
+        <tr>
+          <td class="id-mono" style="color:#8FA79C;">Nov 1, 2025</td><td>Northwind Traders</td>
+          <td>Enterprise plan · annual · 412 seats</td>
+          <td>$242,064.00</td>
+          <td><span class="pay-badge paid">Paid</span></td>
+          <td><a href="#" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">Download ↓</a></td>
+        </tr>
+        <tr>
+          <td class="id-mono" style="color:#8FA79C;">Mar 12, 2026</td><td>Globex Industries</td>
+          <td>Perpetual license — initial purchase, 1,204 seats</td>
+          <td>$84,000.00</td>
+          <td><span class="pay-badge paid">Paid</span></td>
+          <td><a href="#" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">Download ↓</a></td>
+        </tr>
+        <tr>
+          <td class="id-mono" style="color:#8FA79C;">Jan 12, 2026</td><td>Globex Industries</td>
+          <td>Support &amp; upgrades — annual renewal</td>
+          <td>$15,120.00</td>
+          <td><span class="pay-badge paid">Paid</span></td>
+          <td><a href="#" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">Download ↓</a></td>
+        </tr>
+        <tr>
+          <td class="id-mono" style="color:#8FA79C;">Jan 27, 2025</td><td>Umbrella Group</td>
+          <td>Support &amp; upgrades — annual renewal, 2,880 seats</td>
+          <td>$64,800.00</td>
+          <td><span class="pay-badge paid">Paid</span></td>
+          <td><a href="#" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">Download ↓</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<script src="platform-chrome.js" defer></script>
+</body>
+</html>
