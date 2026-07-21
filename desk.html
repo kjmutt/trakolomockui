@@ -91,6 +91,7 @@
 <script>
 const tickets = {
   "TS-4833": {due:20, subject:"Password reset — locked out after new phone", requester:"J. Okoye", priority:"neutral", priorityLabel:"Normal", category:"Account security", source:"Email · support@acme.com", slaLabel:"resolved in 3m", slaPct:100, slaColor:"var(--green)", assigneeAv:"AI", assignee:"Trakolo AI agent", status:"Resolved by AI", statusBadge:"ok", escalation:null,
+    attachments:[{icon:"📄", name:"CSAT survey transcript.pdf", size:"18 KB"}],
     activity:[
       {av:"SY",name:"System",time:"11:55",text:"CSAT survey returned 5/5. Auto-closed with the full conversation transcript attached."},
       {av:"AI",name:"Trakolo AI agent",time:"11:49",text:"Requester confirmed access is restored. Resolving — no human touch needed. Noted for problem management: third MFA-device lockout this week, may warrant a how-to announcement."},
@@ -99,6 +100,7 @@ const tickets = {
       {av:"SY",name:"System",time:"11:46",text:"Email received at support@acme.com — parsed by the email ingestion service and logged as a ticket. Requester sent the ticket ID by reply."}
     ]},
   "TS-4821": {due:20, subject:"VPN drops on hybrid laptops", requester:"D. Ferreira", priority:"crit", priorityLabel:"Urgent", category:"Network & wifi", source:"Portal", slaLabel:"18m left", slaPct:12, slaColor:"var(--coral)", assigneeAv:"RK", assignee:"Raj K.", status:"In progress", statusBadge:"neutral", escalation:null,
+    attachments:[{icon:"🎧", name:"Support call recording — TS-4821.mp3", size:"8.2 MB"}, {icon:"🖼️", name:"Network diagram — 3rd floor APs.png", size:"2.1 MB"}],
     activity:[{av:"RK",name:"Raj K.",time:"10m ago",text:"Reproduced on a test device — looks tied to an AP firmware update. Working with networking now."}]},
   "TS-4819": {due:21, subject:"Shared drive permissions for Finance", requester:"L. Adeyemi", priority:"warn", priorityLabel:"High", category:"Software & access", source:"Email · support@acme.com", slaLabel:"1h 40m", slaPct:38, slaColor:"var(--amber)", assigneeAv:"SM", assignee:"Sara M.", status:"In progress", statusBadge:"neutral", escalation:null,
     activity:[{av:"SM",name:"Sara M.",time:"25m ago",text:"Confirmed with Finance lead which folders need access — applying group changes now."}]},
@@ -180,6 +182,12 @@ function openTicket(id){
     <div style="display:flex;flex-direction:column;gap:8px;">
       ${t.linked.map(([label,val,href]) => `<a href="${href}" style="display:flex;justify-content:space-between;align-items:center;text-decoration:none;color:var(--ink);font-size:12.5px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;"><span style="color:var(--ink-muted);">${label}</span><span class="id-mono" style="color:var(--indigo-text);">${val} →</span></a>`).join('')}
     </div>` : ''}
+
+    <div class="section-label" style="margin-top:20px;">Attachments</div>
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      ${(t.attachments||[]).map(a => `<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:9px;font-size:12.5px;"><span style="font-size:14px;">${a.icon}</span><span style="flex:1;">${a.name}</span><span class="id-mono" style="color:var(--ink-muted);">${a.size}</span></div>`).join('') || '<div class="page-desc">No files attached yet.</div>'}
+      <a href="docs.html" class="btn sm" style="align-self:flex-start;margin-top:2px;">+ Attach from Document library</a>
+    </div>
 
     <div class="section-label" style="margin-top:20px;">Activity</div>
     <div style="display:flex;flex-direction:column;gap:14px;">

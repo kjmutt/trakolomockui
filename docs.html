@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — document library</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .docs-layout{display:grid;grid-template-columns:220px 1fr;gap:20px;align-items:start;}
+  .docs-rail{position:sticky;top:78px;display:flex;flex-direction:column;gap:2px;}
+  .docs-rail .dr-group{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink-muted);font-family:var(--font-mono);margin:14px 0 6px;}
+  .docs-rail .dr-group:first-child{margin-top:0;}
+  .dr-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:var(--r-sm);cursor:pointer;color:var(--ink-2);font-size:13px;}
+  .dr-item:hover{background:var(--surface-2);}
+  .dr-item.active{background:var(--indigo-bg);color:var(--indigo-text);font-weight:600;}
+  .dr-item .cnt{font-size:11px;color:var(--ink-muted);font-family:var(--font-mono);}
+  .dr-item.active .cnt{color:var(--indigo-text);}
+  .breadcrumb{font-size:12.5px;color:var(--ink-muted);margin-bottom:10px;}
+  .breadcrumb b{color:var(--ink);cursor:pointer;}
+  .doc-row{display:flex;align-items:center;gap:12px;padding:10px 8px;border-bottom:1px solid var(--border);cursor:pointer;font-size:13px;}
+  .doc-row:last-child{border-bottom:none;}
+  .doc-row:hover{background:var(--surface-2);}
+  .doc-icon{width:30px;height:30px;border-radius:8px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+  .doc-name{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .doc-meta{width:110px;flex-shrink:0;color:var(--ink-muted);font-size:12px;font-family:var(--font-mono);}
+  .docs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  .doc-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;box-shadow:var(--shadow-sm);cursor:pointer;transition:box-shadow .15s,transform .15s;}
+  .doc-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px);}
+  .doc-card .dc-icon{width:100%;height:64px;border-radius:8px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:10px;}
+  .doc-card .dc-name{font-size:12.5px;font-weight:600;line-height:1.35;margin-bottom:4px;}
+  .doc-card .dc-meta{font-size:11px;color:var(--ink-muted);font-family:var(--font-mono);}
+  .preview-box{background:var(--surface-2);border-radius:var(--r-md);height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;margin-bottom:14px;position:relative;overflow:hidden;}
+  .preview-box .big-icon{font-size:44px;}
+  .play-btn{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--ink);box-shadow:var(--shadow-md);cursor:pointer;}
+  .waveform{display:flex;align-items:flex-end;gap:2px;height:40px;}
+  .waveform i{width:3px;background:var(--indigo);border-radius:2px;}
+  .ver-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+  .ver-row:last-child{border-bottom:none;}
+  .cmt{display:flex;gap:10px;margin-bottom:12px;font-size:12.5px;}
+  .upload-trail{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+  .upload-row{display:flex;align-items:center;gap:10px;font-size:12.5px;}
+  .upload-row .beam{flex:1;height:6px;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a class="active" href="docs.html">Document library</a>
+  <a href="docs-wiki.html">Wiki spaces</a>
+  <a href="desk-kb.html">Knowledge base</a>
+</div>
+
+<div class="wrap">
+  <div class="page-head">
+    <div><div class="page-title">Document library</div><div class="page-desc">Files, videos, audio and images for every team — upload once, attach anywhere: tickets, KB articles, or wiki pages.</div></div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <div class="view-switch" id="view-switch">
+        <button class="active" data-view="list" onclick="setView('list')">☰ List</button>
+        <button data-view="grid" onclick="setView('grid')">▦ Grid</button>
+      </div>
+      <button class="btn">+ New folder</button>
+      <button class="btn primary" onclick="startUpload()">Upload</button>
+    </div>
+  </div>
+
+  <div class="strip">
+    <div class="mcard info"><div class="mlabel">Storage used</div><div class="mval">214 GB</div><div class="mdelta">of 500 GB workspace quota</div></div>
+    <div class="mcard ok"><div class="mlabel">Video &amp; audio</div><div class="mval">137 GB</div><div class="mdelta">recordings, postmortems, calls</div></div>
+    <div class="mcard info"><div class="mlabel">Attached to tickets/KB</div><div class="mval">42</div><div class="mdelta">files linked from IT &amp; Dev</div></div>
+    <div class="mcard warn"><div class="mlabel">Shared externally</div><div class="mval">3</div><div class="mdelta">review link access quarterly</div></div>
+  </div>
+
+  <div class="card" id="upload-card" style="display:none;">
+    <div class="section-label">Uploading</div>
+    <div class="upload-trail" id="upload-trail"></div>
+  </div>
+
+  <div class="docs-layout">
+    <div class="docs-rail">
+      <div class="dr-group">Browse</div>
+      <div class="dr-item active" data-folder="All files">All files <span class="cnt">14</span></div>
+      <div class="dr-item" data-folder="Recent">Recent <span class="cnt">6</span></div>
+      <div class="dr-item" data-folder="Shared with me">Shared with me <span class="cnt">4</span></div>
+      <div class="dr-group">Folders</div>
+      <div class="dr-item" data-folder="Engineering">Engineering <span class="cnt">3</span></div>
+      <div class="dr-item" data-folder="IT Ops">IT Ops <span class="cnt">5</span></div>
+      <div class="dr-item" data-folder="HR & People">HR &amp; People <span class="cnt">2</span></div>
+      <div class="dr-item" data-folder="Finance">Finance <span class="cnt">1</span></div>
+      <div class="dr-item" data-folder="Product">Product <span class="cnt">1</span></div>
+      <div class="dr-group">Other</div>
+      <div class="dr-item" data-folder="Trash">Trash <span class="cnt">2</span></div>
+    </div>
+
+    <div>
+      <div class="breadcrumb" id="breadcrumb">All files</div>
+      <div class="panel" id="list-panel"></div>
+      <div class="docs-grid" id="grid-panel" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeSO()"></div>
+<div class="slideover" id="slideover">
+  <div style="padding:22px;" id="so-body"></div>
+</div>
+
+<script>
+const DOCS = [
+  {id:1,name:'Onboarding checklist.pdf',type:'pdf',folder:'HR & People',owner:'Nadia P.',av:'NP',modified:'Jul 15',size:'420 KB',recent:true},
+  {id:2,name:'VPN outage postmortem — Jul 18.mp4',type:'video',folder:'IT Ops',owner:'Raj K.',av:'RK',modified:'Jul 18',size:'184 MB',recent:true,linkedTicket:['PRB-0007','desk-problems.html']},
+  {id:3,name:'Support call recording — TS-4821.mp3',type:'audio',folder:'IT Ops',owner:'Sara M.',av:'SM',modified:'Jul 14',size:'8.2 MB',linkedTicket:['TS-4821','desk.html']},
+  {id:4,name:'Network diagram — 3rd floor APs.png',type:'image',folder:'IT Ops',owner:'D. Ferreira',av:'DF',modified:'Jul 17',size:'2.1 MB',recent:true},
+  {id:5,name:'Change window schedule Q3.xlsx',type:'sheet',folder:'Engineering',owner:'E. Moreau',av:'EM',modified:'Jul 20',size:'54 KB',recent:true,linkedTicket:['CR-0091','desk-approvals.html']},
+  {id:6,name:'Sprint 34 retro slides.pptx',type:'slide',folder:'Engineering',owner:'Sara M.',av:'SM',modified:'Jul 19',size:'3.4 MB',recent:true},
+  {id:7,name:'Azure AD onboarding runbook.docx',type:'doc',folder:'IT Ops',owner:'E. Moreau',av:'EM',modified:'Jul 12',size:'88 KB',shared:true,linkedWiki:['Azure AD onboarding','docs-wiki.html']},
+  {id:8,name:'Vendor contracts 2026.pdf',type:'pdf',folder:'Finance',owner:'Nadia P.',av:'NP',modified:'Jun 28',size:'1.1 MB',shared:true},
+  {id:9,name:'Product roadmap FY27.pptx',type:'slide',folder:'Product',owner:'D. Ferreira',av:'DF',modified:'Jul 5',size:'5.6 MB',shared:true},
+  {id:10,name:'All-hands recording — Jul.mp4',type:'video',folder:'HR & People',owner:'Nadia P.',av:'NP',modified:'Jul 3',size:'612 MB',shared:true},
+  {id:11,name:'Password policy.docx',type:'doc',folder:'IT Ops',owner:'Raj K.',av:'RK',modified:'Jun 20',size:'32 KB'},
+  {id:12,name:'Escalation rota recording.mp3',type:'audio',folder:'IT Ops',owner:'Raj K.',av:'RK',modified:'Jun 18',size:'4.6 MB'},
+  {id:13,name:'Old vendor deck.pptx',type:'slide',folder:'Trash',owner:'D. Ferreira',av:'DF',modified:'May 2',size:'2.8 MB'},
+  {id:14,name:'Draft NDA (unused).pdf',type:'pdf',folder:'Trash',owner:'Nadia P.',av:'NP',modified:'Apr 20',size:'110 KB'}
+];
+const ICON = {pdf:'📕',video:'🎬',audio:'🎧',image:'🖼️',sheet:'📊',slide:'📽️',doc:'📄'};
+let currentFolder = 'All files';
+let currentView = 'list';
+
+function itemsFor(folder){
+  if(folder === 'All files') return DOCS.filter(d => d.folder !== 'Trash');
+  if(folder === 'Recent') return DOCS.filter(d => d.recent);
+  if(folder === 'Shared with me') return DOCS.filter(d => d.shared);
+  return DOCS.filter(d => d.folder === folder);
+}
+
+function render(){
+  const items = itemsFor(currentFolder);
+  document.getElementById('breadcrumb').innerHTML = currentFolder === 'All files' ? '<b>All files</b>' : `<b onclick="selectFolder('All files')" style="cursor:pointer;">All files</b> / ${currentFolder}`;
+
+  document.getElementById('list-panel').innerHTML = items.map(d => `
+    <div class="doc-row" onclick="openDoc(${d.id})">
+      <div class="doc-icon">${ICON[d.type]}</div>
+      <div class="doc-name">${d.name}</div>
+      <div class="doc-meta">${d.folder}</div>
+      <div class="doc-meta">${d.owner}</div>
+      <div class="doc-meta">${d.modified}</div>
+      <div class="doc-meta" style="text-align:right;">${d.size}</div>
+    </div>`).join('') || '<div style="padding:24px;color:var(--ink-muted);font-size:13px;">Nothing here yet.</div>';
+
+  document.getElementById('grid-panel').innerHTML = items.map(d => `
+    <div class="doc-card" onclick="openDoc(${d.id})">
+      <div class="dc-icon">${ICON[d.type]}</div>
+      <div class="dc-name">${d.name}</div>
+      <div class="dc-meta">${d.size} · ${d.modified}</div>
+    </div>`).join('') || '<div style="padding:24px;color:var(--ink-muted);font-size:13px;">Nothing here yet.</div>';
+}
+
+function selectFolder(folder){
+  currentFolder = folder;
+  document.querySelectorAll('.dr-item').forEach(i => i.classList.toggle('active', i.dataset.folder === folder));
+  render();
+}
+document.querySelectorAll('.dr-item').forEach(i => i.addEventListener('click', () => selectFolder(i.dataset.folder)));
+
+function setView(v){
+  currentView = v;
+  document.querySelectorAll('#view-switch button').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+  document.getElementById('list-panel').style.display = v === 'list' ? '' : 'none';
+  document.getElementById('grid-panel').style.display = v === 'grid' ? '' : 'none';
+}
+
+function previewFor(d){
+  if(d.type === 'video') return `<div class="preview-box"><div class="play-btn">▶</div></div>`;
+  if(d.type === 'audio') return `<div class="preview-box"><div class="waveform">${Array.from({length:28},() => `<i style="height:${8+Math.random()*32}px;"></i>`).join('')}</div><div class="play-btn" style="width:36px;height:36px;font-size:14px;">▶</div></div>`;
+  return `<div class="preview-box"><div class="big-icon">${ICON[d.type]}</div></div>`;
+}
+
+function openDoc(id){
+  const d = DOCS.find(x => x.id === id);
+  const linkedRow = d.linkedTicket ? `<div class="row-line"><div><div class="rname">Linked ticket</div></div><a href="${d.linkedTicket[1]}" class="id-mono" style="color:var(--indigo-text);">${d.linkedTicket[0]} →</a></div>` :
+    d.linkedWiki ? `<div class="row-line"><div><div class="rname">Linked wiki page</div></div><a href="${d.linkedWiki[1]}" class="id-mono" style="color:var(--indigo-text);">${d.linkedWiki[0]} →</a></div>` : '';
+
+  document.getElementById('so-body').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+      <div><div style="font-size:15px;font-weight:700;">${d.name}</div><div style="font-size:12px;color:var(--ink-muted);font-family:var(--font-mono);margin-top:2px;">${d.folder} · ${d.size}</div></div>
+      <button class="btn sm" onclick="closeSO()">✕</button>
+    </div>
+    ${previewFor(d)}
+    <div class="card" style="box-shadow:none;">
+      <div class="row-line"><div><div class="rname">Owner</div></div><div class="who"><div class="av">${d.av}</div>${d.owner}</div></div>
+      <div class="row-line"><div><div class="rname">Modified</div></div><span class="id-mono">${d.modified}</span></div>
+      ${linkedRow}
+    </div>
+    <div class="card">
+      <div class="section-label">Attach to…</div>
+      <select id="attach-target">
+        <option>Ticket TS-4833 — Password reset for new laptop</option>
+        <option>KB article — Fix VPN drops when moving between floors</option>
+        <option>Wiki page — Azure AD onboarding runbook</option>
+      </select>
+      <button class="btn primary sm" style="margin-top:10px;" onclick="attachDoc()">Attach</button>
+      <div id="attach-confirm" class="page-desc" style="display:none;margin-top:8px;color:var(--indigo-text);"></div>
+    </div>
+    <div class="card">
+      <div class="section-label">Version history</div>
+      <div class="ver-row"><span><b>v3</b> · current</span><span style="color:var(--ink-2);">${d.owner} · ${d.modified}</span></div>
+      <div class="ver-row"><span>v2</span><span style="color:var(--ink-2);">${d.owner} · earlier revision</span><button class="btn sm" onclick="event.stopPropagation();alert('Mock: v2 restored as the new current version.')">Restore</button></div>
+      <div class="ver-row"><span>v1</span><span style="color:var(--ink-2);">Original upload</span><button class="btn sm" onclick="event.stopPropagation();alert('Mock: v1 restored as the new current version.')">Restore</button></div>
+    </div>
+    <div class="card">
+      <div class="section-label">Comments</div>
+      <div class="cmt"><div class="who"><div class="av">${d.av}</div></div><div><b>${d.owner}</b> <span style="color:var(--ink-muted);">· 2 days ago</span><div style="color:var(--ink-2);margin-top:2px;">Uploaded the latest version after the review.</div></div></div>
+      <textarea placeholder="Add a comment…"></textarea>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:10px;"><button class="btn">Download</button><button class="btn">Share</button><button class="btn primary sm">Post comment</button></div>
+    </div>`;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('slideover').classList.add('open');
+}
+function closeSO(){
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('slideover').classList.remove('open');
+}
+function attachDoc(){
+  const target = document.getElementById('attach-target').value;
+  const box = document.getElementById('attach-confirm');
+  box.style.display = 'block';
+  box.textContent = 'Attached to: ' + target;
+}
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSO(); });
+
+function startUpload(){
+  const card = document.getElementById('upload-card');
+  const trail = document.getElementById('upload-trail');
+  card.style.display = 'block';
+  const files = [['Q3 planning notes.docx',210],['Team offsite photos.zip',480],['Support call — TS-4901.mp3',95]];
+  trail.innerHTML = files.map((f,i) => `
+    <div class="upload-row" id="up-${i}">
+      <span style="width:220px;">${f[0]}</span>
+      <div class="beam"><i style="width:0%;background:var(--indigo);"></i></div>
+      <span class="id-mono" id="up-pct-${i}">0%</span>
+    </div>`).join('');
+  files.forEach((f,i) => {
+    let pct = 0;
+    const timer = setInterval(() => {
+      pct += 10 + Math.random()*20;
+      if(pct >= 100){ pct = 100; clearInterval(timer); }
+      document.querySelector(`#up-${i} .beam i`).style.width = pct + '%';
+      document.getElementById(`up-pct-${i}`).textContent = Math.round(pct) + '%';
+    }, 250 + i*80);
+  });
+}
+
+render();
+</script>
+<script src="app-chrome.js" defer></script>
+</body>
+</html>

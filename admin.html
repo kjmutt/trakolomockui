@@ -104,6 +104,9 @@
     <div class="set-item" data-panel="reporting">
       <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 13V7M8 13V3M13 13V9"/></svg>Reporting
     </div>
+    <div class="set-item" data-panel="docs">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 2h6l3 3v9H4z"/><path d="M10 2v3h3"/><path d="M6 9h4M6 11.5h4"/></svg>Document library
+    </div>
 
     <div class="set-nav-group">Platform</div>
     <div class="set-item" data-panel="status">
@@ -151,6 +154,8 @@
         <div class="row-line"><div><div class="rname">Asset discovery</div><div class="rdesc">Agent + network scan into SAM</div></div><div class="switch on"></div></div>
         <div class="row-line"><div><div class="rname">Epics &amp; roadmap</div><div class="rdesc">Quarter view over the sprint boards</div></div><div class="switch on"></div></div>
         <div class="row-line"><div><div class="rname">Change management</div><div class="rdesc">CRs, CAB approval, deployment windows</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Document library</div><div class="rdesc">Files, video, audio &amp; images — attachable to tickets, KB articles &amp; wiki pages</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Wiki spaces</div><div class="rdesc">Confluence-style nested pages per team</div></div><div class="switch on"></div></div>
         <div class="row-line"><div><div class="rname">AI Copilot</div><div class="rdesc">Floating assistant on the agent workspace, admin, and self-service portal — off removes it from every page instantly</div></div><div class="switch on" id="feat-copilot"></div></div>
       </div>
     </div>
@@ -957,6 +962,56 @@
       </div>
     </div>
 
+    <!-- DOCUMENT LIBRARY -->
+    <div class="set-panel" id="panel-docs">
+      <div class="page-title" style="font-size:20px;margin-bottom:4px;">Document library &amp; wiki</div>
+      <div class="page-desc" style="margin-bottom:20px;">Storage, file types, retention and sharing for the <a href="docs.html" style="color:var(--indigo-text);">Document library</a> and <a href="docs-wiki.html" style="color:var(--indigo-text);">Wiki spaces</a>.</div>
+
+      <div class="card">
+        <div class="section-label">Storage</div>
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-2);margin:4px 0 6px;"><span>Workspace usage</span><span class="id-mono">214 GB / 500 GB</span></div>
+        <div class="beam" style="width:100%;height:7px;"><i style="width:43%;background:var(--indigo)"></i></div>
+        <label style="margin-top:14px;">Storage quota</label>
+        <select><option>250 GB</option><option selected>500 GB</option><option>1 TB</option><option>Unlimited (Enterprise)</option></select>
+        <label>Max file size per upload</label>
+        <select><option>100 MB</option><option selected>1 GB</option><option>5 GB</option></select>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Allowed file types</div>
+        <div class="row-line"><div><div class="rname">Documents</div><div class="rdesc">.doc, .docx, .pdf, .txt</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Spreadsheets &amp; slides</div><div class="rdesc">.xls, .xlsx, .ppt, .pptx</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Images</div><div class="rdesc">.png, .jpg, .gif, .svg</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Video</div><div class="rdesc">.mp4, .mov, .webm — postmortems, recorded calls, all-hands</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Audio</div><div class="rdesc">.mp3, .wav — support call recordings, voicemail</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Archives</div><div class="rdesc">.zip — flagged for a virus scan before storage</div></div><div class="switch"></div></div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Versioning &amp; retention</div>
+        <div class="row-line"><div><div class="rname">Keep version history</div><div class="rdesc">Every file &amp; wiki page edit keeps a restorable prior version</div></div><div class="switch on"></div></div>
+        <label>Versions kept per file</label>
+        <select><option>5</option><option selected>10</option><option>Unlimited</option></select>
+        <div class="row-line"><div><div class="rname">Empty trash automatically</div><div class="rdesc">Permanently deletes items in Trash after this long</div></div><select style="width:140px;"><option>30 days</option><option selected>90 days</option><option>Never</option></select></div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Sharing</div>
+        <div class="row-line"><div><div class="rname">Allow external share links</div><div class="rdesc">Anyone with the link, no Trakolo account required</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Expire external links automatically</div></div><select style="width:140px;"><option>7 days</option><option selected>30 days</option><option>Never</option></select></div>
+        <div class="row-line"><div><div class="rname">Currently shared externally</div><div class="rdesc">Review periodically for anything stale</div></div><span class="badge warn">3 links</span></div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Wiki spaces</div>
+        <div class="row-line"><div><div class="rname">IT Operations</div><div class="rdesc">12 pages</div></div><span class="badge ok">Active</span></div>
+        <div class="row-line"><div><div class="rname">Engineering</div><div class="rdesc">34 pages</div></div><span class="badge ok">Active</span></div>
+        <div class="row-line"><div><div class="rname">People &amp; HR</div><div class="rdesc">9 pages</div></div><span class="badge ok">Active</span></div>
+        <div class="row-line"><div><div class="rname">Product</div><div class="rdesc">15 pages</div></div><span class="badge ok">Active</span></div>
+        <button class="btn" style="margin-top:10px;">+ New space</button>
+      </div>
+    </div>
+
     <!-- SYSTEM STATUS -->
     <div class="set-panel" id="panel-status">
       <div class="page-head">
@@ -1315,7 +1370,8 @@ window.COPILOT = {
     {label:"What's not licensed on my plan?"},
     {label:'How do I create a custom role?'},
     {label:'Where do I set up SSO?'},
-    {label:'How do I generate an API key?'}
+    {label:'How do I generate an API key?'},
+    {label:'Where do documents & wiki pages live?'}
   ],
   answers: [
     {keywords:['business rule','automation','if this then'], text:'Under Service desk → Create a business rule: pick a trigger, stack conditions, chain actions, and set the run order — it\'s evaluated on every ticket event, first match wins.', link:{href:'admin.html#desk', label:'Open Service desk config'}},
@@ -1327,7 +1383,10 @@ window.COPILOT = {
     {keywords:['audit','who changed','log'], text:'Every admin action and privileged change is in the Audit log, exportable as CSV.', link:{href:'admin.html#auditlog', label:'Open Audit log'}},
     {keywords:['role','permission','rbac','custom role','access level'], text:'Users & roles has a Roles & permissions tab — a matrix of what each role can do per area, plus a "+ New custom role" button to create one starting from an existing role\'s permissions.', link:{href:'admin.html#users', label:'Open Users & roles'}},
     {keywords:['sso','saml','scim','identity provider','okta','single sign-on'], text:'SAML SSO & SCIM provisioning is its own setup flow under Integrations — metadata, entity ID/ACS URL, attribute mapping, IdP group → role mapping, and a test sign-in, all on one page.', link:{href:'admin-sso.html', label:'Open SSO & SCIM setup'}},
-    {keywords:['api key','api token','generate key','rest api'], text:'Workspace-level API keys (for server-to-server access, not personal use) are under Integrations → API keys — pick scopes and generate. Personal tokens live on your own profile instead.', link:{href:'admin.html#integrations', label:'Open Integrations'}}
+    {keywords:['api key','api token','generate key','rest api'], text:'Workspace-level API keys (for server-to-server access, not personal use) are under Integrations → API keys — pick scopes and generate. Personal tokens live on your own profile instead.', link:{href:'admin.html#integrations', label:'Open Integrations'}},
+    {keywords:['document','file storage','video','audio','upload file','drive'], text:'The Document library holds files, video, audio and images in folders, with versioning and attach-anywhere support. Storage quota, file types, and retention are under Document library & wiki.', link:{href:'admin.html#docs', label:'Open Document library settings'}},
+    {keywords:['wiki','confluence','space','runbook','long-form doc'], text:'Wiki spaces are Confluence-style — nested pages per team, with page history and comments. Manage spaces and their settings under Document library & wiki.', link:{href:'admin.html#docs', label:'Open Document library settings'}},
+    {keywords:['attach','attachment'], text:'Files attach from the Document library straight onto a ticket, a knowledge base article, or a wiki page — open any file there and use "Attach to…".', link:{href:'admin.html#docs', label:'Open Document library settings'}}
   ],
   fallback: {text:"I don't have a canned answer for that yet in this mockup — but in the real product I'd search your settings, the docs, and past changes in the audit log to answer directly.", link:{href:'admin.html#general', label:'Go to General settings'}}
 };

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — wiki spaces</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .wiki-layout{display:grid;grid-template-columns:240px 1fr;gap:20px;align-items:start;}
+  .wiki-rail{position:sticky;top:78px;}
+  .space-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--r-sm);cursor:pointer;font-size:13px;color:var(--ink-2);}
+  .space-item:hover{background:var(--surface-2);}
+  .space-item.active{background:var(--indigo-bg);color:var(--indigo-text);font-weight:600;}
+  .wiki-tree{margin-top:14px;display:flex;flex-direction:column;gap:1px;}
+  .wt-item{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:7px;cursor:pointer;font-size:12.5px;color:var(--ink-2);}
+  .wt-item:hover{background:var(--surface-2);}
+  .wt-item.active{background:var(--indigo-bg);color:var(--indigo-text);font-weight:600;}
+  .wiki-page{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:26px 30px;box-shadow:var(--shadow-sm);}
+  .wp-title{font-size:22px;font-weight:700;margin-bottom:4px;}
+  .wp-meta{font-size:12px;color:var(--ink-muted);font-family:var(--font-mono);margin-bottom:20px;}
+  .wp-body p{font-size:13.5px;color:var(--ink-2);line-height:1.7;margin-bottom:14px;}
+  .wp-body h4{font-size:14.5px;font-weight:700;margin:20px 0 8px;}
+  .wp-body ul{padding-left:20px;font-size:13.5px;color:var(--ink-2);line-height:1.8;margin-bottom:14px;}
+  .callout{background:var(--indigo-bg);border:1px solid #A9E0CD;border-radius:var(--r-md);padding:12px 14px;font-size:13px;color:var(--ink);margin-bottom:16px;display:flex;gap:10px;}
+  .wp-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px;}
+  .wp-table th,.wp-table td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);}
+  .wp-table th{color:var(--ink-muted);font-family:var(--font-mono);font-size:11px;text-transform:uppercase;}
+  .attach-chip{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:8px;font-size:12.5px;}
+  .attach-chip .ic{width:26px;height:26px;border-radius:7px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+  .history-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+  .history-row:last-child{border-bottom:none;}
+  .cmt{display:flex;gap:10px;margin-bottom:12px;font-size:12.5px;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="docs.html">Document library</a>
+  <a class="active" href="docs-wiki.html">Wiki spaces</a>
+  <a href="desk-kb.html">Knowledge base</a>
+</div>
+
+<div class="wrap">
+  <div class="page-head">
+    <div><div class="page-title">Wiki spaces</div><div class="page-desc">Long-form team documentation, Confluence-style — nested pages per space, with files attached straight from the Document library.</div></div>
+    <button class="btn primary">+ New page</button>
+  </div>
+
+  <div class="wiki-layout">
+    <div class="wiki-rail">
+      <div class="card" style="padding:14px;">
+        <div class="section-label" style="margin-bottom:8px;">Spaces</div>
+        <div id="space-list"></div>
+      </div>
+      <div class="card" style="padding:14px;margin-top:14px;">
+        <div class="section-label" style="margin-bottom:4px;">Pages</div>
+        <div class="wiki-tree" id="page-tree"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="wiki-page" id="wiki-page"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SPACES = [
+  {id:'itops', name:'IT Operations', icon:'🛠️'},
+  {id:'eng', name:'Engineering', icon:'💻'},
+  {id:'hr', name:'People &amp; HR', icon:'🧑‍🤝‍🧑'},
+  {id:'product', name:'Product', icon:'📦'}
+];
+
+const PAGES = {
+  'itops-home': {space:'itops', title:'IT Operations home', parent:null,
+    body:`<p>Everything the IT Ops team needs day-to-day — runbooks, the on-call handbook, and escalation paths. Start here if you're new to the team.</p>
+      <div class="callout">📌 <span>The <b>on-call</b> rota and escalation rule live in <a href="desk-oncall.html" style="color:var(--indigo-text);">On-call</a> — this space documents the process, not the schedule itself.</span></div>
+      <h4>What's in this space</h4>
+      <ul><li><b>Runbooks</b> — step-by-step guides for recurring incidents</li><li><b>On-call handbook</b> — paging, escalation, and handoff process</li></ul>`,
+    attachments:[], updated:'Jul 18', updatedBy:'E. Moreau', children:['itops-runbooks','itops-oncall']},
+  'itops-runbooks': {space:'itops', title:'Runbooks', parent:'itops-home',
+    body:`<p>One page per recurring issue. Link the runbook from the resolving ticket so the next agent finds it via the AI agent or a search.</p>`,
+    attachments:[], updated:'Jul 10', updatedBy:'Raj K.', children:['itops-azure-onboarding','itops-vpn']},
+  'itops-azure-onboarding': {space:'itops', title:'Azure AD onboarding runbook', parent:'itops-runbooks',
+    body:`<p>Reference for the automation behind <a href="azure-onboarding.html" style="color:var(--indigo-text);">Azure AD onboarding</a> — what it does automatically, and what still needs a human.</p>
+      <h4>Steps the automation runs</h4>
+      <ul><li>Creates the Azure AD account and assigns a license</li><li>Adds the new hire to their department's security group</li><li>Generates a temporary password, forces reset at first login</li><li>Posts the password to the originating ticket as an internal note</li></ul>
+      <h4>Still manual</h4>
+      <table class="wp-table"><thead><tr><th>Step</th><th>Owner</th></tr></thead><tbody>
+        <tr><td>Physical hardware handoff</td><td>IT Ops, day one</td></tr>
+        <tr><td>Building access badge</td><td>Facilities</td></tr>
+        <tr><td>Slack &amp; email signature setup</td><td>New hire, guided by this page</td></tr>
+      </tbody></table>`,
+    attachments:[{name:'Azure AD onboarding runbook.docx', icon:'📄', size:'88 KB'}],
+    updated:'Jul 12', updatedBy:'E. Moreau', children:[]},
+  'itops-vpn': {space:'itops', title:'VPN troubleshooting & postmortems', parent:'itops-runbooks',
+    body:`<p>Working notes on the recurring VPN-drop issue, linked to <a href="desk-problems.html" style="color:var(--indigo-text);">PRB-0007</a> and its <a href="desk-kb.html" style="color:var(--indigo-text);">KB article</a>.</p>
+      <div class="callout">🎬 <span>The recorded postmortem walkthrough is attached below — same recording linked from PRB-0007.</span></div>`,
+    attachments:[{name:'VPN outage postmortem — Jul 18.mp4', icon:'🎬', size:'184 MB'},{name:'Network diagram — 3rd floor APs.png', icon:'🖼️', size:'2.1 MB'}],
+    updated:'Jul 18', updatedBy:'Raj K.', children:[]},
+  'itops-oncall': {space:'itops', title:'On-call handbook', parent:'itops-home',
+    body:`<p>Paging flow, escalation timing, and handoff checklist. The live rota is on the <a href="desk-oncall.html" style="color:var(--indigo-text);">On-call</a> page — this describes the process behind it.</p>
+      <ul><li>Page fires after 15 minutes unacknowledged, per the escalation rule</li><li>Handoff notes go in the shift's ticket comment, not Slack DM</li><li>Weekly rota swap requests go through the on-call page, not this wiki</li></ul>`,
+    attachments:[{name:'Escalation rota recording.mp3', icon:'🎧', size:'4.6 MB'}],
+    updated:'Jun 30', updatedBy:'Raj K.', children:[]},
+
+  'eng-home': {space:'eng', title:'Engineering home', parent:null,
+    body:`<p>Sprint process, environment ownership, and the change management workflow for promoting to production.</p>
+      <div class="callout">📌 <span>Sprint boards live in <a href="dev.html" style="color:var(--indigo-text);">Boards &amp; sprints</a> — this space is the process documentation, not the board itself.</span></div>`,
+    attachments:[{name:'Sprint 34 retro slides.pptx', icon:'📽️', size:'3.4 MB'},{name:'Change window schedule Q3.xlsx', icon:'📊', size:'54 KB'}],
+    updated:'Jul 19', updatedBy:'Sara M.', children:[]},
+
+  'hr-home': {space:'hr', title:'People & HR home', parent:null,
+    body:`<p>Onboarding checklists, leave policy, and recordings of company all-hands.</p>`,
+    attachments:[{name:'Onboarding checklist.pdf', icon:'📕', size:'420 KB'},{name:'All-hands recording — Jul.mp4', icon:'🎬', size:'612 MB'}],
+    updated:'Jul 15', updatedBy:'Nadia P.', children:[]},
+
+  'product-home': {space:'product', title:'Product home', parent:null,
+    body:`<p>Roadmap, epics, and how they map to the <a href="dev-roadmap.html" style="color:var(--indigo-text);">Epics &amp; roadmap</a> board.</p>`,
+    attachments:[{name:'Product roadmap FY27.pptx', icon:'📽️', size:'5.6 MB'}],
+    updated:'Jul 5', updatedBy:'D. Ferreira', children:[]}
+};
+const ROOTS = {itops:'itops-home', eng:'eng-home', hr:'hr-home', product:'product-home'};
+
+let currentSpace = 'itops';
+let currentPage = 'itops-home';
+
+function renderSpaces(){
+  document.getElementById('space-list').innerHTML = SPACES.map(s => `<div class="space-item ${s.id===currentSpace?'active':''}" data-space="${s.id}">${s.icon} ${s.name}</div>`).join('');
+  document.querySelectorAll('.space-item').forEach(el => el.addEventListener('click', () => {
+    currentSpace = el.dataset.space;
+    currentPage = ROOTS[currentSpace];
+    renderSpaces(); renderTree(); renderPage();
+  }));
+}
+
+function renderTree(){
+  const rootId = ROOTS[currentSpace];
+  const html = [];
+  function walk(id, depth){
+    const p = PAGES[id];
+    html.push(`<div class="wt-item ${id===currentPage?'active':''}" data-page="${id}" style="padding-left:${8+depth*14}px;">${depth>0?'└ ':''}${p.title}</div>`);
+    (p.children||[]).forEach(c => walk(c, depth+1));
+  }
+  walk(rootId, 0);
+  document.getElementById('page-tree').innerHTML = html.join('');
+  document.querySelectorAll('.wt-item').forEach(el => el.addEventListener('click', () => {
+    currentPage = el.dataset.page;
+    renderTree(); renderPage();
+  }));
+}
+
+function renderPage(){
+  const p = PAGES[currentPage];
+  const crumbs = [];
+  let id = currentPage;
+  while(id){ crumbs.unshift(PAGES[id].title); id = PAGES[id].parent; }
+  const attachHtml = (p.attachments||[]).map(a => `<div class="attach-chip"><div class="ic">${a.icon}</div><span style="flex:1;">${a.name}</span><span class="id-mono" style="color:var(--ink-muted);">${a.size}</span></div>`).join('') || '<div class="page-desc">No files attached to this page yet.</div>';
+
+  document.getElementById('wiki-page').innerHTML = `
+    <div style="font-size:11.5px;color:var(--ink-muted);margin-bottom:10px;">${crumbs.join(' / ')}</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div class="wp-title">${p.title}</div>
+      <div style="display:flex;gap:8px;flex-shrink:0;">
+        <button class="btn sm" onclick="toggleHistory()">History</button>
+        <button class="btn sm primary">Edit</button>
+      </div>
+    </div>
+    <div class="wp-meta">Updated ${p.updated} by ${p.updatedBy}</div>
+    <div class="wp-body">${p.body}</div>
+
+    <div class="section-label" style="margin-top:22px;">Attachments</div>
+    <div style="margin-top:8px;">${attachHtml}</div>
+    <a href="docs.html" class="btn sm" style="margin-top:4px;display:inline-block;">+ Attach from Document library</a>
+
+    <div id="history-panel" style="display:none;margin-top:22px;">
+      <div class="section-label">Page history</div>
+      <div class="history-row"><span><b>v4</b> · current</span><span style="color:var(--ink-2);">${p.updatedBy} · ${p.updated}</span></div>
+      <div class="history-row"><span>v3</span><span style="color:var(--ink-2);">Earlier revision</span></div>
+      <div class="history-row"><span>v2</span><span style="color:var(--ink-2);">Earlier revision</span></div>
+      <div class="history-row"><span>v1</span><span style="color:var(--ink-2);">Page created</span></div>
+    </div>
+
+    <div class="section-label" style="margin-top:22px;">Comments</div>
+    <div class="cmt"><div class="who"><div class="av">${p.updatedBy.split(' ').map(w=>w[0]).join('').slice(0,2)}</div></div><div><b>${p.updatedBy}</b> <span style="color:var(--ink-muted);">· last week</span><div style="color:var(--ink-2);margin-top:2px;">Updated after the latest process change — flag anything that's still out of date.</div></div></div>
+    <textarea placeholder="Add a comment…"></textarea>
+    <div style="display:flex;justify-content:flex-end;margin-top:10px;"><button class="btn primary sm">Post comment</button></div>`;
+}
+function toggleHistory(){
+  const el = document.getElementById('history-panel');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+renderSpaces();
+renderTree();
+renderPage();
+</script>
+<script src="app-chrome.js" defer></script>
+</body>
+</html>
