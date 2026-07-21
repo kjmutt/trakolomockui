@@ -45,7 +45,8 @@
     <div class="section-label">Connection</div>
     <div class="row-line"><div><div class="rname">Tenant</div><div class="rdesc">acme.onmicrosoft.com</div></div><span class="badge ok">Connected</span></div>
     <div class="row-line"><div><div class="rname">Directory sync</div><div class="rdesc">Users, groups, and licenses</div></div><div class="switch on"></div></div>
-    <div class="row-line"><div><div class="rname">Last synced</div></div><span class="id-mono">4 min ago</span></div>
+    <div class="row-line"><div><div class="rname">Grant Self-Service Portal access on sync</div><div class="rdesc">Every synced user can sign in to the SSP (SSO) the moment they appear in the directory — no separate invite step</div></div><div class="switch on"></div></div>
+    <div class="row-line"><div><div class="rname">Last synced</div></div><span class="id-mono">4 min ago · 342 users, 3 new since last sync</span></div>
   </div>
 
   <div class="card">
@@ -131,7 +132,8 @@ function runOnboarding(){
     `Assigning Microsoft 365 E3 license and adding to ${dept} security group…`,
     `Generating temporary password and setting "change at next sign-in"…`,
     `Password posted to ${ticket} as an internal activity note.`,
-    `Credentials emailed to <b>${email}</b>.`
+    `Credentials emailed to <b>${email}</b>.`,
+    `Synced to Trakolo — Self-Service Portal access granted automatically, no separate invite needed.`
   ];
 
   let i = 0;
@@ -142,6 +144,7 @@ function runOnboarding(){
         <div class="result-row"><span style="color:var(--ink-2);">Ticket</span><a href="desk.html" class="id-mono" style="color:var(--indigo-text);">${ticket} →</a></div>
         <div class="result-row"><span style="color:var(--ink-2);">Account</span><span class="id-mono">${upn}</span></div>
         <div class="result-row"><span style="color:var(--ink-2);">Temporary password</span><span><span class="pw-mask" id="pw-value">••••••••••</span> <button class="pw-toggle" onclick="togglePw('${password}')">Show</button></span></div>
+        <div class="result-row"><span style="color:var(--ink-2);">Self-Service Portal</span><span class="badge ok">Access granted</span></div>
         <div class="result-row"><span style="color:var(--ink-2);">Status</span><span class="badge ok">Provisioned</span></div>`;
       const hist = document.getElementById('on-history');
       hist.insertAdjacentHTML('afterbegin', `<tr><td class="id-mono">${ticket}</td><td>${name}</td><td>${dept}</td><td><span class="badge ok">Provisioned</span></td><td class="id-mono">Just now</td></tr>`);

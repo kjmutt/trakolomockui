@@ -625,44 +625,12 @@
 
       <div class="card">
         <div class="section-label">Support groups</div>
-        <div class="sub-card">
-          <div class="sc-head">IT Ops <span class="badge neutral" style="font-weight:500;">2 members</span></div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <div class="who"><div class="av">RK</div>Raj K.</div>
-            <div class="who"><div class="av">SM</div>Sara M.</div>
-          </div>
+        <div class="page-desc" style="margin:-4px 0 10px;">Pick who works Service desk tickets — add or remove people per group, or stand up a brand new team.</div>
+        <div id="support-groups"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <input type="text" id="new-group-name" placeholder="New group name, e.g. Facilities" style="margin:0;flex:1;">
+          <button class="btn sm" onclick="createSupportGroup()">+ Add group</button>
         </div>
-        <div class="sub-card">
-          <div class="sc-head">Infrastructure <span class="badge neutral" style="font-weight:500;">1 member</span></div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <div class="who"><div class="av">DF</div>D. Ferreira</div>
-          </div>
-        </div>
-        <div class="sub-card">
-          <div class="sc-head">Security <span class="badge neutral" style="font-weight:500;">1 member</span></div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <div class="who"><div class="av">NP</div>Nadia P.</div>
-          </div>
-        </div>
-        <div class="sub-card">
-          <div class="sc-head">Workplace <span class="badge warn" style="font-weight:500;">0 members</span></div>
-          <div style="font-size:12.5px;color:var(--ink-muted);">No one assigned yet — facilities tickets sit unassigned until someone joins.</div>
-        </div>
-        <div class="sub-card">
-          <div class="sc-head">Product &amp; Engineering <span class="badge neutral" style="font-weight:500;">2 members</span></div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <div class="who"><div class="av">RK</div>Raj K.</div>
-            <div class="who"><div class="av">TK</div>Tomas K.</div>
-          </div>
-        </div>
-        <div class="sub-card">
-          <div class="sc-head">Change Advisory Board <span class="badge neutral" style="font-weight:500;">2 members</span></div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <div class="who"><div class="av">NP</div>Nadia P.</div>
-            <div class="who"><div class="av">SM</div>Sara M.</div>
-          </div>
-        </div>
-        <button class="btn" style="margin-top:2px;">+ Add group</button>
       </div>
 
       <div class="card">
@@ -1117,6 +1085,57 @@
   });
   if(location.hash) showPanel(location.hash.slice(1));
   document.querySelectorAll('.switch').forEach(s=>s.addEventListener('click', ()=>s.classList.toggle('on')));
+
+  const ROSTER = {RK:'Raj K.', SM:'Sara M.', DF:'D. Ferreira', NP:'Nadia P.', TK:'Tomas K.', EM:'E. Moreau', LA:'L. Adeyemi', MA:'M. Alvarez'};
+  const SUPPORT_GROUPS = {
+    'IT Ops': ['RK','SM'],
+    'Infrastructure': ['DF'],
+    'Security': ['NP'],
+    'Workplace': [],
+    'Product & Engineering': ['RK','TK'],
+    'Change Advisory Board': ['NP','SM']
+  };
+  function renderSupportGroups(){
+    const el = document.getElementById('support-groups');
+    el.innerHTML = Object.keys(SUPPORT_GROUPS).map(g=>{
+      const members = SUPPORT_GROUPS[g];
+      const available = Object.keys(ROSTER).filter(id=>!members.includes(id));
+      const chips = members.map(id=>`<div class="who" style="background:var(--surface-2);padding:4px 10px 4px 4px;border-radius:20px;">
+          <div class="av">${id}</div>${ROSTER[id]}
+          <button onclick="removeSupportMember('${g}','${id}')" style="border:none;background:none;cursor:pointer;color:var(--ink-muted);font-size:13px;padding:0 0 0 2px;line-height:1;" title="Remove">×</button>
+        </div>`).join('');
+      const memberCount = members.length;
+      const addRow = available.length ? `
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <select id="add-sel-${g.replace(/\s+/g,'-')}" style="margin:0;width:auto;flex:1;">${available.map(id=>`<option value="${id}">${ROSTER[id]}</option>`).join('')}</select>
+          <button class="btn sm" onclick="addSupportMember('${g}')">+ Add member</button>
+        </div>` : '';
+      return `<div class="sub-card">
+          <div class="sc-head">${g} <span class="badge ${memberCount?'neutral':'warn'}" style="font-weight:500;">${memberCount} member${memberCount===1?'':'s'}</span></div>
+          ${memberCount ? `<div style="display:flex;gap:10px;flex-wrap:wrap;">${chips}</div>` : `<div style="font-size:12.5px;color:var(--ink-muted);">No one assigned yet — tickets routed here sit unassigned until someone joins.</div>`}
+          ${addRow}
+        </div>`;
+    }).join('');
+  }
+  function addSupportMember(g){
+    const sel = document.getElementById('add-sel-'+g.replace(/\s+/g,'-'));
+    if(!sel || !sel.value) return;
+    SUPPORT_GROUPS[g].push(sel.value);
+    renderSupportGroups();
+  }
+  function removeSupportMember(g, id){
+    SUPPORT_GROUPS[g] = SUPPORT_GROUPS[g].filter(x=>x!==id);
+    renderSupportGroups();
+  }
+  function createSupportGroup(){
+    const input = document.getElementById('new-group-name');
+    const name = input.value.trim();
+    if(!name || SUPPORT_GROUPS[name]) return;
+    SUPPORT_GROUPS[name] = [];
+    input.value = '';
+    renderSupportGroups();
+  }
+  renderSupportGroups();
 
   const PERM_AREAS = ['Tickets & desk','Assets (SAM)','Dev boards','Reporting','Business rules','Billing & license','Users & roles'];
   const PERM_LEVELS = ['None','View','Edit','Full'];

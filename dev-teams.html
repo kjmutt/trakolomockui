@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — projects & teams</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .team-card{margin-bottom:16px;}
+  .team-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:12px;}
+  .team-name{font-family:var(--font-display);font-size:16px;font-weight:700;}
+  .team-goal{font-size:12.5px;color:var(--ink-2);margin-top:3px;}
+  .team-meta{font-size:11.5px;color:var(--ink-muted);font-family:var(--font-mono);margin-top:4px;}
+  .proj-row{display:grid;grid-template-columns:1.3fr 1fr auto auto;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .proj-row:last-child{border-bottom:none;}
+  .proj-name{font-weight:600;}
+  .member-chip{display:flex;align-items:center;gap:8px;background:var(--surface-2);padding:4px 10px 4px 4px;border-radius:20px;font-size:12.5px;}
+  .member-chip button{border:none;background:none;cursor:pointer;color:var(--ink-muted);font-size:13px;padding:0 0 0 2px;line-height:1;}
+  .member-chip button:hover{color:var(--coral-text);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a class="active" href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="docs.html">Docs</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="dev.html">Sprint board</a>
+  <a href="dev-backlog.html">Backlog &amp; planning</a>
+  <a href="dev-roadmap.html">Epics &amp; roadmap</a>
+  <a href="dev-gantt.html">Gantt</a>
+  <a href="dev-ownership.html">Team ownership</a>
+  <a href="dev-product-tree.html">Product tree</a>
+  <a class="active" href="dev-teams.html">Projects &amp; teams</a>
+</div>
+
+<div class="wrap">
+  <div class="page-head">
+    <div><div class="page-title">Projects &amp; teams</div><div class="page-desc">Spin up a new project, stand up a scrum team, and decide who's working on what — same teams shown on <a href="dev-ownership.html" style="color:var(--indigo-text);">Team ownership</a>.</div></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Projects</div>
+    <div id="proj-rows"></div>
+    <div class="card" id="new-project-card" style="display:none;margin-top:10px;box-shadow:none;background:var(--surface-2);">
+      <label>Project name</label>
+      <input type="text" id="proj-name" placeholder="e.g. Mobile app">
+      <label>Owning scrum team</label>
+      <select id="proj-team"></select>
+      <label>Status</label>
+      <select id="proj-status"><option>Planning</option><option selected>Active</option></select>
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button class="btn primary sm" onclick="createProject()">Create project</button>
+        <button class="btn sm" onclick="document.getElementById('new-project-card').style.display='none';">Cancel</button>
+      </div>
+    </div>
+    <button class="btn sm" id="new-project-btn" style="margin-top:12px;" onclick="document.getElementById('new-project-card').style.display='block';document.getElementById('proj-name').focus();">+ New project</button>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Scrum teams</div>
+    <div class="page-desc" style="margin:-4px 0 10px;">Add or remove people per team — sprint boards and ownership pages read from the same roster.</div>
+    <div id="team-cards"></div>
+    <div class="card" id="new-team-card" style="display:none;margin-top:10px;box-shadow:none;background:var(--surface-2);">
+      <label>Team name</label>
+      <input type="text" id="team-name" placeholder="e.g. Data Platform">
+      <label>Goal</label>
+      <input type="text" id="team-goal" placeholder="e.g. Ship the analytics pipeline">
+      <label>Sprint cadence</label>
+      <select id="team-sprint"><option>1 week</option><option selected>2 weeks</option><option>3 weeks</option><option>4 weeks</option></select>
+      <label>Starting members</label>
+      <div id="team-member-picker" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;"></div>
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button class="btn primary sm" onclick="createTeam()">Create team</button>
+        <button class="btn sm" onclick="document.getElementById('new-team-card').style.display='none';">Cancel</button>
+      </div>
+    </div>
+    <button class="btn sm" id="new-team-btn" style="margin-top:2px;" onclick="openNewTeamForm()">+ New scrum team</button>
+  </div>
+</div>
+
+<script>
+const ROSTER = {RK:'Raj K.', SM:'Sara M.', DF:'D. Ferreira', NP:'Nadia P.', TK:'Tomas K.', EM:'E. Moreau', JO:'J. Okoye', LA:'L. Adeyemi'};
+
+const TEAMS = {
+  'Platform Reliability': {goal:'Reduce P1 incidents and hold SLA compliance at 95%+.', sprint:'2 weeks', members:['RK','SM','TK']},
+  'Self-Service Experience': {goal:'Cut average resolution time by improving self-service tooling.', sprint:'2 weeks', members:['NP','DF']},
+  'Compliance & Reporting': {goal:'Automate SOC 2 and ISO 27001 evidence collection.', sprint:'3 weeks', members:['TK','SM']}
+};
+
+const PROJECTS = {
+  'Service desk (ITSM)': {team:'Platform Reliability', status:'Active'},
+  'Boards & sprints': {team:'Platform Reliability', status:'Active'},
+  'Asset management (SAM)': {team:'Self-Service Experience', status:'Active'},
+  'Self-service portal': {team:'Self-Service Experience', status:'Active'},
+  'Reporting & compliance': {team:'Compliance & Reporting', status:'Active'},
+  'Change management (ITSM)': {team:'Compliance & Reporting', status:'Planning'}
+};
+
+function statusBadge(s){
+  return s === 'Active' ? '<span class="badge ok">Active</span>' : '<span class="badge neutral">Planning</span>';
+}
+
+function renderProjects(){
+  document.getElementById('proj-rows').innerHTML = Object.keys(PROJECTS).map(name=>{
+    const p = PROJECTS[name];
+    const team = TEAMS[p.team];
+    const avs = team ? team.members.map(id=>`<div class="av" title="${ROSTER[id]}" style="width:24px;height:24px;font-size:10px;">${id}</div>`).join('') : '';
+    return `<div class="proj-row">
+      <div class="proj-name">${name}</div>
+      <a href="dev-ownership.html" style="color:var(--indigo-text);text-decoration:none;font-size:12.5px;">${p.team} →</a>
+      <div style="display:flex;">${avs}</div>
+      ${statusBadge(p.status)}
+    </div>`;
+  }).join('');
+  const sel = document.getElementById('proj-team');
+  sel.innerHTML = Object.keys(TEAMS).map(t=>`<option>${t}</option>`).join('');
+}
+
+function renderTeams(){
+  document.getElementById('team-cards').innerHTML = Object.keys(TEAMS).map(name=>{
+    const t = TEAMS[name];
+    const available = Object.keys(ROSTER).filter(id=>!t.members.includes(id));
+    const chips = t.members.map(id=>`<div class="member-chip"><div class="av" style="width:22px;height:22px;font-size:10px;">${id}</div>${ROSTER[id]}<button onclick="removeTeamMember('${name}','${id}')" title="Remove">×</button></div>`).join('');
+    const addRow = available.length ? `
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <select id="team-add-${name.replace(/[^a-zA-Z0-9]/g,'')}" style="margin:0;width:auto;flex:1;">${available.map(id=>`<option value="${id}">${ROSTER[id]}</option>`).join('')}</select>
+        <button class="btn sm" onclick="addTeamMember('${name}')">+ Add member</button>
+      </div>` : '';
+    return `<div class="sub-card team-card">
+      <div class="team-head">
+        <div><div class="team-name">${name}</div><div class="team-goal">${t.goal}</div><div class="team-meta">Sprint cadence: ${t.sprint}</div></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">${chips || '<span style="font-size:12.5px;color:var(--ink-muted);">No members yet.</span>'}</div>
+      ${addRow}
+    </div>`;
+  }).join('');
+}
+
+function addTeamMember(team){
+  const sel = document.getElementById('team-add-'+team.replace(/[^a-zA-Z0-9]/g,''));
+  if(!sel || !sel.value) return;
+  TEAMS[team].members.push(sel.value);
+  renderTeams(); renderProjects();
+}
+function removeTeamMember(team, id){
+  TEAMS[team].members = TEAMS[team].members.filter(x=>x!==id);
+  renderTeams(); renderProjects();
+}
+
+function createProject(){
+  const name = document.getElementById('proj-name').value.trim();
+  if(!name || PROJECTS[name]) return;
+  PROJECTS[name] = {team: document.getElementById('proj-team').value, status: document.getElementById('proj-status').value};
+  document.getElementById('proj-name').value = '';
+  document.getElementById('new-project-card').style.display = 'none';
+  renderProjects();
+}
+
+function openNewTeamForm(){
+  document.getElementById('new-team-card').style.display = 'block';
+  document.getElementById('team-member-picker').innerHTML = Object.keys(ROSTER).map(id=>`
+    <label style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:400;border:1px solid var(--border);padding:5px 10px;border-radius:20px;cursor:pointer;">
+      <input type="checkbox" value="${id}" style="width:auto;margin:0;"> ${ROSTER[id]}
+    </label>`).join('');
+  document.getElementById('team-name').focus();
+}
+function createTeam(){
+  const name = document.getElementById('team-name').value.trim();
+  if(!name || TEAMS[name]) return;
+  const members = [...document.querySelectorAll('#team-member-picker input:checked')].map(c=>c.value);
+  TEAMS[name] = {goal: document.getElementById('team-goal').value.trim() || 'No goal set yet.', sprint: document.getElementById('team-sprint').value, members};
+  document.getElementById('team-name').value = '';
+  document.getElementById('team-goal').value = '';
+  document.getElementById('new-team-card').style.display = 'none';
+  renderTeams(); renderProjects();
+}
+
+renderTeams();
+renderProjects();
+</script>
+<script src="app-chrome.js" defer></script>
+</body>
+</html>
