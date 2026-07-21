@@ -24,7 +24,7 @@ body{margin:0;background:radial-gradient(circle at 18% -8%, rgba(12,130,102,.06)
 a{color:inherit;}
 
 /* topbar + nav */
-.topbar{display:flex;align-items:center;padding:14px 40px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap;row-gap:10px;position:sticky;top:0;z-index:30;box-shadow:var(--shadow-xs);}
+.topbar{display:flex;align-items:center;padding:14px 40px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap;row-gap:10px;position:sticky;top:0;z-index:85;box-shadow:var(--shadow-xs);}
 .brand{display:flex;align-items:center;gap:9px;text-decoration:none;}
 .brand-name{font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--ink);letter-spacing:-.2px;}
 .mod-nav{display:flex;gap:4px;margin-left:30px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:3px;}
@@ -173,7 +173,7 @@ input::placeholder, textarea::placeholder{color:var(--ink-muted);}
 .audit-row:last-child{border-bottom:none;}
 
 /* portal (public-facing) pages */
-.portal-header{display:flex;align-items:center;padding:16px 40px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:30;box-shadow:var(--shadow-xs);}
+.portal-header{display:flex;align-items:center;padding:16px 40px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:85;box-shadow:var(--shadow-xs);}
 .portal-links{display:flex;gap:22px;margin-left:auto;align-items:center;}
 .portal-links a{font-size:13px;color:var(--ink-2);text-decoration:none;font-weight:500;}
 .portal-links a.cta{color:#fff;background:var(--grad-primary);padding:9px 16px;border-radius:var(--r-sm);box-shadow:var(--shadow-sm);}
@@ -302,10 +302,13 @@ input::placeholder, textarea::placeholder{color:var(--ink-muted);}
 .clickable:hover{background:var(--surface-2);}
 
 /* platform / SaaS admin console (internal, visually distinct from customer app) */
-.platform-header{display:flex;align-items:center;padding:16px 40px;background:#0E1613;border-bottom:1px solid #223028;}
+.platform-header{display:flex;align-items:center;padding:16px 40px;background:#0E1613;border-bottom:1px solid #223028;position:relative;z-index:85;}
 .platform-header .brand-name{color:#fff;}
 .platform-header .plat-tag{font-family:var(--font-mono);font-size:10.5px;color:#8FB5A8;background:rgba(93,202,165,.12);border:1px solid rgba(93,202,165,.25);padding:3px 9px;border-radius:5px;margin-left:10px;text-transform:uppercase;letter-spacing:.5px;}
 .platform-header .top-right a{color:#B9C7C0;font-size:13px;text-decoration:none;}
+.platform-header .chrome-btn{background:rgba(255,255,255,.06);border-color:#26362F;color:#B9C7C0;}
+.platform-header .chrome-btn:hover{background:rgba(255,255,255,.12);color:#fff;}
+.platform-header .avatar{background:#1B2E27;color:#5DCAA5;border:1px solid #26362F;}
 .platform-body{background:#0E1613;min-height:calc(100vh - 60px);color:#EAF2ED;}
 .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:640px;margin:0 auto;}
 .role-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:22px;text-decoration:none;color:var(--ink);display:block;box-shadow:var(--shadow-sm);transition:box-shadow .15s,transform .15s,border-color .15s,background .15s;}
@@ -394,7 +397,7 @@ html[data-theme="dark"] .switch::after{background:#D6E4DE;}
 .cn-time{margin-left:auto;font-family:var(--font-mono);font-size:10.5px;color:var(--ink-muted);flex-shrink:0;}
 .chrome-empty{padding:22px 18px;font-size:13px;color:var(--ink-muted);}
 .chrome-search-foot{padding:9px 16px;font-size:11px;color:var(--ink-muted);background:var(--surface-2);border-top:1px solid var(--border);font-family:var(--font-mono);}
-.chrome-pop{position:fixed;width:min(380px,92vw);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);box-shadow:var(--shadow-lg);z-index:90;display:none;overflow:hidden;}
+.chrome-pop{position:fixed;width:min(380px,92vw);background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:var(--r-md);box-shadow:var(--shadow-lg);z-index:90;display:none;overflow:hidden;}
 .chrome-pop.open{display:block;}
 .chrome-pop-head{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;}
 .chrome-notif{display:flex;gap:11px;padding:12px 14px;text-decoration:none;border-bottom:1px solid var(--border);align-items:flex-start;}
