@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Release notes — Trakolo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .rn-list { max-width: 760px; }
+  .rn-entry { border-bottom: 1px solid var(--line); padding: 30px 0; }
+  .rn-entry:first-child { padding-top: 0; }
+  .rn-entry:last-child { border-bottom: none; }
+  .rn-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
+  .rn-version { font-family: 'Sora', sans-serif; font-size: 21px; font-weight: 700; color: var(--ink); }
+  .rn-date { font-size: 13px; color: var(--ink-faint); }
+  .rn-editions { display: flex; gap: 6px; margin-bottom: 14px; }
+  .rn-edition { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--teal-50); color: var(--teal-800); border: 1px solid var(--teal-100); }
+  .rn-edition.onprem { background: #EEEDFE; color: #534AB7; border-color: #DAD7FA; }
+  .rn-group { margin-bottom: 12px; }
+  .rn-group:last-child { margin-bottom: 0; }
+  .rn-tag { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 999px; margin-right: 8px; }
+  .rn-tag.added { background: var(--teal-50); color: var(--teal-800); }
+  .rn-tag.improved { background: #E6F1FB; color: #185FA5; }
+  .rn-tag.fixed { background: #FAEEDA; color: #854F0B; }
+  .rn-items { list-style: none; margin-top: 8px; }
+  .rn-items li { font-size: 14px; color: var(--ink-soft); padding: 5px 0 5px 0; display: flex; gap: 10px; align-items: baseline; }
+  .rn-items li .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--ink-faint); flex-shrink: 0; margin-top: 8px; }
+  .rn-sub { max-width: 560px; }
+  @media (max-width: 860px) {
+    .rn-head { flex-direction: column; align-items: flex-start; gap: 2px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a href="index.html" class="logo">
+      <svg width="30" height="30" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+      trakolo
+    </a>
+    <div class="nav-links">
+      <a href="how-it-works.html">How it works</a>
+      <a href="features.html">Features</a>
+      <a href="use-cases.html">Use cases</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="docs.html">Docs</a>
+    </div>
+    <div class="nav-actions">
+      <a href="../login.html" class="btn btn-ghost">Sign in</a>
+      <a href="../login.html" class="btn btn-primary">Start free</a>
+    </div>
+  </nav>
+</div>
+
+<div class="page-header">
+  <div class="wrap">
+    <h1>Release notes</h1>
+    <p class="rn-sub">What shipped in each version. Cloud gets these continuously as they ship; Standalone/On-premise installs them as discrete, versioned upgrades — see the <a href="docs.html#onprem-upgrade" style="color:var(--teal-800);font-weight:600;">upgrade guide</a> before jumping several versions at once.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap rn-list">
+
+    <div class="rn-entry">
+      <div class="rn-head"><span class="rn-version">2026.7.2</span><span class="rn-date">Jul 21, 2026</span></div>
+      <div class="rn-editions"><span class="rn-edition">Cloud</span><span class="rn-edition onprem">Standalone</span></div>
+      <div class="rn-group">
+        <ul class="rn-items">
+          <li><span class="rn-tag added">Added</span><span>Document library — folders, files, video, audio and images side by side, with versioning and an "attach to…" flow onto tickets, KB articles, or wiki pages.</span></li>
+          <li><span class="rn-tag added">Added</span><span>Confluence-style wiki spaces — nested pages per team, page history, comments.</span></li>
+          <li><span class="rn-tag added">Added</span><span>Employee self-service HR — joining date, designation, offer letter, payslips, leave entitlement and requests, working hours.</span></li>
+          <li><span class="rn-tag added">Added</span><span>Notifications and a logged-in profile menu on the Self-Service Portal and the platform console, matching the agent workspace.</span></li>
+          <li><span class="rn-tag improved">Improved</span><span>License &amp; billing now shows a Cloud subscription view (plan, seats, invoices) alongside the on-premise license view.</span></li>
+          <li><span class="rn-tag improved">Improved</span><span>Tenant workspaces (platform console) now shows database and file storage consumed per tenant, plus platform-wide totals.</span></li>
+          <li><span class="rn-tag fixed">Fixed</span><span>Primary buttons could render invisible (white text on a light background) while hovered — a CSS specificity bug affecting every page.</span></li>
+          <li><span class="rn-tag fixed">Fixed</span><span>Notification and search popovers could become unclickable if another popover was already open.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rn-entry">
+      <div class="rn-head"><span class="rn-version">2026.7.1</span><span class="rn-date">Jul 14, 2026</span></div>
+      <div class="rn-editions"><span class="rn-edition">Cloud</span><span class="rn-edition onprem">Standalone</span></div>
+      <ul class="rn-items">
+        <li><span class="rn-tag added">Added</span><span>SAML SSO &amp; SCIM provisioning — bring your own identity provider, with attribute and group→role mapping.</span></li>
+        <li><span class="rn-tag added">Added</span><span>Custom roles &amp; a per-area permission matrix, alongside the built-in Admin/Manager/Agent/Viewer roles.</span></li>
+        <li><span class="rn-tag added">Added</span><span>Workspace-level API keys — scoped, revocable, separate from each user's personal token.</span></li>
+      </ul>
+    </div>
+
+    <div class="rn-entry">
+      <div class="rn-head"><span class="rn-version">2026.6.0</span><span class="rn-date">Jun 20, 2026</span></div>
+      <div class="rn-editions"><span class="rn-edition">Cloud</span><span class="rn-edition onprem">Standalone</span></div>
+      <ul class="rn-items">
+        <li><span class="rn-tag added">Added</span><span>AI Copilot — a floating assistant on the agent workspace, admin, and self-service portal.</span></li>
+        <li><span class="rn-tag improved">Improved</span><span>Business rules turned into a full visual builder — pick a trigger, stack conditions, chain actions, set the run order.</span></li>
+        <li><span class="rn-tag improved">Improved</span><span>Appearance &amp; language — dark mode, five accent themes, and per-user language override.</span></li>
+      </ul>
+    </div>
+
+    <div class="rn-entry">
+      <div class="rn-head"><span class="rn-version">2026.5.0</span><span class="rn-date">May 18, 2026</span></div>
+      <div class="rn-editions"><span class="rn-edition">Cloud</span><span class="rn-edition onprem">Standalone</span></div>
+      <ul class="rn-items">
+        <li><span class="rn-tag added">Added</span><span>Gantt chart for sprints — bars, percent complete, dependencies, and deploy milestones.</span></li>
+        <li><span class="rn-tag added">Added</span><span>Team workload view — my/group new-ticket queues, drag to assign or pair, claim unassigned work.</span></li>
+        <li><span class="rn-tag added">Added</span><span>Calendar, card, and list views for tickets and sprint boards.</span></li>
+      </ul>
+    </div>
+
+    <div class="rn-entry">
+      <div class="rn-head"><span class="rn-version">2026.4.0</span><span class="rn-date">Apr 12, 2026</span></div>
+      <div class="rn-editions"><span class="rn-edition">Cloud</span><span class="rn-edition onprem">Standalone</span></div>
+      <ul class="rn-items">
+        <li><span class="rn-tag added">Added</span><span>Service catalog — admins create catalog items with an approval path and fulfillment group, published to employees instantly.</span></li>
+        <li><span class="rn-tag added">Added</span><span>Problem management and on-call/paging with escalation.</span></li>
+        <li><span class="rn-tag improved">Improved</span><span>Ticket sources — email-to-ticket and phone with voicemail transcription, both stamped with their source.</span></li>
+      </ul>
+    </div>
+
+    <div class="rn-entry">
+      <div class="rn-head"><span class="rn-version">2026.3.0</span><span class="rn-date">Mar 8, 2026</span></div>
+      <div class="rn-editions"><span class="rn-edition">Cloud</span><span class="rn-edition onprem">Standalone</span></div>
+      <ul class="rn-items">
+        <li><span class="rn-tag added">Added</span><span>Change management — change requests, CAB approval, and deployment-window scheduling for every PRE → PROD promotion.</span></li>
+        <li><span class="rn-tag added">Added</span><span>Asset discovery — agent and network scan, reconciled into the asset inventory.</span></li>
+      </ul>
+    </div>
+
+    <div class="rn-entry">
+      <div class="rn-head"><span class="rn-version">2026.2.0</span><span class="rn-date">Feb 2, 2026</span></div>
+      <div class="rn-editions"><span class="rn-edition">Cloud</span><span class="rn-edition onprem">Standalone</span></div>
+      <ul class="rn-items">
+        <li><span class="rn-tag added">Added</span><span>General availability — ticketing &amp; SLAs, software &amp; asset management, sprint boards, and audit-ready reporting.</span></li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<div class="wrap">
+  <footer>
+    <span>© 2026 Trakolo. Never lose track.</span>
+    <span>Privacy · Terms · Contact · <a href="release-notes.html" style="color:inherit;">Release notes</a></span>
+  </footer>
+</div>
+
+</body>
+</html>

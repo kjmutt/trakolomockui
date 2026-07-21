@@ -104,6 +104,10 @@
         <a href="#onprem-license">License management</a>
         <a href="#onprem-upgrade">Upgrades &amp; backups</a>
       </div>
+      <div class="group">
+        <div class="group-title">More</div>
+        <a href="release-notes.html">Release notes</a>
+      </div>
     </div>
 
     <div>
@@ -239,12 +243,16 @@ docker compose up -d
         <h3>Standalone / On-premise: license management</h3>
         <div class="doc-note"><b>Where it lives:</b> <code>Admin → Settings → License</code>. On-premise has no billing page — your license is a signed <code>.trklic</code> file, validated locally. No phone-home, works air-gapped.</div>
         <p>The license file encodes four things: who it's licensed to, the <b>named-user seat count</b>, the <b>modules enabled</b> (ITSM, SAM, Dev boards, Reporting, AI features), and the <b>support &amp; upgrades expiry date</b>.</p>
-        <p><b>Common operations:</b></p>
+
+        <p><b>How the file is generated:</b> you never generate this yourself — it's issued by Trakolo. Whenever you buy seats, add a module, or renew support, your account team (or you, via a self-serve request on the customer portal) triggers an issuance on our side: a platform operator opens your workspace record, sets the new seat count / module list / expiry date, and generates a fresh <code>.trklic</code> — a JSON payload signed with Trakolo's private key. Only our public key, bundled with your installation, can verify that signature; nobody outside Trakolo can mint a valid file. The new file is emailed to your license contact and also available for download from the customer portal, replacing the old one.</p>
+
+        <p><b>How to handle it once you have the file:</b></p>
         <ul class="field-list">
-          <li><span class="req">seats</span> <span>Adding seats — buy an expansion, get a replacement <code>.trklic</code> file, upload it under <code>License → Upload new license file</code>. Applies instantly, no restart.</span></li>
+          <li><span class="req">seats</span> <span>Adding seats — buy an expansion, receive the replacement <code>.trklic</code>, upload it under <code>License → Upload new license file</code>. Applies instantly, no restart.</span></li>
           <li><span class="req">modules</span> <span>Enabling a module you didn't license — same flow: new license file, upload, the module appears in Settings immediately.</span></li>
           <li><span class="req">renewal</span> <span>Support &amp; upgrades expiry — the product <b>keeps working forever</b> after expiry (it's a perpetual license). What stops: new version upgrades and support tickets. Renewing issues a new file with a new date.</span></li>
           <li><span class="opt">air-gap</span> <span>Offline activation — for networks with no outbound access, <code>License → Offline activation</code> generates a request code; exchange it on the customer portal from any machine and paste the response back.</span></li>
+          <li><span class="opt">storage</span> <span>Keep the file itself somewhere safe (password manager, secrets vault) — <code>License → Download current license</code> re-downloads it any time, and it's included automatically in the nightly backup archive below.</span></li>
         </ul>
         <p>If the license expires or seats are exceeded, admins get a banner and a 30-day grace period — users are never locked out mid-incident.</p>
       </div>
@@ -254,7 +262,7 @@ docker compose up -d
         <p>Upgrades are manual and under your control — download the new bundle, then:</p>
         <pre>docker compose pull && docker compose up -d   # migrations run automatically</pre>
         <p>Always take a database snapshot first. The bundled PostgreSQL can be dumped with <code>./bin/trakolo-backup</code>, which writes a single restorable archive (database + uploaded attachments + your license file). Point it at a network share or object storage on a nightly cron.</p>
-        <p>Version support policy: each release gets security fixes for 18 months. You can skip versions — migrations chain automatically — but upgrading requires an active support &amp; upgrades plan.</p>
+        <p>Version support policy: each release gets security fixes for 18 months. You can skip versions — migrations chain automatically — but upgrading requires an active support &amp; upgrades plan. See what's new in each version on the <a href="release-notes.html" style="color:var(--teal-800);font-weight:600;">release notes →</a> page before you upgrade.</p>
       </div>
     </div>
   </div>
@@ -263,7 +271,7 @@ docker compose up -d
 <div class="wrap">
   <footer>
     <span>© 2026 Trakolo. Never lose track.</span>
-    <span>Privacy · Terms · Contact</span>
+    <span>Privacy · Terms · Contact · <a href="release-notes.html" style="color:inherit;">Release notes</a></span>
   </footer>
 </div>
 
