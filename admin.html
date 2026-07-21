@@ -383,6 +383,19 @@
       </div>
 
       <div class="card">
+        <div class="section-label">Employee HR info shown</div>
+        <div class="page-desc" style="margin:-4px 0 8px;">What appears on <a href="portal-hr.html" style="color:var(--indigo-text);">My HR info</a> — synced read-only from your HRIS, not editable here.</div>
+        <div class="row-line"><div><div class="rname">Joining date, designation &amp; employment details</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Offer letter &amp; HR documents</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Payslips</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Leave entitlement &amp; requests</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">Working hours</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">HR communications feed</div></div><div class="switch on"></div></div>
+        <label style="margin-top:10px;">HRIS source</label>
+        <select><option>Workday</option><option>BambooHR</option><option>SAP SuccessFactors</option><option>ADP</option></select>
+      </div>
+
+      <div class="card">
         <div class="section-label">Announcements</div>
         <div class="page-desc" style="margin:-4px 0 8px;">Banner shown on the portal pages — heads off ticket floods during planned work.</div>
         <div class="row-line"><div><div class="rname">Planned maintenance — email, Sat Jul 26, 22:00–23:00</div><div class="rdesc">Live on contact &amp; track pages · auto-expires after the window</div></div><div class="switch on"></div></div>
@@ -1372,7 +1385,8 @@ window.COPILOT = {
     {label:'How do I create a custom role?'},
     {label:'Where do I set up SSO?'},
     {label:'How do I generate an API key?'},
-    {label:'Where do documents & wiki pages live?'}
+    {label:'Where do documents & wiki pages live?'},
+    {label:'Where do employees see their payslips?'}
   ],
   answers: [
     {keywords:['business rule','automation','if this then'], text:'Under Service desk → Create a business rule: pick a trigger, stack conditions, chain actions, and set the run order — it\'s evaluated on every ticket event, first match wins.', link:{href:'admin.html#desk', label:'Open Service desk config'}},
@@ -1387,7 +1401,8 @@ window.COPILOT = {
     {keywords:['api key','api token','generate key','rest api'], text:'Workspace-level API keys (for server-to-server access, not personal use) are under Integrations → API keys — pick scopes and generate. Personal tokens live on your own profile instead.', link:{href:'admin.html#integrations', label:'Open Integrations'}},
     {keywords:['document','file storage','video','audio','upload file','drive'], text:'The Document library holds files, video, audio and images in folders, with versioning and attach-anywhere support. Storage quota, file types, and retention are under Document library & wiki.', link:{href:'admin.html#docs', label:'Open Document library settings'}},
     {keywords:['wiki','confluence','space','runbook','long-form doc'], text:'Wiki spaces are Confluence-style — nested pages per team, with page history and comments. Manage spaces and their settings under Document library & wiki.', link:{href:'admin.html#docs', label:'Open Document library settings'}},
-    {keywords:['attach','attachment'], text:'Files attach from the Document library straight onto a ticket, a knowledge base article, or a wiki page — open any file there and use "Attach to…".', link:{href:'admin.html#docs', label:'Open Document library settings'}}
+    {keywords:['attach','attachment'], text:'Files attach from the Document library straight onto a ticket, a knowledge base article, or a wiki page — open any file there and use "Attach to…".', link:{href:'admin.html#docs', label:'Open Document library settings'}},
+    {keywords:['payslip','payroll','offer letter','leave','hr info','working hours','designation','joining date','hris'], text:'Employees see their own joining date, designation, offer letter, payslips, leave entitlement &amp; requests, and working hours on My HR info — synced read-only from your HRIS. Toggle what\'s shown under Self-service portal → Employee HR info shown.', link:{href:'admin.html#portal', label:'Open Self-service portal settings'}}
   ],
   fallback: {text:"I don't have a canned answer for that yet in this mockup — but in the real product I'd search your settings, the docs, and past changes in the audit log to answer directly.", link:{href:'admin.html#general', label:'Go to General settings'}}
 };

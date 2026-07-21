@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — my HR info</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .hr-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
+  .hr-grid .card{margin-bottom:0;}
+  .doc-chip{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:8px;font-size:12.5px;}
+  .doc-chip .ic{width:26px;height:26px;border-radius:7px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+  .leave-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .leave-row:last-child{border-bottom:none;}
+  @media (max-width:860px){ .hr-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="portal-header">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="portal-links">
+    <a href="desk-log-ticket.html">Log a ticket</a>
+    <a href="track.html">Track a ticket</a>
+    <a href="contact.html">Contact us</a>
+    <a class="active" href="portal-hr.html">My HR info</a>
+    <a class="cta" href="login.html">Sign out</a>
+  </div>
+</div>
+
+<div class="portal-wrap wide">
+  <div style="text-align:center;margin-bottom:28px;">
+    <div class="page-title" style="font-size:26px;">My HR info</div>
+    <div class="page-desc">Your employment details, documents, and pay — synced from HR, viewable here.</div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div>
+        <div style="font-family:var(--font-display);font-size:19px;font-weight:700;">J. Okoye</div>
+        <div style="font-size:13px;color:var(--ink-2);margin-top:2px;">Senior Product Analyst · Engineering</div>
+      </div>
+      <span class="badge ok" style="font-size:12px;padding:6px 12px;">Active employee</span>
+    </div>
+    <table style="width:100%;font-size:13px;margin-top:18px;">
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Employee ID</td><td style="text-align:right;" class="id-mono">EMP-2214</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Date of joining</td><td style="text-align:right;">Mar 3, 2023</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Designation</td><td style="text-align:right;">Senior Product Analyst</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Department</td><td style="text-align:right;">Engineering</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Employment type</td><td style="text-align:right;">Full-time, permanent</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Reporting manager</td><td style="text-align:right;">Nadia P.</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Work location</td><td style="text-align:right;">San Francisco (Hybrid)</td></tr>
+    </table>
+  </div>
+
+  <div class="hr-grid" style="margin-top:18px;">
+    <div>
+      <div class="card">
+        <div class="section-label">My documents</div>
+        <div class="doc-chip"><div class="ic">📄</div><span style="flex:1;">Offer letter — signed Feb 12, 2023.pdf</span><a href="#" style="color:var(--indigo-text);font-weight:600;">Download ↓</a></div>
+        <div class="doc-chip"><div class="ic">📄</div><span style="flex:1;">Employment contract.pdf</span><a href="#" style="color:var(--indigo-text);font-weight:600;">Download ↓</a></div>
+        <div class="doc-chip"><div class="ic">📄</div><span style="flex:1;">Latest appraisal letter — 2026.pdf</span><a href="#" style="color:var(--indigo-text);font-weight:600;">Download ↓</a></div>
+        <div class="page-desc" style="margin-top:4px;">Personal HR documents — private to you, not shared in the team Document library.</div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <div class="section-label">Payslips</div>
+        <table>
+          <thead><tr><th>Month</th><th>Gross pay</th><th>Net pay</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>Jun 2026</td><td class="id-mono">$8,450.00</td><td class="id-mono">$6,312.40</td><td><span class="badge ok">Paid</span></td><td><a href="#" style="color:var(--indigo-text);">Download ↓</a></td></tr>
+            <tr><td>May 2026</td><td class="id-mono">$8,450.00</td><td class="id-mono">$6,312.40</td><td><span class="badge ok">Paid</span></td><td><a href="#" style="color:var(--indigo-text);">Download ↓</a></td></tr>
+            <tr><td>Apr 2026</td><td class="id-mono">$8,450.00</td><td class="id-mono">$6,298.10</td><td><span class="badge ok">Paid</span></td><td><a href="#" style="color:var(--indigo-text);">Download ↓</a></td></tr>
+            <tr><td>Mar 2026</td><td class="id-mono">$8,200.00</td><td class="id-mono">$6,105.70</td><td><span class="badge ok">Paid</span></td><td><a href="#" style="color:var(--indigo-text);">Download ↓</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <div class="section-label">Working hours</div>
+        <div class="leave-row"><span>Standard hours</span><span class="id-mono">09:00–18:00, Mon–Fri</span></div>
+        <div class="leave-row"><span>Core collaboration hours</span><span class="id-mono">10:00–16:00</span></div>
+        <div class="leave-row"><span>Weekly contracted hours</span><span class="id-mono">40 hrs</span></div>
+        <div class="leave-row"><span>Work mode</span><span>Hybrid — Tue/Wed/Thu in office</span></div>
+        <div class="leave-row"><span>Timezone</span><span class="id-mono">America/Los_Angeles</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="section-label">Leave entitlement — 2026</div>
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-2);margin:4px 0 6px;"><span>Annual leave</span><span class="id-mono">9 / 24 days used</span></div>
+        <div class="beam" style="width:100%;height:7px;"><i style="width:38%;background:var(--indigo)"></i></div>
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-2);margin:14px 0 6px;"><span>Sick leave</span><span class="id-mono">2 / 10 days used</span></div>
+        <div class="beam" style="width:100%;height:7px;"><i style="width:20%;background:var(--amber)"></i></div>
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-2);margin:14px 0 6px;"><span>Work-from-anywhere</span><span class="id-mono">4 / 15 days used</span></div>
+        <div class="beam" style="width:100%;height:7px;"><i style="width:27%;background:var(--green)"></i></div>
+        <button class="btn primary" id="request-leave-btn" style="margin-top:16px;width:100%;" onclick="toggleLeaveForm(true)">Request leave</button>
+
+        <div id="leave-form" style="display:none;margin-top:14px;">
+          <label>Leave type</label>
+          <select id="lv-type"><option>Annual leave</option><option>Sick leave</option><option>Work-from-anywhere</option></select>
+          <label>From</label>
+          <input type="date" id="lv-from">
+          <label>To</label>
+          <input type="date" id="lv-to">
+          <label>Reason (optional)</label>
+          <textarea id="lv-reason" placeholder="Let your manager know why"></textarea>
+          <div style="display:flex;gap:10px;margin-top:14px;">
+            <button class="btn primary sm" onclick="submitLeave()">Submit request</button>
+            <button class="btn sm" onclick="toggleLeaveForm(false)">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <div class="section-label">Recent leave requests</div>
+        <div id="leave-requests">
+          <div class="leave-row"><span>Annual leave · Jul 28–29</span><span class="badge ok">Approved</span></div>
+          <div class="leave-row"><span>Sick leave · Jun 3</span><span class="badge ok">Approved</span></div>
+          <div class="leave-row"><span>Annual leave · Apr 14–18</span><span class="badge ok">Approved</span></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <div class="section-label">HR communications</div>
+        <div class="leave-row"><span>Updated leave carry-over policy for 2027</span><span class="id-mono">Jul 15</span></div>
+        <div class="leave-row"><span>Open enrollment for benefits — closes Aug 1</span><span class="id-mono">Jul 10</span></div>
+        <div class="leave-row"><span>Annual bonus payout schedule</span><span class="id-mono">Jun 28</span></div>
+        <div class="leave-row"><span>Updated hybrid work-mode guidelines</span><span class="id-mono">Jun 5</span></div>
+        <a href="docs-wiki.html" class="btn sm" style="margin-top:12px;display:inline-block;">See all in the People &amp; HR wiki space →</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function toggleLeaveForm(show){
+  document.getElementById('leave-form').style.display = show ? 'block' : 'none';
+  document.getElementById('request-leave-btn').style.display = show ? 'none' : 'block';
+}
+function submitLeave(){
+  const type = document.getElementById('lv-type').value;
+  const from = document.getElementById('lv-from').value || 'TBD';
+  const to = document.getElementById('lv-to').value || from;
+  document.getElementById('leave-requests').insertAdjacentHTML('afterbegin',
+    `<div class="leave-row"><span>${type} · ${from}${to!==from?'–'+to:''}</span><span class="badge neutral">Pending approval</span></div>`);
+  toggleLeaveForm(false);
+  document.getElementById('lv-reason').value = '';
+}
+window.COPILOT = {
+  surface: 'ssp',
+  title: 'Trakolo Assistant',
+  greeting: "Hi! I can answer common questions or point you to the right place — for anything I can't resolve myself, I'll get you to a person.",
+  prompts: [
+    {label:'Where is my payslip?'},
+    {label:'How many leave days do I have left?'},
+    {label:'Where is my offer letter?'},
+    {label:'What are my working hours?'}
+  ],
+  answers: [
+    {keywords:['payslip','salary','pay stub','net pay'], text:'Your last 12 months of payslips are under Payslips on this page — each one downloads as a PDF.'},
+    {keywords:['leave','vacation','pto','days left','sick'], text:'Your leave balances are under Leave entitlement — annual, sick, and work-from-anywhere, each with days used vs. remaining. Use "Request leave" to submit a new request.'},
+    {keywords:['offer letter','contract','joining','designation'], text:'Your offer letter, employment contract, and joining details are under My documents and the employment summary at the top of this page.'},
+    {keywords:['working hours','shift','hybrid','office days','timezone'], text:'Your standard hours, core collaboration hours, and hybrid office days are under Working hours on this page.'}
+  ],
+  fallback: {text:"I don't have a canned answer for that yet in this mockup — the full chat experience handles free-form questions like this and hands off to a person when needed.", link:{href:'chat.html', label:'Open full chat'}}
+};
+</script>
+<script src="copilot-widget.js" defer></script>
+</body>
+</html>
