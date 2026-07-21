@@ -8,7 +8,7 @@
   .plat-wrap{max-width:1080px;margin:0 auto;padding:32px 40px 60px;}
   .plat-card{background:#151F1B;border:1px solid #26362F;border-radius:14px;}
   .plat-card table{width:100%;border-collapse:collapse;}
-  .plat-card th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:#7C948A;font-family:var(--font-mono);font-weight:500;padding:12px 18px;border-bottom:1px solid #26362F;}
+  .plat-card th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:#7C948A;font-family:var(--font-mono);font-weight:500;padding:12px 18px;border-bottom:1px solid #26362F;background:#151F1B;}
   .plat-card td{padding:14px 18px;border-bottom:1px solid #26362F;font-size:13px;color:#D6E4DE;}
   .plat-card tbody tr:hover{background:#1B2620;}
   .plat-mcard{background:#151F1B;border:1px solid #26362F;border-radius:12px;padding:16px 18px;}
@@ -40,39 +40,53 @@
     <button class="btn primary" style="background:#1D9E75;border-color:#1D9E75;">+ New tenant</button>
   </div>
 
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;">
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px;">
     <div class="plat-mcard"><div class="mlabel">Active tenants</div><div class="mval">312</div></div>
     <div class="plat-mcard"><div class="mlabel">Total seats</div><div class="mval">18,940</div></div>
     <div class="plat-mcard"><div class="mlabel">On-prem installs</div><div class="mval">14</div></div>
     <div class="plat-mcard"><div class="mlabel">Platform uptime</div><div class="mval">99.97%</div></div>
   </div>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:22px;">
+    <div class="plat-mcard"><div class="mlabel">Database storage consumed</div><div class="mval">779 GB</div><div style="font-size:11.5px;color:#7C948A;margin-top:4px;">Across all Cloud tenants · on-prem installs excluded</div></div>
+    <div class="plat-mcard"><div class="mlabel">Files &amp; documents storage consumed</div><div class="mval">2.72 TB</div><div style="font-size:11.5px;color:#7C948A;margin-top:4px;">Document library + attachments, Cloud tenants only</div></div>
+  </div>
 
-  <div class="plat-card">
+  <div class="plat-card" style="overflow-x:auto;">
     <table>
-      <thead><tr><th>Org</th><th>Plan</th><th>Seats</th><th>Region</th><th>Health</th><th>Deployment</th><th></th></tr></thead>
+      <thead><tr><th>Org</th><th>Plan</th><th>Seats</th><th>Region</th><th>DB size</th><th>Files &amp; docs</th><th>Health</th><th>Deployment</th><th></th></tr></thead>
       <tbody>
         <tr>
           <td><b style="color:#fff;">Org1 — Acme Corp</b></td><td>Team</td><td>84</td><td>us-east</td>
+          <td>4.8 GB <span style="color:#7C948A;">/ 20 GB</span></td>
+          <td>62 GB <span style="color:#7C948A;">/ 100 GB</span></td>
           <td><span class="tenant-health"><span class="hdot" style="background:#5DCAA5;"></span>Healthy</span></td>
           <td>Cloud</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
         </tr>
         <tr>
           <td><b style="color:#fff;">Org2 — Northwind Traders</b></td><td>Enterprise</td><td>412</td><td>eu-west</td>
+          <td>84 GB <span style="color:#7C948A;">/ 500 GB</span></td>
+          <td>340 GB <span style="color:#7C948A;">/ 2 TB</span></td>
           <td><span class="tenant-health"><span class="hdot" style="background:#5DCAA5;"></span>Healthy</span></td>
           <td>Cloud</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
         </tr>
         <tr>
           <td><b style="color:#fff;">Org3 — Globex Industries</b></td><td>Enterprise</td><td>1,204</td><td>on-prem</td>
+          <td>210 GB <span style="color:#7C948A;">(self-hosted)</span></td>
+          <td>512 GB <span style="color:#7C948A;">(self-hosted)</span></td>
           <td><span class="tenant-health"><span class="hdot" style="background:#DDA234;"></span>Degraded — sync delayed</span></td>
           <td>On-premise</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
         </tr>
         <tr>
           <td><b style="color:#fff;">Initech</b></td><td>Starter</td><td>18</td><td>us-east</td>
+          <td>0.4 GB <span style="color:#7C948A;">/ 1 GB</span></td>
+          <td>1.1 GB <span style="color:#7C948A;">/ 2 GB</span></td>
           <td><span class="tenant-health"><span class="hdot" style="background:#5DCAA5;"></span>Healthy</span></td>
           <td>Cloud</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
         </tr>
         <tr>
           <td><b style="color:#fff;">Umbrella Group</b></td><td>Enterprise</td><td>2,880</td><td>ap-south</td>
+          <td>480 GB <span style="color:#7C948A;">(self-hosted)</span></td>
+          <td>1.8 TB <span style="color:#7C948A;">(self-hosted)</span></td>
           <td><span class="tenant-health"><span class="hdot" style="background:#D85A30;"></span>License expiring in 6 days</span></td>
           <td>On-premise</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
         </tr>
