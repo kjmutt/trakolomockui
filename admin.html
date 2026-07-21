@@ -82,7 +82,7 @@
       <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M2 6h12"/></svg>Self-service portal
     </div>
     <div class="set-item" data-panel="license">
-      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="6" r="3.5"/><path d="M6 9l-1.5 5 3.5-2 3.5 2L10 9"/></svg>License
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="6" r="3.5"/><path d="M6 9l-1.5 5 3.5-2 3.5 2L10 9"/></svg>License &amp; billing
     </div>
     <div class="set-item" data-panel="auditlog">
       <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 2h8v12H4z"/><path d="M6 5h4M6 8h4M6 11h2"/></svg>Audit log
@@ -196,17 +196,62 @@
 
     <!-- USERS -->
     <div class="set-panel" id="panel-users">
-      <div class="page-head"><div><div class="page-title" style="font-size:20px;">Users &amp; roles</div><div class="page-desc">Who has access, and what they can do.</div></div><button class="btn primary">Invite user</button></div>
-      <div class="panel">
-        <table>
-          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td><div class="who"><div class="av">RK</div>Raj K.</div></td><td class="id-mono">raj@acme.com</td><td><select style="width:auto;padding:5px 8px;"><option>Admin</option></select></td><td><span class="badge ok">Active</span></td></tr>
-            <tr><td><div class="who"><div class="av">SM</div>Sara M.</div></td><td class="id-mono">sara@acme.com</td><td><select style="width:auto;padding:5px 8px;"><option>Agent</option></select></td><td><span class="badge ok">Active</span></td></tr>
-            <tr><td><div class="who"><div class="av">DF</div>D. Ferreira</div></td><td class="id-mono">diego@acme.com</td><td><select style="width:auto;padding:5px 8px;"><option>Viewer</option></select></td><td><span class="badge ok">Active</span></td></tr>
-            <tr><td><div class="who"><div class="av">NP</div>Nadia P.</div></td><td class="id-mono">nadia@acme.com</td><td><select style="width:auto;padding:5px 8px;"><option>Manager</option></select></td><td><span class="badge neutral">Invited</span></td></tr>
-          </tbody>
-        </table>
+      <div class="page-head"><div><div class="page-title" style="font-size:20px;">Users &amp; roles</div><div class="page-desc">Who has access, and exactly what they can do.</div></div><button class="btn primary" id="users-tab-action">Invite user</button></div>
+
+      <div style="display:flex;gap:10px;margin:14px 0 16px;">
+        <div class="chip users-tab active" data-utab="people">People</div>
+        <div class="chip users-tab" data-utab="roles">Roles &amp; permissions</div>
+      </div>
+
+      <div id="users-people">
+        <div class="panel">
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><div class="who"><div class="av">RK</div>Raj K.</div></td><td class="id-mono">raj@acme.com</td><td><select style="width:auto;padding:5px 8px;"><option>Admin</option></select></td><td><span class="badge ok">Active</span></td></tr>
+              <tr><td><div class="who"><div class="av">SM</div>Sara M.</div></td><td class="id-mono">sara@acme.com</td><td><select style="width:auto;padding:5px 8px;"><option>Agent</option></select></td><td><span class="badge ok">Active</span></td></tr>
+              <tr><td><div class="who"><div class="av">DF</div>D. Ferreira</div></td><td class="id-mono">diego@acme.com</td><td><select style="width:auto;padding:5px 8px;"><option>Viewer</option></select></td><td><span class="badge ok">Active</span></td></tr>
+              <tr><td><div class="who"><div class="av">NP</div>Nadia P.</div></td><td class="id-mono">nadia@acme.com</td><td><select style="width:auto;padding:5px 8px;"><option>Manager</option></select></td><td><span class="badge neutral">Invited</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="users-roles" style="display:none;">
+        <div class="card">
+          <div class="section-label">Roles</div>
+          <div class="page-desc" style="margin:-4px 0 10px;">4 built-in roles plus any custom roles your workspace has created. Built-in roles can't be deleted, but their permissions below can still be changed.</div>
+          <div id="role-chip-list" style="display:flex;flex-wrap:wrap;gap:8px;">
+            <div class="col-chip" style="margin:0;"><span><b>Admin</b> · 1 user</span><span class="badge info" style="margin-left:8px;">Built-in</span></div>
+            <div class="col-chip" style="margin:0;"><span><b>Manager</b> · 1 user</span><span class="badge info" style="margin-left:8px;">Built-in</span></div>
+            <div class="col-chip" style="margin:0;"><span><b>Agent</b> · 1 user</span><span class="badge info" style="margin-left:8px;">Built-in</span></div>
+            <div class="col-chip" style="margin:0;"><span><b>Viewer</b> · 1 user</span><span class="badge info" style="margin-left:8px;">Built-in</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-label">Permission matrix</div>
+          <div class="page-desc" style="margin:-4px 0 10px;">Per-role access level for each area of the product. Changes apply the moment you leave this page.</div>
+          <div style="overflow-x:auto;">
+            <table id="perm-matrix">
+              <thead><tr id="perm-head"><th>Area</th><th>Admin</th><th>Manager</th><th>Agent</th><th>Viewer</th></tr></thead>
+              <tbody id="perm-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card" id="new-role-card" style="display:none;">
+          <div class="section-label">Create a custom role</div>
+          <label>Role name</label>
+          <input type="text" id="role-name" placeholder="e.g. IT Ops Lead">
+          <label>Start from</label>
+          <select id="role-copy-from"><option value="Admin">Admin's permissions</option><option value="Manager">Manager's permissions</option><option value="Agent">Agent's permissions</option><option value="Viewer" selected>Viewer's permissions</option><option value="">All set to None</option></select>
+          <div style="display:flex;gap:10px;margin-top:14px;">
+            <button class="btn primary sm" onclick="createRole()">Create role</button>
+            <button class="btn sm" onclick="document.getElementById('new-role-card').style.display='none';">Cancel</button>
+          </div>
+        </div>
+        <button class="btn" id="new-role-btn" onclick="document.getElementById('new-role-card').style.display='block';document.getElementById('role-name').focus();">+ New custom role</button>
       </div>
     </div>
 
@@ -236,12 +281,48 @@
         <div class="row-line"><div><div class="rname">Slack</div><div class="rdesc">Escalation and SLA alerts</div></div><div class="switch on"></div></div>
         <div class="row-line"><div><div class="rname">Google Workspace</div><div class="rdesc">SSO and directory sync</div></div><div class="switch on"></div></div>
         <div class="row-line"><div><div class="rname">Okta</div><div class="rdesc">SSO provider</div></div><div class="switch"></div></div>
+        <div class="row-line">
+          <div><div class="rname"><a href="admin-sso.html" style="text-decoration:none;color:var(--ink);">SAML SSO &amp; SCIM provisioning</a></div><div class="rdesc">Bring your own identity provider — Enterprise plan · <a href="admin-sso.html" style="color:var(--indigo-text);">Configure →</a></div></div>
+          <span class="badge neutral">Not connected</span>
+        </div>
         <div class="row-line"><div><div class="rname">GitHub</div><div class="rdesc">Link commits &amp; PRs to cards</div></div><div class="switch on"></div></div>
         <div class="row-line"><div><div class="rname">Jira</div><div class="rdesc">One-time backlog import · <a href="data-migration.html" style="color:var(--indigo-text);">Import data →</a></div></div><div class="switch"></div></div>
         <div class="row-line">
           <div><div class="rname"><a href="azure-onboarding.html" style="text-decoration:none;color:var(--ink);">Azure Active Directory</a></div><div class="rdesc">Onboarding automation — creates users, assigns passwords · <a href="azure-onboarding.html" style="color:var(--indigo-text);">Configure →</a></div></div>
           <div class="switch on"></div>
         </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">API keys</div>
+        <div class="page-desc" style="margin:-4px 0 8px;">Workspace-level keys for server-to-server access to the REST API — <a href="site/docs.html#api-access" style="color:var(--indigo-text);">API reference →</a>. Personal tokens live on each user's <a href="profile.html" style="color:var(--indigo-text);">profile</a> instead.</div>
+        <table>
+          <thead><tr><th>Name</th><th>Key</th><th>Scopes</th><th>Last used</th><th></th></tr></thead>
+          <tbody id="api-key-rows">
+            <tr><td>CI pipeline</td><td class="id-mono">trk_live_••••8a2f</td><td>Tickets: read/write</td><td class="id-mono">2 hours ago</td><td><button class="btn sm" onclick="this.closest('tr').remove()">Revoke</button></td></tr>
+            <tr><td>SIEM export</td><td class="id-mono">trk_live_••••c710</td><td>Audit log: read</td><td class="id-mono">10 min ago</td><td><button class="btn sm" onclick="this.closest('tr').remove()">Revoke</button></td></tr>
+            <tr><td>BI dashboard</td><td class="id-mono">trk_live_••••44e0</td><td>Assets: read, Reporting: read</td><td class="id-mono">1 day ago</td><td><button class="btn sm" onclick="this.closest('tr').remove()">Revoke</button></td></tr>
+          </tbody>
+        </table>
+        <div class="card" id="new-key-card" style="display:none;margin-top:12px;box-shadow:none;background:var(--surface-2);">
+          <label>Key name</label>
+          <input type="text" id="api-key-name" placeholder="e.g. Nightly export job">
+          <label>Scopes</label>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
+            <div class="chip key-scope-chip active" data-scope="Tickets: read">Tickets: read</div>
+            <div class="chip key-scope-chip" data-scope="Tickets: write">Tickets: write</div>
+            <div class="chip key-scope-chip" data-scope="Assets: read">Assets: read</div>
+            <div class="chip key-scope-chip" data-scope="Dev boards: read">Dev boards: read</div>
+            <div class="chip key-scope-chip" data-scope="Reporting: read">Reporting: read</div>
+            <div class="chip key-scope-chip" data-scope="Audit log: read">Audit log: read</div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:14px;">
+            <button class="btn primary sm" onclick="generateApiKey()">Generate key</button>
+            <button class="btn sm" onclick="document.getElementById('new-key-card').style.display='none';">Cancel</button>
+          </div>
+        </div>
+        <div id="new-key-reveal" class="page-desc" style="display:none;margin-top:10px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface-2);"></div>
+        <button class="btn sm" id="new-key-btn" style="margin-top:10px;" onclick="document.getElementById('new-key-card').style.display='block';document.getElementById('api-key-name').focus();">+ Generate new key</button>
       </div>
 
       <div class="card">
@@ -304,44 +385,89 @@
       </div>
     </div>
 
-    <!-- LICENSE -->
+    <!-- LICENSE & BILLING -->
     <div class="set-panel" id="panel-license">
-      <div class="page-title" style="font-size:20px;margin-bottom:4px;">License</div>
-      <div class="page-desc" style="margin-bottom:20px;">This workspace runs the Standalone / On-premise edition — the license lives here, not on a billing page. <a href="site/docs.html#onprem-install" style="color:var(--indigo-text);">On-premise setup guide →</a></div>
+      <div class="page-title" style="font-size:20px;margin-bottom:4px;">License &amp; billing</div>
+      <div class="page-desc" style="margin-bottom:16px;">How this workspace is licensed depends on which edition it runs — Trakolo Cloud is a subscription, Standalone/On-premise is a perpetual license.</div>
 
-      <div class="card">
-        <div class="section-label">Deployment</div>
-        <div class="row-line"><div><div class="rname">Edition</div><div class="rdesc">Perpetual license, installed in your own environment</div></div><span class="badge info">Standalone / On-premise</span></div>
-        <div class="row-line"><div><div class="rname">Installed version</div><div class="rdesc">Latest available: 2026.7.2</div></div><span class="id-mono">2026.7.1</span></div>
-        <div class="row-line"><div><div class="rname">License status</div><div class="rdesc">Validated locally — no phone-home required</div></div><span class="badge ok">Active</span></div>
+      <div style="display:flex;gap:10px;margin-bottom:20px;">
+        <div class="chip deploy-chip active" data-deploy="onprem">Standalone / On-premise</div>
+        <div class="chip deploy-chip" data-deploy="cloud">Trakolo Cloud</div>
       </div>
 
-      <div class="card">
-        <div class="section-label">License key</div>
-        <div class="row-line"><div><div class="rname">Licensed to</div></div><span>Acme Corp</span></div>
-        <div class="row-line"><div><div class="rname">Key</div><div class="rdesc">Issued Mar 12, 2026</div></div><span class="id-mono">TRK-ACME-••••-••••-9F2C</span></div>
-        <div class="row-line"><div><div class="rname">Support &amp; upgrades until</div><div class="rdesc">Optional plan, 18% of license — renew to stay on new releases</div></div><span class="id-mono">Mar 12, 2027</span></div>
-        <div style="display:flex;gap:10px;margin-top:14px;">
-          <button class="btn sm">Upload new license file</button>
-          <button class="btn sm">Offline activation</button>
-          <button class="btn sm">Download current license</button>
+      <div id="license-onprem">
+        <div class="page-desc" style="margin:-8px 0 16px;">This workspace runs the Standalone / On-premise edition — the license lives here, not on a billing page. <a href="site/docs.html#onprem-install" style="color:var(--indigo-text);">On-premise setup guide →</a></div>
+
+        <div class="card">
+          <div class="section-label">Deployment</div>
+          <div class="row-line"><div><div class="rname">Edition</div><div class="rdesc">Perpetual license, installed in your own environment</div></div><span class="badge info">Standalone / On-premise</span></div>
+          <div class="row-line"><div><div class="rname">Installed version</div><div class="rdesc">Latest available: 2026.7.2</div></div><span class="id-mono">2026.7.1</span></div>
+          <div class="row-line"><div><div class="rname">License status</div><div class="rdesc">Validated locally — no phone-home required</div></div><span class="badge ok">Active</span></div>
+        </div>
+
+        <div class="card">
+          <div class="section-label">License key</div>
+          <div class="row-line"><div><div class="rname">Licensed to</div></div><span>Acme Corp</span></div>
+          <div class="row-line"><div><div class="rname">Key</div><div class="rdesc">Issued Mar 12, 2026</div></div><span class="id-mono">TRK-ACME-••••-••••-9F2C</span></div>
+          <div class="row-line"><div><div class="rname">Support &amp; upgrades until</div><div class="rdesc">Optional plan, 18% of license — renew to stay on new releases</div></div><span class="id-mono">Mar 12, 2027</span></div>
+          <div style="display:flex;gap:10px;margin-top:14px;">
+            <button class="btn sm">Upload new license file</button>
+            <button class="btn sm">Offline activation</button>
+            <button class="btn sm">Download current license</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-label">Named users</div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-2);margin:4px 0 6px;"><span>Seats in use</span><span class="id-mono">342 / 500</span></div>
+          <div class="beam" style="width:100%;height:7px;"><i style="width:68%;background:var(--indigo)"></i></div>
+          <div class="page-desc" style="margin-top:10px;">Seats free up when a user is deactivated in <b>Users &amp; roles</b>. Need more? A seat expansion is a new license file, not a subscription change.</div>
+        </div>
+
+        <div class="card">
+          <div class="section-label">Modules licensed</div>
+          <div class="row-line"><div><div class="rname">Service desk (ITSM)</div><div class="rdesc">Incl. change management</div></div><span class="badge ok">Licensed</span></div>
+          <div class="row-line"><div><div class="rname">Asset management (SAM)</div></div><span class="badge ok">Licensed</span></div>
+          <div class="row-line"><div><div class="rname">Dev boards &amp; sprints</div></div><span class="badge ok">Licensed</span></div>
+          <div class="row-line"><div><div class="rname">Reporting &amp; compliance</div></div><span class="badge ok">Licensed</span></div>
+          <div class="row-line"><div><div class="rname">AI features</div><div class="rdesc">Triage, AI agent auto-resolution, predictive alerts</div></div><span class="badge ok">Licensed</span></div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="section-label">Named users</div>
-        <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-2);margin:4px 0 6px;"><span>Seats in use</span><span class="id-mono">342 / 500</span></div>
-        <div class="beam" style="width:100%;height:7px;"><i style="width:68%;background:var(--indigo)"></i></div>
-        <div class="page-desc" style="margin-top:10px;">Seats free up when a user is deactivated in <b>Users &amp; roles</b>. Need more? A seat expansion is a new license file, not a subscription change.</div>
-      </div>
+      <div id="license-cloud" style="display:none;">
+        <div class="page-desc" style="margin:-8px 0 16px;">Hosted and managed by Trakolo — billed monthly or annually to the card on file. <a href="site/pricing.html" style="color:var(--indigo-text);">Compare plans →</a></div>
 
-      <div class="card">
-        <div class="section-label">Modules licensed</div>
-        <div class="row-line"><div><div class="rname">Service desk (ITSM)</div><div class="rdesc">Incl. change management</div></div><span class="badge ok">Licensed</span></div>
-        <div class="row-line"><div><div class="rname">Asset management (SAM)</div></div><span class="badge ok">Licensed</span></div>
-        <div class="row-line"><div><div class="rname">Dev boards &amp; sprints</div></div><span class="badge ok">Licensed</span></div>
-        <div class="row-line"><div><div class="rname">Reporting &amp; compliance</div></div><span class="badge ok">Licensed</span></div>
-        <div class="row-line"><div><div class="rname">AI features</div><div class="rdesc">Triage, AI agent auto-resolution, predictive alerts</div></div><span class="badge ok">Licensed</span></div>
+        <div class="card">
+          <div class="section-label">Current plan</div>
+          <div class="row-line"><div><div class="rname">Business</div><div class="rdesc">Billed annually · $49 / user / month</div></div><span class="badge ok">Active</span></div>
+          <div class="row-line"><div><div class="rname">Next renewal</div><div class="rdesc">Auto-renews unless cancelled</div></div><span class="id-mono">Feb 1, 2027</span></div>
+          <div class="row-line"><div><div class="rname">Seats in use</div></div><span class="id-mono">342 / 350</span></div>
+          <div class="beam" style="width:100%;height:7px;margin-top:2px;"><i style="width:98%;background:var(--indigo)"></i></div>
+          <div style="display:flex;gap:10px;margin-top:14px;">
+            <button class="btn sm primary">Upgrade to Enterprise</button>
+            <button class="btn sm">Add seats</button>
+            <button class="btn sm">Cancel subscription</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-label">Payment method</div>
+          <div class="row-line"><div><div class="rname">Visa •••• 4242</div><div class="rdesc">Expires 08/2028</div></div><button class="btn sm">Update</button></div>
+          <div class="row-line"><div><div class="rname">Billing email</div></div><span class="id-mono">billing@acme.com</span></div>
+          <div class="row-line"><div><div class="rname">Billing address</div></div><span style="text-align:right;">Acme Corp, 500 Market St, San Francisco, CA</span></div>
+        </div>
+
+        <div class="card">
+          <div class="section-label">Invoice history</div>
+          <table>
+            <thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              <tr><td class="id-mono">Jan 1, 2026</td><td>Business plan · annual · 342 seats</td><td class="id-mono">$16,464.00</td><td><span class="badge ok">Paid</span></td><td><a href="#" style="color:var(--indigo-text);">Download ↓</a></td></tr>
+              <tr><td class="id-mono">Jan 1, 2025</td><td>Business plan · annual · 298 seats</td><td class="id-mono">$14,364.00</td><td><span class="badge ok">Paid</span></td><td><a href="#" style="color:var(--indigo-text);">Download ↓</a></td></tr>
+              <tr><td class="id-mono">Jan 1, 2024</td><td>Team plan · annual · 210 seats</td><td class="id-mono">$5,880.00</td><td><span class="badge ok">Paid</span></td><td><a href="#" style="color:var(--indigo-text);">Download ↓</a></td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -922,6 +1048,76 @@
   });
   if(location.hash) showPanel(location.hash.slice(1));
   document.querySelectorAll('.switch').forEach(s=>s.addEventListener('click', ()=>s.classList.toggle('on')));
+
+  const PERM_AREAS = ['Tickets & desk','Assets (SAM)','Dev boards','Reporting','Business rules','Billing & license','Users & roles'];
+  const PERM_LEVELS = ['None','View','Edit','Full'];
+  const ROLES = {
+    Admin:  ['Full','Full','Full','Full','Full','Full','Full'],
+    Manager:['Full','Edit','Edit','View','View','None','View'],
+    Agent:  ['Edit','View','Edit','None','None','None','None'],
+    Viewer: ['View','View','View','View','None','None','None']
+  };
+  function renderPermMatrix(){
+    const head = document.getElementById('perm-head');
+    head.innerHTML = '<th>Area</th>' + Object.keys(ROLES).map(r=>'<th>'+r+'</th>').join('');
+    const body = document.getElementById('perm-body');
+    body.innerHTML = PERM_AREAS.map((area,i)=>{
+      const cells = Object.keys(ROLES).map(r=>{
+        const val = ROLES[r][i];
+        return '<td><select style="width:auto;padding:5px 8px;" data-role="'+r+'" data-area="'+i+'">'+PERM_LEVELS.map(l=>'<option'+(l===val?' selected':'')+'>'+l+'</option>').join('')+'</select></td>';
+      }).join('');
+      return '<tr><td>'+area+'</td>'+cells+'</tr>';
+    }).join('');
+    body.querySelectorAll('select').forEach(s=>s.addEventListener('change', e=>{
+      ROLES[s.dataset.role][+s.dataset.area] = s.value;
+    }));
+  }
+  renderPermMatrix();
+  function createRole(){
+    const name = document.getElementById('role-name').value.trim();
+    if(!name) return;
+    const copyFrom = document.getElementById('role-copy-from').value;
+    ROLES[name] = copyFrom ? ROLES[copyFrom].slice() : PERM_AREAS.map(()=>'None');
+    renderPermMatrix();
+    document.getElementById('role-chip-list').insertAdjacentHTML('beforeend', '<div class="col-chip" style="margin:0;"><span><b>'+name+'</b> · 0 users</span><span class="badge neutral" style="margin-left:8px;">Custom</span></div>');
+    document.getElementById('role-name').value = '';
+    document.getElementById('new-role-card').style.display = 'none';
+  }
+  document.querySelectorAll('.users-tab').forEach(t=>t.addEventListener('click', ()=>{
+    document.querySelectorAll('.users-tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    const isPeople = t.dataset.utab==='people';
+    document.getElementById('users-people').style.display = isPeople ? '' : 'none';
+    document.getElementById('users-roles').style.display = isPeople ? 'none' : '';
+    document.getElementById('users-tab-action').style.display = isPeople ? '' : 'none';
+  }));
+
+  document.querySelectorAll('.key-scope-chip').forEach(c=>c.addEventListener('click', ()=>c.classList.toggle('active')));
+  function randKey(){
+    const chars='abcdef0123456789';
+    let s=''; for(let i=0;i<4;i++) s+=chars[Math.floor(Math.random()*chars.length)];
+    return s;
+  }
+  function generateApiKey(){
+    const name = document.getElementById('api-key-name').value.trim() || 'Untitled key';
+    const scopes = [...document.querySelectorAll('.key-scope-chip.active')].map(c=>c.dataset.scope);
+    const scopeText = scopes.length ? scopes.join(', ') : 'No scopes selected';
+    const suffix = randKey();
+    document.getElementById('api-key-rows').insertAdjacentHTML('beforeend',
+      '<tr><td>'+name+'</td><td class="id-mono">trk_live_••••'+suffix+'</td><td>'+scopeText+'</td><td class="id-mono">Never</td><td><button class="btn sm" onclick="this.closest(\'tr\').remove()">Revoke</button></td></tr>');
+    const reveal = document.getElementById('new-key-reveal');
+    reveal.style.display = 'block';
+    reveal.innerHTML = '<b>'+name+'</b> created. Copy this key now — it won\'t be shown again: <span class="id-mono">trk_live_9f2c7a1b'+suffix+'</span>';
+    document.getElementById('api-key-name').value = '';
+    document.getElementById('new-key-card').style.display = 'none';
+  }
+
+  document.querySelectorAll('.deploy-chip').forEach(c=>c.addEventListener('click', ()=>{
+    document.querySelectorAll('.deploy-chip').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active');
+    document.getElementById('license-onprem').style.display = c.dataset.deploy==='onprem' ? '' : 'none';
+    document.getElementById('license-cloud').style.display = c.dataset.deploy==='cloud' ? '' : 'none';
+  }));
   const copilotSwitch = document.getElementById('feat-copilot');
   if(copilotSwitch){
     if(localStorage.getItem('trakolo-feature-copilot') === 'off') copilotSwitch.classList.remove('on');
@@ -1117,15 +1313,21 @@ window.COPILOT = {
     {label:'How do I add a business rule?'},
     {label:'Where do I change SLA targets?'},
     {label:"What's not licensed on my plan?"},
-    {label:'How do I enable or disable a feature?'}
+    {label:'How do I create a custom role?'},
+    {label:'Where do I set up SSO?'},
+    {label:'How do I generate an API key?'}
   ],
   answers: [
     {keywords:['business rule','automation','if this then'], text:'Under Service desk → Create a business rule: pick a trigger, stack conditions, chain actions, and set the run order — it\'s evaluated on every ticket event, first match wins.', link:{href:'admin.html#desk', label:'Open Service desk config'}},
     {keywords:['sla','target','response time','resolution time'], text:'SLA targets by priority (Urgent/High/Normal/Low, first response and resolution) are under Service desk → SLA targets by priority.', link:{href:'admin.html#desk', label:'Open Service desk config'}},
-    {keywords:['license','licensed','plan','entitlement'], text:'Check the License panel — it lists every module and whether it\'s licensed for this workspace. AI features are licensed on your current plan.', link:{href:'admin.html#license', label:'Open License'}},
+    {keywords:['license','licensed','plan','entitlement'], text:'Check License & billing — toggle between Standalone/On-premise and Trakolo Cloud to see the license or the subscription, invoices, and payment method for this workspace.', link:{href:'admin.html#license', label:'Open License & billing'}},
+    {keywords:['billing','invoice','payment','subscription','upgrade plan','seats'], text:'Switch License & billing to the "Trakolo Cloud" view for your current plan, seat usage, payment method, and invoice history.', link:{href:'admin.html#license', label:'Open License & billing'}},
     {keywords:['enable','disable','feature','toggle','turn off','turn on'], text:'Individual features (knowledge base, catalog, problem management, approvals, on-call, chat, discovery, roadmap, change management, this Copilot) have their own switches under General → Features enabled.', link:{href:'admin.html#general', label:'Open Features enabled'}},
     {keywords:['catalog','service catalog','request item'], text:'Create and assign catalog items — approval path plus which group fulfills them — under Service catalog.', link:{href:'admin.html#catalog', label:'Open Service catalog'}},
-    {keywords:['audit','who changed','log'], text:'Every admin action and privileged change is in the Audit log, exportable as CSV.', link:{href:'admin.html#auditlog', label:'Open Audit log'}}
+    {keywords:['audit','who changed','log'], text:'Every admin action and privileged change is in the Audit log, exportable as CSV.', link:{href:'admin.html#auditlog', label:'Open Audit log'}},
+    {keywords:['role','permission','rbac','custom role','access level'], text:'Users & roles has a Roles & permissions tab — a matrix of what each role can do per area, plus a "+ New custom role" button to create one starting from an existing role\'s permissions.', link:{href:'admin.html#users', label:'Open Users & roles'}},
+    {keywords:['sso','saml','scim','identity provider','okta','single sign-on'], text:'SAML SSO & SCIM provisioning is its own setup flow under Integrations — metadata, entity ID/ACS URL, attribute mapping, IdP group → role mapping, and a test sign-in, all on one page.', link:{href:'admin-sso.html', label:'Open SSO & SCIM setup'}},
+    {keywords:['api key','api token','generate key','rest api'], text:'Workspace-level API keys (for server-to-server access, not personal use) are under Integrations → API keys — pick scopes and generate. Personal tokens live on your own profile instead.', link:{href:'admin.html#integrations', label:'Open Integrations'}}
   ],
   fallback: {text:"I don't have a canned answer for that yet in this mockup — but in the real product I'd search your settings, the docs, and past changes in the audit log to answer directly.", link:{href:'admin.html#general', label:'Go to General settings'}}
 };
