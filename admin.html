@@ -21,6 +21,11 @@
   @keyframes panelIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
   .rule-row{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;}
   .rule-row:last-child{border-bottom:none;}
+  .cond-row,.act-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:center;margin-top:8px;}
+  .cond-row select,.act-row select{width:100%;}
+  .cond-row input,.act-row input{width:100%;}
+  .rule-remove{width:30px;height:30px;border-radius:var(--r-sm);border:1px solid var(--border-strong);background:var(--surface);color:var(--ink-muted);cursor:pointer;font-size:14px;flex-shrink:0;}
+  .rule-remove:hover{background:var(--coral-bg);color:var(--coral-text);border-color:transparent;}
   .col-chip{padding:8px 12px;border:1px solid var(--border);border-radius:var(--r-sm);font-size:12.5px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;background:var(--surface-2);}
   .swatch{width:22px;height:22px;border-radius:7px;border:2px solid transparent;cursor:pointer;transition:transform .15s;}
   .swatch:hover{transform:scale(1.1);}
@@ -405,13 +410,51 @@
 
       <div class="card">
         <div class="section-label">Business rules</div>
-        <div class="page-desc" style="margin:-4px 0 8px;">If-this-then-that automation, evaluated on every ticket event by the <b>Business rules engine</b> (see System status). Rules run in order; the first match per event wins.</div>
-        <div class="row-line"><div><div class="rname">New starter onboarding</div><div class="rdesc">When category = Onboarding request → run the <a href="azure-onboarding.html" style="color:var(--indigo-text);">Azure AD provisioning automation</a></div></div><div class="switch on"></div></div>
-        <div class="row-line"><div><div class="rname">VIP fast lane</div><div class="rdesc">When requester is in Executives group → set priority to at least High, route to IT Ops</div></div><div class="switch on"></div></div>
-        <div class="row-line"><div><div class="rname">SLA breach warning</div><div class="rdesc">When SLA timer reaches 80% → notify assignee and their manager in Slack</div></div><div class="switch on"></div></div>
-        <div class="row-line"><div><div class="rname">Outage clustering</div><div class="rdesc">When 3+ similar tickets arrive within 10 minutes → open a problem ticket and link them all</div></div><div class="switch on"></div></div>
-        <div class="row-line"><div><div class="rname">Repair vs replace</div><div class="rdesc">When the linked asset is over 3 years old → suggest replacement instead of repair</div></div><div class="switch"></div></div>
-        <button class="btn" style="margin-top:12px;">+ New business rule</button>
+        <div class="page-desc" style="margin:-4px 0 8px;">If-this-then-that automation, evaluated on every ticket event by the <b>Business rules engine</b> (see System status). Rules run in the order below; the first match per event wins.</div>
+        <div class="panel" style="box-shadow:none;">
+          <table>
+            <thead><tr><th>#</th><th>Rule</th><th>When</th><th>If</th><th>Then</th><th>Status</th><th></th></tr></thead>
+            <tbody id="rule-rows">
+              <tr data-id="R1"><td class="id-mono">1</td><td><b>New starter onboarding</b></td><td>Ticket created</td><td>Category = Onboarding request</td><td>Run <a href="azure-onboarding.html" style="color:var(--indigo-text);">Azure AD automation</a></td><td><span class="badge ok">Enabled</span></td><td><button class="btn sm" onclick="toggleRule(this)">Disable</button></td></tr>
+              <tr data-id="R2"><td class="id-mono">2</td><td><b>VIP fast lane</b></td><td>Ticket created</td><td>Requester group = Executives</td><td>Set priority ≥ High; route to IT Ops</td><td><span class="badge ok">Enabled</span></td><td><button class="btn sm" onclick="toggleRule(this)">Disable</button></td></tr>
+              <tr data-id="R3"><td class="id-mono">3</td><td><b>SLA breach warning</b></td><td>SLA timer reaches threshold</td><td>SLA % elapsed ≥ 80%</td><td>Notify assignee &amp; manager in Slack</td><td><span class="badge ok">Enabled</span></td><td><button class="btn sm" onclick="toggleRule(this)">Disable</button></td></tr>
+              <tr data-id="R4"><td class="id-mono">4</td><td><b>Outage clustering</b></td><td>N similar tickets arrive within window</td><td>Ticket count in window ≥ 3 (10 min)</td><td>Open a problem ticket; link them all</td><td><span class="badge ok">Enabled</span></td><td><button class="btn sm" onclick="toggleRule(this)">Disable</button></td></tr>
+              <tr data-id="R5"><td class="id-mono">5</td><td><b>Repair vs replace</b></td><td>Ticket updated</td><td>Asset age (years) &gt; 3</td><td>Suggest replacement instead of repair</td><td><span class="badge neutral">Disabled</span></td><td><button class="btn sm" onclick="toggleRule(this)">Enable</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Create a business rule</div>
+        <div class="page-desc" style="margin:-4px 0 8px;">Build an if-this-then-that automation: pick a trigger, add conditions, then add the actions to run when they all match.</div>
+
+        <label>Rule name</label>
+        <input type="text" id="rule-name" placeholder="e.g. Escalate VIP hardware requests">
+
+        <label>When (trigger)</label>
+        <select id="rule-trigger">
+          <option>Ticket created</option>
+          <option>Ticket updated</option>
+          <option>SLA timer reaches threshold</option>
+          <option>N similar tickets arrive within window</option>
+          <option>Change request submitted</option>
+          <option>Asset linked to ticket</option>
+        </select>
+
+        <label style="margin-top:18px;">If (all conditions match)</label>
+        <div id="rule-conditions"></div>
+        <button class="btn sm" style="margin-top:2px;" onclick="addConditionRow()">+ Add condition</button>
+
+        <label style="margin-top:18px;">Then (run these actions)</label>
+        <div id="rule-actions"></div>
+        <button class="btn sm" style="margin-top:2px;" onclick="addActionRow()">+ Add action</button>
+
+        <div class="row-line" style="margin-top:18px;"><div><div class="rname">Run order</div><div class="rdesc">Rules run in order; the first match per event wins</div></div><input class="mini-input" type="number" id="rule-order" value="6" min="1" style="width:64px;"></div>
+        <div class="row-line"><div><div class="rname">Enabled</div><div class="rdesc">Off saves the rule without activating it</div></div><div class="switch on" id="rule-enabled"></div></div>
+
+        <button class="btn primary" style="margin-top:16px;" onclick="createRule()">+ Save rule</button>
+        <div id="rule-toast" style="display:none;margin-top:12px;font-size:12.5px;color:var(--indigo-text);background:var(--indigo-bg);border-radius:var(--r-sm);padding:9px 12px;"></div>
       </div>
 
       <div class="card">
@@ -987,6 +1030,82 @@
 
     ['cat-name','cat-code','cat-desc','cat-sla'].forEach(id => document.getElementById(id).value = '');
   }
+
+  const COND_FIELDS = ['Category','Priority','Requester group','Source channel','SLA % elapsed','Asset age (years)','Ticket count in window'];
+  const COND_OPS = ['equals','is greater than','is less than','contains','is in group'];
+  const ACTION_TYPES = ['Set priority to','Route to group','Send Slack notification to','Run automation','Open problem ticket','Suggest asset replacement'];
+
+  function condRowHtml(){
+    return `<div class="cond-row">
+      <select class="cond-field">${COND_FIELDS.map(f=>`<option>${f}</option>`).join('')}</select>
+      <select class="cond-op">${COND_OPS.map(o=>`<option>${o}</option>`).join('')}</select>
+      <input type="text" class="cond-val" placeholder="value">
+      <button class="rule-remove" onclick="this.closest('.cond-row').remove()" title="Remove condition">✕</button>
+    </div>`;
+  }
+  function actRowHtml(){
+    return `<div class="act-row">
+      <select class="act-type">${ACTION_TYPES.map(a=>`<option>${a}</option>`).join('')}</select>
+      <input type="text" class="act-val" placeholder="target / value" style="grid-column:span 2;">
+      <button class="rule-remove" onclick="this.closest('.act-row').remove()" title="Remove action">✕</button>
+    </div>`;
+  }
+  function addConditionRow(){ document.getElementById('rule-conditions').insertAdjacentHTML('beforeend', condRowHtml()); }
+  function addActionRow(){ document.getElementById('rule-actions').insertAdjacentHTML('beforeend', actRowHtml()); }
+  addConditionRow();
+  addActionRow();
+
+  function toggleRule(btn){
+    const row = btn.closest('tr');
+    const statusCell = row.children[5];
+    const enabled = statusCell.querySelector('.badge').classList.contains('ok');
+    statusCell.innerHTML = enabled ? '<span class="badge neutral">Disabled</span>' : '<span class="badge ok">Enabled</span>';
+    btn.textContent = enabled ? 'Enable' : 'Disable';
+  }
+
+  function createRule(){
+    const name = document.getElementById('rule-name').value.trim();
+    const trigger = document.getElementById('rule-trigger').value;
+    const order = document.getElementById('rule-order').value || '—';
+    const enabled = document.getElementById('rule-enabled').classList.contains('on');
+    const toast = document.getElementById('rule-toast');
+
+    const conditions = [...document.querySelectorAll('#rule-conditions .cond-row')].map(r => {
+      const val = r.querySelector('.cond-val').value.trim();
+      return `${r.querySelector('.cond-field').value} ${r.querySelector('.cond-op').value} ${val || '…'}`;
+    });
+    const actions = [...document.querySelectorAll('#rule-actions .act-row')].map(r => {
+      const val = r.querySelector('.act-val').value.trim();
+      return `${r.querySelector('.act-type').value} ${val || '…'}`;
+    });
+
+    if(!name){
+      toast.style.display = 'block';
+      toast.style.color = 'var(--coral-text)'; toast.style.background = 'var(--coral-bg)';
+      toast.textContent = 'Give the rule a name before saving it.';
+      return;
+    }
+
+    const tbody = document.getElementById('rule-rows');
+    const rowNum = tbody.children.length + 1;
+    const statusBadge = enabled ? '<span class="badge ok">Enabled</span>' : '<span class="badge neutral">Disabled</span>';
+    const tr = document.createElement('tr');
+    tr.dataset.id = 'R' + rowNum;
+    tr.innerHTML = `<td class="id-mono">${order}</td><td><b>${name}</b></td><td>${trigger}</td><td>${conditions.join(' AND ') || '—'}</td><td>${actions.join('; ') || '—'}</td><td>${statusBadge}</td><td><button class="btn sm" onclick="toggleRule(this)">${enabled?'Disable':'Enable'}</button></td>`;
+    tbody.appendChild(tr);
+
+    toast.style.display = 'block';
+    toast.style.color = 'var(--indigo-text)'; toast.style.background = 'var(--indigo-bg)';
+    toast.textContent = enabled
+      ? `"${name}" is live — the business rules engine evaluates it on every "${trigger.toLowerCase()}" event from now on.`
+      : `"${name}" saved but disabled — flip it to Enabled from the table above when you're ready.`;
+
+    document.getElementById('rule-name').value = '';
+    document.getElementById('rule-conditions').innerHTML = '';
+    document.getElementById('rule-actions').innerHTML = '';
+    addConditionRow();
+    addActionRow();
+  }
 </script>
 <script src="app-chrome.js" defer></script>
 <script>
@@ -1001,7 +1120,7 @@ window.COPILOT = {
     {label:'How do I enable or disable a feature?'}
   ],
   answers: [
-    {keywords:['business rule','automation','if this then'], text:'Business rules live under Service desk → Business rules — if-this-then-that automation evaluated on every ticket event, in order. Click "+ New business rule" there.', link:{href:'admin.html#desk', label:'Open Service desk config'}},
+    {keywords:['business rule','automation','if this then'], text:'Under Service desk → Create a business rule: pick a trigger, stack conditions, chain actions, and set the run order — it\'s evaluated on every ticket event, first match wins.', link:{href:'admin.html#desk', label:'Open Service desk config'}},
     {keywords:['sla','target','response time','resolution time'], text:'SLA targets by priority (Urgent/High/Normal/Low, first response and resolution) are under Service desk → SLA targets by priority.', link:{href:'admin.html#desk', label:'Open Service desk config'}},
     {keywords:['license','licensed','plan','entitlement'], text:'Check the License panel — it lists every module and whether it\'s licensed for this workspace. AI features are licensed on your current plan.', link:{href:'admin.html#license', label:'Open License'}},
     {keywords:['enable','disable','feature','toggle','turn off','turn on'], text:'Individual features (knowledge base, catalog, problem management, approvals, on-call, chat, discovery, roadmap, change management, this Copilot) have their own switches under General → Features enabled.', link:{href:'admin.html#general', label:'Open Features enabled'}},
