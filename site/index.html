@@ -52,11 +52,13 @@
   /* Nav */
   nav {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 22px 0;
+    padding: 22px 0; position: relative;
   }
   .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 19px; color: var(--teal-800); font-family: 'Sora', sans-serif; }
   .nav-links { display: flex; gap: 32px; font-size: 15px; color: var(--ink-soft); font-weight: 500; }
   .nav-actions { display: flex; align-items: center; gap: 16px; }
+  .nav-toggle { display: none; background: none; border: 1px solid var(--line); border-radius: 8px; font-size: 18px; line-height: 1; width: 40px; height: 40px; align-items: center; justify-content: center; cursor: pointer; color: var(--ink); }
+  .nav-signin-mobile { display: none; }
 
   /* Hero */
   .hero {
@@ -141,7 +143,10 @@
   .features { padding: 88px 0; }
   .features h2 { font-size: 34px; margin-bottom: 12px; }
   .features > .wrap > p { color: var(--ink-soft); font-size: 16px; max-width: 520px; margin-bottom: 48px; }
-  .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+  .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 960px) and (min-width: 861px) {
+    .feature-grid { grid-template-columns: repeat(2, 1fr); }
+  }
   .feature-card {
     background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 26px 22px;
   }
@@ -184,7 +189,18 @@
     .hero h1 { font-size: 36px; }
     .stages, .feature-grid { grid-template-columns: 1fr; gap: 32px; }
     .stage-connector { display: none; }
-    .nav-links { display: none; }
+    .nav-toggle { display: inline-flex; }
+    .nav-actions .btn-ghost { display: none; }
+    .nav-links {
+      display: none; flex-direction: column; gap: 0;
+      position: absolute; top: 100%; left: 32px; right: 32px;
+      background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+      padding: 6px 18px; box-shadow: 0 16px 32px -16px rgba(15,33,25,0.22); z-index: 60;
+    }
+    .nav-links.open { display: flex; }
+    .nav-links a { padding: 13px 0; border-bottom: 1px solid var(--line); }
+    .nav-links a:last-child { border-bottom: none; }
+    .nav-signin-mobile { display: block; font-weight: 600; color: var(--teal-800); }
   }
 </style>
 </head>
@@ -204,7 +220,9 @@
       <a href="pricing.html">Pricing</a>
       <a href="docs.html">Docs</a>
       <a href="release-notes.html">Release notes</a>
+      <a href="../login.html" class="nav-signin-mobile">Sign in</a>
     </div>
+    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
     <div class="nav-actions">
       <a href="../login.html" class="btn btn-ghost">Sign in</a>
       <a href="../login.html" class="btn btn-primary">Start free</a>
@@ -358,5 +376,6 @@
   </footer>
 </div>
 
+<script src="nav.js" defer></script>
 </body>
 </html>

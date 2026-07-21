@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="styles.css">
 <style>
   .plans { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
-  .plan-card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 28px 24px; display: flex; flex-direction: column; }
+  .plan-card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 28px 24px; display: flex; flex-direction: column; position: relative; }
   .plan-card.featured { border-color: var(--teal-600); box-shadow: 0 16px 40px -18px rgba(15,110,86,0.28); position: relative; }
   .plan-badge { position: absolute; top: -12px; left: 24px; background: var(--teal-600); color: #fff; font-size: 11.5px; font-weight: 600; padding: 4px 12px; border-radius: 999px; }
   .plan-card h3 { font-size: 18px; margin-bottom: 6px; }
@@ -58,7 +58,9 @@
       <a href="pricing.html" class="current">Pricing</a>
       <a href="docs.html">Docs</a>
       <a href="release-notes.html">Release notes</a>
+      <a href="../login.html" class="nav-signin-mobile">Sign in</a>
     </div>
+    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
     <div class="nav-actions">
       <a href="../login.html" class="btn btn-ghost">Sign in</a>
       <a href="../login.html" class="btn btn-primary">Start free</a>
@@ -196,6 +198,7 @@
       <span class="tag">Compare plans</span>
     </div>
     <h2>Full feature comparison</h2>
+    <div style="overflow-x:auto;">
     <table class="compare-table">
       <tr><th>Feature</th><th>Free</th><th>Team</th><th>Business</th><th>Enterprise</th></tr>
       <tr><td>Users</td><td>Up to 10</td><td>Unlimited</td><td>Unlimited</td><td>Unlimited</td></tr>
@@ -228,6 +231,7 @@
       <tr><td>Standalone / on-premise option</td><td>—</td><td>—</td><td>—</td><td class="yes">✓</td></tr>
       <tr><td>Support</td><td>Email</td><td>Email &amp; chat</td><td>Priority</td><td>Dedicated</td></tr>
     </table>
+    </div>
   </div>
 </section>
 
@@ -258,5 +262,6 @@
   </footer>
 </div>
 
+<script src="nav.js" defer></script>
 </body>
 </html>
