@@ -236,5 +236,26 @@ renderCardsView();
 renderCalView();
 </script>
 <script src="app-chrome.js" defer></script>
+<script>
+window.COPILOT = {
+  surface: 'agent',
+  title: 'Agent Copilot',
+  greeting: "Hi, I can help you move faster on this queue — summarize a ticket, draft a reply, or find what's similar. Try a prompt below or just ask.",
+  prompts: [
+    {label:'Summarize TS-4821 for a handoff'},
+    {label:'Draft a reply asking for more detail'},
+    {label:"What's my SLA risk today?"},
+    {label:'Find tickets similar to this one'}
+  ],
+  answers: [
+    {keywords:['summarize','summary','handoff','ts-4821'], text:'TS-4821 — VPN drops on hybrid laptops, Urgent, 18m left on SLA. Raj K. reproduced it on a test device and traced it to an AP firmware update; PRB-0007 already has a workaround live since Jul 18. Safe to hand off with that context.', link:{href:'desk.html', label:'Open TS-4821'}},
+    {keywords:['draft','reply','more detail','respond'], text:'Draft: "Thanks for the report — to narrow this down, could you confirm which floor/AP you were near when it dropped, and whether it happens on wifi only or VPN too? That\'ll help us match it to the known issue we\'re tracking."'},
+    {keywords:['sla','risk','breach','today'], text:'2 tickets are at risk today: TS-4821 (18m left, Urgent) and TS-4816 (7m left, already escalated to L3). Both are visible in the SLA-at-risk tile on the service desk.', link:{href:'desk.html', label:'Open the queue'}},
+    {keywords:['similar','duplicate','same issue','related'], text:'PRB-0007 already links 12 similar VPN-drop tickets from the last 2 weeks, all traced to the same AP firmware update.', link:{href:'desk-problems.html', label:'See the problem record'}}
+  ],
+  fallback: {text:"I don't have a canned answer for that yet in this mockup — but in the real product I'd search your tickets, KB articles, and past resolutions to answer directly.", link:{href:'desk-kb.html', label:'Search the knowledge base'}}
+};
+</script>
+<script src="copilot-widget.js" defer></script>
 </body>
 </html>

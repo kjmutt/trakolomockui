@@ -62,5 +62,26 @@
     </div>
   </div>
 </div>
+<script>
+window.COPILOT = {
+  surface: 'ssp',
+  title: 'Trakolo Assistant',
+  greeting: "Hi! I can answer common questions or point you to the right place — for anything I can't resolve myself, I'll get you to a person.",
+  prompts: [
+    {label:"I'm locked out of my account"},
+    {label:'How do I request a laptop?'},
+    {label:'What does "Escalated" mean?'},
+    {label:'My VPN keeps dropping'}
+  ],
+  answers: [
+    {keywords:['locked out','password','mfa','login'], text:"I can fix that myself — this is exactly what the full live chat handles: identity verification, a reset link, and MFA re-enrollment, done in a couple of minutes."},
+    {keywords:['laptop','hardware','request a laptop','new laptop'], text:'Laptop requests go through the service catalog — pick standard or engineering build, and it routes for manager approval automatically.', link:{href:'desk-catalog.html', label:'Open the service catalog'}},
+    {keywords:['escalated','status meaning','what does'], text:'"Escalated" means the ticket breached its response window and automatically moved to the next support tier — it\'s being looked at by someone more senior, not stuck.'},
+    {keywords:['vpn','wifi','network','dropping'], text:"There's a known issue here with a workaround already posted — most people are back to normal after applying it."}
+  ],
+  fallback: {text:"I don't have a canned answer for that yet in this mockup — the full chat experience handles free-form questions like this and hands off to a person when needed.", link:{href:'chat.html', label:'Open full chat'}}
+};
+</script>
+<script src="copilot-widget.js" defer></script>
 </body>
 </html>

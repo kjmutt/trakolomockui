@@ -146,6 +146,7 @@
         <div class="row-line"><div><div class="rname">Asset discovery</div><div class="rdesc">Agent + network scan into SAM</div></div><div class="switch on"></div></div>
         <div class="row-line"><div><div class="rname">Epics &amp; roadmap</div><div class="rdesc">Quarter view over the sprint boards</div></div><div class="switch on"></div></div>
         <div class="row-line"><div><div class="rname">Change management</div><div class="rdesc">CRs, CAB approval, deployment windows</div></div><div class="switch on"></div></div>
+        <div class="row-line"><div><div class="rname">AI Copilot</div><div class="rdesc">Floating assistant on the agent workspace, admin, and self-service portal — off removes it from every page instantly</div></div><div class="switch on" id="feat-copilot"></div></div>
       </div>
     </div>
 
@@ -878,6 +879,13 @@
   });
   if(location.hash) showPanel(location.hash.slice(1));
   document.querySelectorAll('.switch').forEach(s=>s.addEventListener('click', ()=>s.classList.toggle('on')));
+  const copilotSwitch = document.getElementById('feat-copilot');
+  if(copilotSwitch){
+    if(localStorage.getItem('trakolo-feature-copilot') === 'off') copilotSwitch.classList.remove('on');
+    copilotSwitch.addEventListener('click', () => {
+      localStorage.setItem('trakolo-feature-copilot', copilotSwitch.classList.contains('on') ? 'on' : 'off');
+    });
+  }
   document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click', ()=>{
     c.parentElement.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
     c.classList.add('active');
@@ -981,5 +989,28 @@
   }
 </script>
 <script src="app-chrome.js" defer></script>
+<script>
+window.COPILOT = {
+  surface: 'admin',
+  title: 'Admin Copilot',
+  greeting: "I know your workspace settings — ask me where something lives, or how to set it up, and I'll explain or take you there.",
+  prompts: [
+    {label:'How do I add a business rule?'},
+    {label:'Where do I change SLA targets?'},
+    {label:"What's not licensed on my plan?"},
+    {label:'How do I enable or disable a feature?'}
+  ],
+  answers: [
+    {keywords:['business rule','automation','if this then'], text:'Business rules live under Service desk → Business rules — if-this-then-that automation evaluated on every ticket event, in order. Click "+ New business rule" there.', link:{href:'admin.html#desk', label:'Open Service desk config'}},
+    {keywords:['sla','target','response time','resolution time'], text:'SLA targets by priority (Urgent/High/Normal/Low, first response and resolution) are under Service desk → SLA targets by priority.', link:{href:'admin.html#desk', label:'Open Service desk config'}},
+    {keywords:['license','licensed','plan','entitlement'], text:'Check the License panel — it lists every module and whether it\'s licensed for this workspace. AI features are licensed on your current plan.', link:{href:'admin.html#license', label:'Open License'}},
+    {keywords:['enable','disable','feature','toggle','turn off','turn on'], text:'Individual features (knowledge base, catalog, problem management, approvals, on-call, chat, discovery, roadmap, change management, this Copilot) have their own switches under General → Features enabled.', link:{href:'admin.html#general', label:'Open Features enabled'}},
+    {keywords:['catalog','service catalog','request item'], text:'Create and assign catalog items — approval path plus which group fulfills them — under Service catalog.', link:{href:'admin.html#catalog', label:'Open Service catalog'}},
+    {keywords:['audit','who changed','log'], text:'Every admin action and privileged change is in the Audit log, exportable as CSV.', link:{href:'admin.html#auditlog', label:'Open Audit log'}}
+  ],
+  fallback: {text:"I don't have a canned answer for that yet in this mockup — but in the real product I'd search your settings, the docs, and past changes in the audit log to answer directly.", link:{href:'admin.html#general', label:'Go to General settings'}}
+};
+</script>
+<script src="copilot-widget.js" defer></script>
 </body>
 </html>
