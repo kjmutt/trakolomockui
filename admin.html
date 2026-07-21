@@ -441,6 +441,19 @@
           <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-2);margin:4px 0 6px;"><span>Seats in use</span><span class="id-mono">342 / 500</span></div>
           <div class="beam" style="width:100%;height:7px;"><i style="width:68%;background:var(--indigo)"></i></div>
           <div class="page-desc" style="margin-top:10px;">Seats free up when a user is deactivated in <b>Users &amp; roles</b>. Need more? A seat expansion is a new license file, not a subscription change.</div>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-top:14px;">
+            <div class="row-line"><div><div class="rname">Agent seats (Service desk)</div><div class="rdesc">Ticket-handling agents, on-call, approvers</div></div><span class="id-mono">210 / 260</span></div>
+            <div class="row-line"><div><div class="rname">Dev seats (Boards &amp; sprints)</div><div class="rdesc">Sprint boards, backlog, dev tooling</div></div><span class="id-mono">96 / 140</span></div>
+            <div class="row-line"><div><div class="rname">Admin &amp; viewer seats</div><div class="rdesc">Settings-only or read-only access</div></div><span class="id-mono">36 / 100</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-label">Self-Service Portal users</div>
+          <div class="page-desc" style="margin:-4px 0 10px;">Employees who submit tickets through the SSP — a separate pool from named agent/dev seats above, and doesn't consume a license seat.</div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-2);margin:4px 0 6px;"><span>Active SSP accounts</span><span class="id-mono">1,842 / 2,000</span></div>
+          <div class="beam" style="width:100%;height:7px;"><i style="width:92%;background:var(--indigo)"></i></div>
+          <div class="page-desc" style="margin-top:10px;">Granted automatically on Azure AD sync — see <a href="azure-onboarding.html" style="color:var(--indigo-text);">Azure AD onboarding</a>.</div>
         </div>
 
         <div class="card">
@@ -450,6 +463,16 @@
           <div class="row-line"><div><div class="rname">Dev boards &amp; sprints</div></div><span class="badge ok">Licensed</span></div>
           <div class="row-line"><div><div class="rname">Reporting &amp; compliance</div></div><span class="badge ok">Licensed</span></div>
           <div class="row-line"><div><div class="rname">AI features</div><div class="rdesc">Triage, AI agent auto-resolution, predictive alerts</div></div><span class="badge ok">Licensed</span></div>
+        </div>
+
+        <div class="card">
+          <div class="section-label">AI Agent licenses</div>
+          <div class="page-desc" style="margin:-4px 0 10px;">Autonomous AI agents are licensed separately from human seats — one license per active agent instance, by the work it's licensed to do.</div>
+          <div class="row-line"><div><div class="rname">AI Agent — Service desk</div><div class="rdesc">Triage, auto-resolution, drafts and sends ticket replies</div></div><span class="id-mono">2 / 3</span></div>
+          <div class="row-line"><div><div class="rname">AI Agent — Coding</div><div class="rdesc">Picks up backlog items, writes the change, opens a PR for review</div></div><span class="id-mono">1 / 2</span></div>
+          <div style="display:flex;gap:10px;margin-top:14px;">
+            <button class="btn sm">Upload new license file</button>
+          </div>
         </div>
       </div>
 
@@ -462,10 +485,31 @@
           <div class="row-line"><div><div class="rname">Next renewal</div><div class="rdesc">Auto-renews unless cancelled</div></div><span class="id-mono">Feb 1, 2027</span></div>
           <div class="row-line"><div><div class="rname">Seats in use</div></div><span class="id-mono">342 / 350</span></div>
           <div class="beam" style="width:100%;height:7px;margin-top:2px;"><i style="width:98%;background:var(--indigo)"></i></div>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-top:14px;">
+            <div class="row-line"><div><div class="rname">Agent seats (Service desk)</div><div class="rdesc">Ticket-handling agents, on-call, approvers</div></div><span class="id-mono">210 / 215</span></div>
+            <div class="row-line"><div><div class="rname">Dev seats (Boards &amp; sprints)</div><div class="rdesc">Sprint boards, backlog, dev tooling</div></div><span class="id-mono">96 / 99</span></div>
+            <div class="row-line"><div><div class="rname">Admin &amp; viewer seats</div><div class="rdesc">Settings-only or read-only access — fully allocated</div></div><span class="id-mono">36 / 36</span></div>
+          </div>
           <div style="display:flex;gap:10px;margin-top:14px;">
             <button class="btn sm primary">Upgrade to Enterprise</button>
             <button class="btn sm">Add seats</button>
             <button class="btn sm">Cancel subscription</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-label">Self-Service Portal users</div>
+          <div class="page-desc" style="margin:-4px 0 10px;">Employees who submit tickets through the SSP — unlimited on Business and above, doesn't consume a paid seat.</div>
+          <div class="row-line"><div><div class="rname">Active SSP accounts</div><div class="rdesc">Auto-provisioned on Azure AD sync</div></div><span class="id-mono">1,842 / Unlimited</span></div>
+        </div>
+
+        <div class="card">
+          <div class="section-label">AI Agent licenses</div>
+          <div class="page-desc" style="margin:-4px 0 10px;">Paid add-on, billed separately from named user seats — one license per active AI agent instance.</div>
+          <div class="row-line"><div><div class="rname">AI Agent — Service desk</div><div class="rdesc">Triage, auto-resolution, drafts and sends ticket replies</div></div><span class="id-mono">2 / 3</span></div>
+          <div class="row-line"><div><div class="rname">AI Agent — Coding</div><div class="rdesc">Picks up backlog items, writes the change, opens a PR for review</div></div><span class="id-mono">1 / 2</span></div>
+          <div style="display:flex;gap:10px;margin-top:14px;">
+            <button class="btn sm primary">Add AI Agent license</button>
           </div>
         </div>
 
