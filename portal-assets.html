@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — my assets</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .ma-row{display:grid;grid-template-columns:44px 1.4fr 1fr 1fr auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .ma-row > .badge{justify-self:start;}
+  .ma-row:last-child{border-bottom:none;}
+  .ma-ic{width:36px;height:36px;border-radius:9px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .ma-name{font-weight:600;}
+  .ma-tag{font-size:12px;color:var(--ink-muted);margin-top:2px;font-family:var(--font-mono);}
+  @media (max-width:800px){ .ma-row{grid-template-columns:36px 1fr;row-gap:4px;} .ma-row > *:nth-child(3),.ma-row > *:nth-child(4){grid-column:2;} }
+</style>
+</head>
+<body>
+<div class="portal-header">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="portal-links">
+    <a href="portal-home.html">Home</a>
+    <a href="portal-workcentre.html">Work Centre</a>
+    <a href="contact.html">Contact us</a>
+    <a class="cta" href="login.html">Sign out</a>
+  </div>
+</div>
+
+<div class="portal-wrap wide">
+  <div class="page-head">
+    <div><div class="page-title">My Assets</div><div class="page-desc">Hardware and software licensed to you — report an issue or request a change, no need to know who owns what.</div></div>
+  </div>
+
+  <div class="card">
+    <div class="ma-row" style="font-family:var(--font-mono);font-size:10.5px;color:var(--ink-muted);text-transform:uppercase;border-bottom:1px solid var(--border);">
+      <span></span><span>Asset</span><span>Status</span><span>Since</span><span></span>
+    </div>
+
+    <div class="ma-row">
+      <div class="ma-ic">💻</div>
+      <div><div class="ma-name">MacBook Pro 14" (engineering build)</div><div class="ma-tag">AST-2291</div></div>
+      <span class="badge ok">Active</span>
+      <span>Mar 3, 2023</span>
+      <a href="desk-log-ticket.html" class="btn sm">Report an issue</a>
+    </div>
+
+    <div class="ma-row">
+      <div class="ma-ic">🖥️</div>
+      <div><div class="ma-name">Dell 27" monitor</div><div class="ma-tag">AST-2292</div></div>
+      <span class="badge ok">Active</span>
+      <span>Mar 3, 2023</span>
+      <a href="desk-log-ticket.html" class="btn sm">Report an issue</a>
+    </div>
+
+    <div class="ma-row">
+      <div class="ma-ic">📱</div>
+      <div><div class="ma-name">iPhone 14 (company mobile)</div><div class="ma-tag">AST-2318</div></div>
+      <span class="badge ok">Active</span>
+      <span>Jun 20, 2023</span>
+      <a href="desk-catalog.html" class="btn sm">Request replacement</a>
+    </div>
+
+    <div class="ma-row">
+      <div class="ma-ic">🔑</div>
+      <div><div class="ma-name">Microsoft 365 E3 license</div><div class="ma-tag">SW-0044</div></div>
+      <span class="badge ok">Active</span>
+      <span>Mar 3, 2023</span>
+      <a href="contact.html" class="btn sm">Get help</a>
+    </div>
+
+    <div class="ma-row">
+      <div class="ma-ic">🎨</div>
+      <div><div class="ma-name">Figma Professional</div><div class="ma-tag">SW-0118</div></div>
+      <span class="badge warn">Renewing — confirm access</span>
+      <span>Jul 14, 2024</span>
+      <a href="portal-workcentre.html" class="btn sm">View ticket</a>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px;">
+    <div class="section-label">Don't see something you use?</div>
+    <div class="page-desc" style="margin-top:2px;">Assets sync from IT's inventory — if something's missing or assigned to the wrong person, <a href="contact.html" style="color:var(--indigo-text);">contact support</a> rather than editing it yourself.</div>
+  </div>
+</div>
+<script src="portal-chrome.js" defer></script>
+</body>
+</html>

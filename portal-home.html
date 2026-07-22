@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — home</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .ph-search{position:relative;max-width:560px;margin:22px auto 0;}
+  .ph-search input{margin:0;padding:13px 16px 13px 42px;border-radius:999px;font-size:14px;}
+  .ph-search svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--ink-muted);}
+  .ph-tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:30px 0;}
+  .ph-tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 14px;text-align:center;text-decoration:none;color:var(--ink);box-shadow:var(--shadow-sm);transition:box-shadow .15s ease,transform .15s ease;}
+  .ph-tile:hover{box-shadow:var(--shadow-md);transform:translateY(-1px);}
+  .ph-tile .ic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12.5px;font-family:var(--font-display);margin:0 auto 10px;}
+  .ph-tile .tt{font-size:12.5px;font-weight:600;}
+  .ph-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:start;}
+  .ph-list-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+  .ph-list-row:last-child{border-bottom:none;}
+  .ph-list-row .t{font-weight:600;color:var(--ink);}
+  .ph-list-row .s{color:var(--ink-muted);margin-top:2px;}
+  @media (max-width:900px){ .ph-tiles{grid-template-columns:repeat(3,1fr);} .ph-cols{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="portal-header">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="portal-links">
+    <a href="desk-log-ticket.html">Log a ticket</a>
+    <a href="portal-workcentre.html">Work Centre</a>
+    <a href="contact.html">Contact us</a>
+    <a class="cta" href="login.html">Sign out</a>
+  </div>
+</div>
+
+<div class="portal-wrap wide">
+  <div style="text-align:center;">
+    <div class="page-title" style="font-size:28px;">Hello J. Okoye</div>
+    <div class="page-desc">Welcome to the Self-Service Portal.</div>
+    <div class="ph-search">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="7" cy="7" r="5.2"/><path d="M11 11l3.5 3.5"/></svg>
+      <input type="text" placeholder="Search for help, articles, or a service…">
+    </div>
+  </div>
+
+  <div class="ph-tiles">
+    <a class="ph-tile" href="desk-log-ticket.html"><div class="ic" style="background:var(--indigo-bg);color:var(--indigo-text);">RR</div><div class="tt">Record &amp; Report</div></a>
+    <a class="ph-tile" href="desk-catalog.html"><div class="ic" style="background:var(--violet-bg);color:var(--violet-text);">RS</div><div class="tt">Request Service</div></a>
+    <a class="ph-tile" href="portal-workcentre.html"><div class="ic" style="background:var(--amber-bg);color:var(--amber-text);">WC</div><div class="tt">Work Centre</div></a>
+    <a class="ph-tile" href="portal-assets.html"><div class="ic" style="background:var(--coral-bg);color:var(--coral-text);">MA</div><div class="tt">My Assets</div></a>
+    <a class="ph-tile" href="desk-kb.html"><div class="ic" style="background:var(--green-bg);color:var(--green-text);">KB</div><div class="tt">Knowledge</div></a>
+    <a class="ph-tile" href="contact.html"><div class="ic" style="background:var(--surface-2);color:var(--ink-2);">CU</div><div class="tt">Contact Us</div></a>
+  </div>
+
+  <div class="ph-cols">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div class="section-label" style="margin-bottom:0;">My tickets</div>
+        <a href="track.html" style="font-size:12px;color:var(--indigo-text);font-weight:600;text-decoration:none;">View all →</a>
+      </div>
+      <div class="ph-list-row"><div><div class="t">TS-4790</div><div class="s">VPN disconnects on my laptop</div></div><span class="badge info">In progress</span></div>
+      <div class="ph-list-row"><div><div class="t">TS-4833</div><div class="s">Password reset — locked out</div></div><span class="badge ok">Resolved</span></div>
+      <div class="ph-list-row"><div><div class="t">TS-4842</div><div class="s">Figma license renewal</div></div><span class="badge warn">Awaiting your confirmation</span></div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div class="section-label" style="margin-bottom:0;">Top services</div>
+        <a href="desk-catalog.html" style="font-size:12px;color:var(--indigo-text);font-weight:600;text-decoration:none;">View all →</a>
+      </div>
+      <div class="ph-list-row"><div class="t">⭐ New starter onboarding</div></div>
+      <div class="ph-list-row"><div class="t">⭐ Laptop request</div></div>
+      <div class="ph-list-row"><div class="t">⭐ Software license</div></div>
+      <div class="ph-list-row"><div class="t">⭐ Access request</div></div>
+      <div class="ph-list-row"><div class="t">⭐ Mobile device</div></div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div class="section-label" style="margin-bottom:0;">Knowledge share</div>
+        <a href="desk-kb.html" style="font-size:12px;color:var(--indigo-text);font-weight:600;text-decoration:none;">View all →</a>
+      </div>
+      <div class="ph-list-row"><div class="t">❓ Password &amp; MFA self-service</div></div>
+      <div class="ph-list-row"><div class="t">❓ VPN troubleshooting</div></div>
+      <div class="ph-list-row"><div class="t">❓ How to request a laptop</div></div>
+      <div class="ph-list-row"><div class="t">❓ Setting up email on mobile</div></div>
+      <div class="ph-list-row"><div class="t">❓ Booking a meeting room</div></div>
+    </div>
+  </div>
+</div>
+<script src="portal-chrome.js" defer></script>
+</body>
+</html>

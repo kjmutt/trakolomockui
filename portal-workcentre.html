@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — work centre</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .wc-row{display:grid;grid-template-columns:110px 1fr 160px 90px;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .wc-row > .badge{justify-self:start;}
+  .wc-row:last-child{border-bottom:none;}
+  .wc-subject{font-weight:600;}
+  .wc-meta{font-size:12px;color:var(--ink-muted);margin-top:2px;}
+  .wc-eye{background:none;border:1px solid var(--border);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--indigo-text);}
+  .wc-eye:hover{background:var(--indigo-bg);}
+  @media (max-width:700px){ .wc-row{grid-template-columns:1fr;gap:4px;} }
+</style>
+</head>
+<body>
+<div class="portal-header">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="portal-links">
+    <a href="portal-home.html">Home</a>
+    <a href="portal-assets.html">My Assets</a>
+    <a href="contact.html">Contact us</a>
+    <a class="cta" href="login.html">Sign out</a>
+  </div>
+</div>
+
+<div class="portal-wrap wide">
+  <div class="page-head">
+    <div><div class="page-title">Work Centre</div><div class="page-desc">Tickets and tasks that need your input — quick view, update, or close without leaving this page.</div></div>
+  </div>
+
+  <div class="card">
+    <div class="wc-row" style="font-family:var(--font-mono);font-size:10.5px;color:var(--ink-muted);text-transform:uppercase;border-bottom:1px solid var(--border);">
+      <span>Ticket</span><span>Subject</span><span>Status</span><span></span>
+    </div>
+    <div id="wc-rows"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeSO()"></div>
+<div class="slideover" id="slideover">
+  <div class="so-head">
+    <div>
+      <div class="id-mono" id="so-id" style="margin-bottom:4px;"></div>
+      <div style="font-family:var(--font-display);font-size:18px;font-weight:700;" id="so-subject"></div>
+    </div>
+    <button class="so-close" onclick="closeSO()">✕</button>
+  </div>
+  <div class="so-body" id="so-body"></div>
+</div>
+
+<script>
+const TICKETS = {
+  'TS-4790': {subject:'VPN disconnects on my laptop', status:'In progress', statusBadge:'info', category:'Network & wifi', updated:'25m ago',
+    asset:'MacBook Pro 14" — AST-2291',
+    timeline:[
+      {av:'RK', name:'Raj K.', time:'25m ago', text:'Reproduced the disconnects on a test device — looks tied to an AP firmware update. Working with networking now.'},
+      {av:'SY', name:'System', time:'Yesterday', text:'Ticket triaged and assigned to Raj K.'}
+    ], canClose:false},
+  'TS-4833': {subject:'Password reset — locked out after new phone', status:'Resolved', statusBadge:'ok', category:'Account security', updated:'3 days ago',
+    asset:null,
+    timeline:[
+      {av:'AI', name:'Trakolo AI agent', time:'3 days ago', text:'Identity verified, password reset and MFA re-enrolled. Resolved — no human touch needed.'}
+    ], canClose:false},
+  'TS-4842': {subject:'Figma license renewal', status:'Awaiting your confirmation', statusBadge:'warn', category:'Software & access', updated:'2h ago',
+    asset:'Figma Professional — SW-0118',
+    timeline:[
+      {av:'SM', name:'Sara M.', time:'2h ago', text:'Renewed your Figma seat for another 12 months. Confirm you can still access it and I\'ll close this out.'},
+      {av:'SY', name:'System', time:'Yesterday', text:'Ticket logged from the renewal reminder — license was expiring in 5 days.'}
+    ], canClose:true}
+};
+
+function renderRows(){
+  document.getElementById('wc-rows').innerHTML = Object.entries(TICKETS).map(([id,t]) => `
+    <div class="wc-row">
+      <span class="id-mono">${id}</span>
+      <div><div class="wc-subject">${t.subject}</div><div class="wc-meta">${t.category} · updated ${t.updated}</div></div>
+      <span class="badge ${t.statusBadge}">${t.status}</span>
+      <button class="wc-eye" title="Quick view" onclick="openTicket('${id}')">👁</button>
+    </div>`).join('');
+}
+
+function openTicket(id){
+  const t = TICKETS[id];
+  document.getElementById('so-id').textContent = id;
+  document.getElementById('so-subject').textContent = t.subject;
+  document.getElementById('so-body').innerHTML = `
+    <div class="section-label">Status</div>
+    <span class="badge ${t.statusBadge}" style="font-size:12.5px;padding:6px 12px;">${t.status}</span>
+
+    ${t.asset ? `<div class="section-label" style="margin-top:20px;">Linked asset</div><div style="font-size:13px;color:var(--ink-2);">${t.asset}</div>` : ''}
+
+    <div class="section-label" style="margin-top:20px;">Timeline</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      ${t.timeline.map(m => `<div style="display:flex;gap:11px;"><div class="who"><div class="av">${m.av}</div></div><div style="font-size:13px;"><b>${m.name}</b> <span style="color:var(--ink-muted);font-size:12px;">· ${m.time}</span><div style="color:var(--ink-2);margin-top:2px;">${m.text}</div></div></div>`).join('')}
+    </div>
+
+    <div class="section-label" style="margin-top:20px;">Add an update</div>
+    <textarea id="wc-update-${id}" placeholder="Add a note or answer a question…"></textarea>
+    <div style="display:flex;gap:10px;margin-top:12px;">
+      <button class="btn primary" onclick="submitUpdate('${id}')">Send update</button>
+      ${t.canClose ? `<button class="btn sm" onclick="closeTicket('${id}')">Close ticket</button>` : ''}
+    </div>
+    <div id="wc-toast-${id}" style="display:none;margin-top:12px;font-size:12.5px;color:var(--indigo-text);background:var(--indigo-bg);border-radius:var(--r-sm);padding:9px 12px;"></div>`;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('slideover').classList.add('open');
+}
+function closeSO(){
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('slideover').classList.remove('open');
+}
+function submitUpdate(id){
+  const ta = document.getElementById('wc-update-'+id);
+  if(!ta.value.trim()) return;
+  const toast = document.getElementById('wc-toast-'+id);
+  toast.style.display = 'block';
+  toast.textContent = 'Update sent — the assigned agent has been notified.';
+  ta.value = '';
+}
+function closeTicket(id){
+  TICKETS[id].status = 'Closed';
+  TICKETS[id].statusBadge = 'ok';
+  TICKETS[id].canClose = false;
+  renderRows();
+  closeSO();
+}
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSO(); });
+renderRows();
+</script>
+<script src="portal-chrome.js" defer></script>
+</body>
+</html>

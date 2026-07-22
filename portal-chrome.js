@@ -40,6 +40,9 @@
     '</div>' +
     '<div class="chrome-pop" id="portal-chrome-menu">' +
       '<div class="chrome-menu-id"><span class="avatar" style="width:34px;height:34px;">' + initials + '</span><span><b>' + name + '</b><span class="cn-sub">Senior Product Analyst · Engineering</span></span></div>' +
+      '<a class="chrome-menu-item" href="portal-home.html">🏠 Home</a>' +
+      '<a class="chrome-menu-item" href="portal-workcentre.html">🗂 Work Centre</a>' +
+      '<a class="chrome-menu-item" href="portal-assets.html">💻 My Assets</a>' +
       '<a class="chrome-menu-item" href="portal-hr.html">🪪 My HR info</a>' +
       '<a class="chrome-menu-item" href="track.html">🎫 Track a ticket</a>' +
       '<a class="chrome-menu-item" href="desk-log-ticket.html">✎ Log a ticket</a>' +
