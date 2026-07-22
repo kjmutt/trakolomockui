@@ -86,7 +86,7 @@ const columns = [
   {name:"Backlog", cards:["DEV-1042","DEV-1039"]},
   {name:"In progress", cards:["DEV-1031","DEV-1028"]},
   {name:"In review", cards:["DEV-1019","DEV-1014"]},
-  {name:"Done", cards:["DEV-1002","DEV-0997","DEV-1058","DEV-1063"]}
+  {name:"Done", cards:["DEV-1002","DEV-0997","DEV-1058","DEV-1063","DEV-1067"]}
 ];
 
 const cards = {
@@ -131,6 +131,14 @@ const cards = {
       {av:"TK",name:"Tomas K.",time:"1 day ago",text:"PR #486 merged. Opened change request CR-0092 to promote from PRE to PROD — awaiting approval."},
       {av:"NP",name:"Nadia P.",time:"2 days ago",text:"Reviewed PR #486 — query plan looks right, confirmed the index doesn't collide with the nightly reindex job."},
       {av:"TK",name:"Tomas K.",time:"2 days ago",text:"UAT sign-off — p95 on the asset list endpoint dropped from 640ms to 90ms."}
+    ]},
+  "DEV-1067":{due:24, title:"Ship AP firmware 4.2.2 profile — root-cause fix for PRB-0007", tags:["backend","infra","P1"], av:"RK", pts:3, problem:"PRB-0007", changeRequest:"CR-0093", sprint:"Sprint 34",
+    desc:"Root-cause fix for problem PRB-0007 (VPN drops after AP firmware update): rolls out AP firmware 4.2.2 with 802.11r fast transition re-enabled safely, replacing the interim fleet-wide workaround. Built and verified across DEV, INT, and UAT before merge — promotion to PROD goes through change management, not this board.",
+    subtasks:[["Build &amp; unit test in DEV",true],["Verify in INT",true],["UAT sign-off",true],["Open PR",true],["Code review",true],["Merge PR",true]],
+    comments:[
+      {av:"RK",name:"Raj K.",time:"1 day ago",text:"PR #491 merged. Opened change request CR-0093 to promote from PRE to PROD — awaiting approval."},
+      {av:"RK",name:"Raj K.",time:"2 days ago",text:"UAT sign-off — verified against the roaming-laptop scenario from PRB-0007, zero drops over 48 hours."},
+      {av:"RK",name:"Raj K.",time:"2 days ago",text:"Verified in INT against the vendor's 4.2.2 beta build."}
     ]}
 };
 
@@ -173,6 +181,7 @@ function openCard(id){
       <tr><td style="color:var(--ink-2);padding:6px 0;">Sprint</td><td style="text-align:right;">${c.sprint || 'Sprint 34'}</td></tr>
       ${c.pair ? `<tr><td style="color:var(--ink-2);padding:6px 0;">Assignees</td><td style="text-align:right;">${c.pair} · <span style="color:var(--violet-text);font-weight:600;">pairing</span></td></tr>` : ''}
       ${c.ticket ? `<tr><td style="color:var(--ink-2);padding:6px 0;">Source ticket</td><td style="text-align:right;"><a href="desk.html" style="color:var(--indigo-text);">${c.ticket} →</a></td></tr>` : (c.changeRequest ? `<tr><td style="color:var(--ink-2);padding:6px 0;">Source ticket</td><td style="text-align:right;color:var(--ink-muted);">None — created directly on the board</td></tr>` : '')}
+      ${c.problem ? `<tr><td style="color:var(--ink-2);padding:6px 0;">Problem</td><td style="text-align:right;"><a href="desk-problems.html" style="color:var(--indigo-text);">${c.problem} →</a></td></tr>` : ''}
       ${c.changeRequest ? `<tr><td style="color:var(--ink-2);padding:6px 0;">Change request</td><td style="text-align:right;"><a href="desk.html" style="color:var(--indigo-text);">${c.changeRequest} →</a></td></tr>` : ''}
     </table>
 
@@ -208,7 +217,7 @@ function renderListView(){
 function renderCalView(){
   const byDay = {};
   Object.entries(cards).forEach(([id,c]) => { (byDay[c.due] = byDay[c.due] || []).push([id,c]); });
-  const deploys = {20:['CR-0091 · deploy 02:00 UTC'], 22:['CR-0092 · window 03:00 UTC']};
+  const deploys = {20:['CR-0091 · deploy 02:00 UTC'], 22:['CR-0092 · window 03:00 UTC'], 24:['CR-0093 · window 02:00 UTC']};
   let html = '';
   for(let i=0;i<2;i++) html += '<div class="cal-day blank"></div>';
   for(let d=1;d<=31;d++){

@@ -138,6 +138,12 @@ const tickets = {
     activity:[
       {av:"TK",name:"Tomas K.",time:"Jul 19",text:"Selected deployment window: Jul 22, 03:00–04:00 UTC — off-peak slot for the index migration."},
       {av:"TK",name:"Tomas K.",time:"Jul 19",text:"Submitted after PR #486 merged and passed DEV, INT, and UAT. No source ticket — this started as a backlog item, not a use case. Risk: Low. Rollback: drop the new index, revert query."}
+    ]},
+  "CR-0093": {due:24, subject:"Change request: Roll out AP firmware 4.2.2 — root-cause fix for PRB-0007", requester:"Raj K.", priority:"warn", priorityLabel:"High", category:"Change request", source:"Change management", slaLabel:"awaiting approval", slaPct:40, slaColor:"var(--amber)", assigneeAv:"NP", assignee:"Nadia P. (manager)", status:"Pending approval", statusBadge:"warn", escalation:null,
+    linked:[["Problem","PRB-0007 · workaround posted","desk-problems.html"],["Sprint card","DEV-1067 · Sprint 34","dev.html"]],
+    activity:[
+      {av:"RK",name:"Raj K.",time:"Jul 20",text:"Selected deployment window: Jul 24, 02:00–04:00 UTC — replaces the interim fast-transition workaround with the vendor's permanent fix."},
+      {av:"RK",name:"Raj K.",time:"Jul 20",text:"Submitted after PR #491 merged and passed DEV, INT, and UAT. Closes out problem PRB-0007. Risk: Medium — firmware rollback plan on file."}
     ]}
 };
 
