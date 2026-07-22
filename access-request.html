@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — environment &amp; DevOps access request</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .trail{display:flex;flex-direction:column;gap:10px;margin-top:18px;}
+  .trail-step{display:flex;gap:11px;align-items:flex-start;font-size:13px;opacity:0;animation:stepIn .25s ease forwards;}
+  @keyframes stepIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+  .trail-step .si{width:20px;height:20px;border-radius:50%;background:var(--indigo-bg);color:var(--indigo-text);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+  .trail-step .st{color:var(--ink-2);}
+  .result-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);padding:16px 18px;margin-top:14px;}
+  .result-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:13px;}
+  .env-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px;}
+  .env-cell{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 8px;text-align:center;}
+  .env-cell .en{font-size:10.5px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.5px;color:var(--ink-muted);}
+  .env-cell .ev{font-size:15px;margin-top:5px;}
+  .env-cell.granted{border-color:#A9E0CD;background:var(--indigo-bg);}
+  .env-cell.granted .ev{color:var(--indigo-text);}
+  @media (max-width:640px){ .env-grid{grid-template-columns:repeat(2,1fr);} }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a class="active" href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="docs.html">Docs</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+
+<div class="wrap" style="max-width:900px;">
+  <div class="page-head">
+    <div><div class="page-title">Environment &amp; DevOps access</div><div class="page-desc">Access is granted by role, scoped to one project at a time — never blanket, never self-selected.</div></div>
+    <a href="desk-catalog.html" class="btn">← Back to Service catalog</a>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Request access</div>
+    <label>Project</label>
+    <select id="ar-project">
+      <option>Service desk (ITSM)</option>
+      <option>Boards &amp; sprints</option>
+      <option>Asset management (SAM)</option>
+      <option>Self-service portal</option>
+      <option>Reporting &amp; compliance</option>
+      <option>Change management (ITSM)</option>
+    </select>
+    <label>Your role on this project</label>
+    <select id="ar-role" onchange="renderPolicy()">
+      <option value="Developer">Developer</option>
+      <option value="QA / Tester">QA / Tester</option>
+      <option value="DBA">DBA</option>
+      <option value="DevOps engineer">DevOps engineer</option>
+      <option value="Release manager">Release manager</option>
+    </select>
+    <label>Reason for access</label>
+    <textarea id="ar-reason" placeholder="e.g. Joining the sprint team, need to debug the DEV build locally"></textarea>
+
+    <div class="section-label" style="margin-top:18px;">Access policy preview</div>
+    <div id="ar-policy-note" class="page-desc" style="margin:-2px 0 4px;"></div>
+    <div class="env-grid" id="ar-env-grid"></div>
+
+    <div id="ar-error" class="hint" style="display:none;background:var(--coral-bg);border-color:#F0C1B6;color:var(--coral-text);"></div>
+    <button class="btn primary" id="ar-submit" style="margin-top:16px;" onclick="submitAccess()">Submit access request</button>
+
+    <div class="trail" id="ar-trail"></div>
+    <div class="result-card" id="ar-result" style="display:none;"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">How access is scoped, by role</div>
+    <table>
+      <thead><tr><th>Role</th><th>DEV</th><th>INT</th><th>UAT</th><th>PRE</th><th>PROD</th><th>Approval</th></tr></thead>
+      <tbody>
+        <tr><td>Developer</td><td class="id-mono">Server + app</td><td>—</td><td>—</td><td>—</td><td>—</td><td>Pre-approved</td></tr>
+        <tr><td>QA / Tester</td><td class="id-mono">App</td><td class="id-mono">App</td><td class="id-mono">App</td><td>—</td><td>—</td><td>Pre-approved</td></tr>
+        <tr><td>DBA</td><td class="id-mono">DB only</td><td class="id-mono">DB only</td><td class="id-mono">DB only</td><td class="id-mono">DB only</td><td class="id-mono">DB only</td><td>Pre-approved</td></tr>
+        <tr><td>DevOps engineer</td><td class="id-mono">Server + pipeline</td><td class="id-mono">Server + pipeline</td><td class="id-mono">Server + pipeline</td><td class="id-mono">Server + pipeline</td><td>Elevated request only</td><td>Manager sign-off</td></tr>
+        <tr><td>Release manager</td><td class="id-mono">Pipeline approval</td><td class="id-mono">Pipeline approval</td><td class="id-mono">Pipeline approval</td><td class="id-mono">Pipeline approval</td><td class="id-mono">Pipeline approval</td><td>Manager sign-off</td></tr>
+      </tbody>
+    </table>
+    <div class="page-desc" style="margin-top:10px;">No role gets OS/server access <i>and</i> database access at once, and nobody but Infra can create or resize the machines behind these environments — see <a href="machine-request.html" style="color:var(--indigo-text);">Machine request</a> for that.</div>
+  </div>
+</div>
+
+<script>
+const POLICY = {
+  "Developer":       {envs:["DEV"],                          kind:"Server + app access",   approval:"pre",  note:"Developers get server and app access to their project's DEV environment only — nothing upstream."},
+  "QA / Tester":     {envs:["DEV","INT","UAT"],               kind:"App access",             approval:"pre",  note:"QA gets app-level access through UAT to test promoted builds — no server login, no PRE/PROD."},
+  "DBA":             {envs:["DEV","INT","UAT","PRE","PROD"],  kind:"Database access only",   approval:"pre",  note:"DBAs get database access across every environment, including PROD — but never OS/server login and never machine admin rights."},
+  "DevOps engineer": {envs:["DEV","INT","UAT","PRE"],         kind:"Server + pipeline access",approval:"mgr",  note:"DevOps engineers get server and Azure DevOps pipeline access through PRE. PROD needs a separate elevated request, reviewed by the project manager."},
+  "Release manager": {envs:["DEV","INT","UAT","PRE","PROD"],  kind:"Pipeline approval rights",approval:"mgr",  note:"Release managers get Azure DevOps release-approval permissions across every environment — no direct server or database access of their own."}
+};
+const ENVS = ["DEV","INT","UAT","PRE","PROD"];
+
+function renderPolicy(){
+  const role = document.getElementById('ar-role').value;
+  const p = POLICY[role];
+  document.getElementById('ar-policy-note').textContent = p.note;
+  document.getElementById('ar-env-grid').innerHTML = ENVS.map(e => {
+    const granted = p.envs.includes(e);
+    return `<div class="env-cell ${granted?'granted':''}"><div class="en">${e}</div><div class="ev">${granted ? '✓' : '—'}</div></div>`;
+  }).join('');
+}
+
+function genAR(){ return "AR-" + String(240 + Math.floor(Math.random()*50)).padStart(4,'0'); }
+
+function submitAccess(){
+  const project = document.getElementById('ar-project').value;
+  const role = document.getElementById('ar-role').value;
+  const reason = document.getElementById('ar-reason').value.trim();
+  const errBox = document.getElementById('ar-error');
+  const p = POLICY[role];
+
+  if(!reason){
+    errBox.textContent = "Add a short reason for the request before submitting.";
+    errBox.style.display = 'flex';
+    return;
+  }
+  errBox.style.display = 'none';
+
+  const btn = document.getElementById('ar-submit');
+  btn.disabled = true; btn.style.opacity = .6;
+  const trail = document.getElementById('ar-trail');
+  const resultBox = document.getElementById('ar-result');
+  trail.innerHTML = '';
+  resultBox.style.display = 'none';
+
+  const id = genAR();
+  const scope = p.envs.length ? p.envs.join(', ') : 'none';
+  const steps = p.approval === 'pre'
+    ? [
+        `Request ${id} logged — ${role} access to <b>${project}</b>.`,
+        `Validating against the role-based access policy…`,
+        `Pre-approved by policy — ${role} access is standard for this project, no manual sign-off needed.`,
+        `Access granted: ${p.kind} on ${scope}.`,
+        `Logged to the audit trail.`
+      ]
+    : [
+        `Request ${id} logged — ${role} access to <b>${project}</b>.`,
+        `Validating against the role-based access policy…`,
+        `Routed to the project manager for approval — ${role} requests on ${project} need sign-off.`,
+        `Approved — access granted: ${p.kind} on ${scope}.`,
+        `Logged to the audit trail.`
+      ];
+
+  let i = 0;
+  function next(){
+    if(i >= steps.length){
+      resultBox.style.display = 'block';
+      resultBox.innerHTML = `
+        <div class="result-row"><span style="color:var(--ink-2);">Request</span><a href="desk-approvals.html" class="id-mono" style="color:var(--indigo-text);">${id} →</a></div>
+        <div class="result-row"><span style="color:var(--ink-2);">Project</span><span>${project}</span></div>
+        <div class="result-row"><span style="color:var(--ink-2);">Role</span><span>${role}</span></div>
+        <div class="result-row"><span style="color:var(--ink-2);">Scope granted</span><span class="id-mono">${p.kind} · ${scope}</span></div>
+        <div class="result-row"><span style="color:var(--ink-2);">Status</span><span class="badge ok">${p.approval === 'pre' ? 'Granted' : 'Approved'}</span></div>`;
+      btn.disabled = false; btn.style.opacity = 1;
+      return;
+    }
+    const el = document.createElement('div');
+    el.className = 'trail-step';
+    el.innerHTML = `<div class="si">✓</div><div class="st">${steps[i]}</div>`;
+    trail.appendChild(el);
+    i++;
+    setTimeout(next, 450);
+  }
+  next();
+}
+
+renderPolicy();
+</script>
+<script src="app-chrome.js" defer></script>
+</body>
+</html>

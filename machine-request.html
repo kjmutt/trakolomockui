@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — machine request</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .trail{display:flex;flex-direction:column;gap:10px;margin-top:18px;}
+  .trail-step{display:flex;gap:11px;align-items:flex-start;font-size:13px;opacity:0;animation:stepIn .25s ease forwards;}
+  @keyframes stepIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+  .trail-step .si{width:20px;height:20px;border-radius:50%;background:var(--indigo-bg);color:var(--indigo-text);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+  .trail-step .st{color:var(--ink-2);}
+  .result-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);padding:16px 18px;margin-top:14px;}
+  .result-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:13px;}
+  .req-type{display:flex;gap:10px;margin:6px 0 14px;}
+  .req-type label{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:400;border:1px solid var(--border);padding:8px 14px;border-radius:9px;cursor:pointer;flex:1;margin:0;}
+  .req-type input{width:auto;margin:0;}
+  .req-type label.active{border-color:var(--indigo);background:var(--indigo-bg);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a class="active" href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="docs.html">Docs</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+
+<div class="wrap" style="max-width:900px;">
+  <div class="page-head">
+    <div><div class="page-title">Machine request</div><div class="page-desc">New machine or a spec upgrade — nobody provisions or resizes one directly, this is the only path.</div></div>
+    <a href="desk-catalog.html" class="btn">← Back to Service catalog</a>
+  </div>
+
+  <div class="hint" style="margin-bottom:18px;">
+    <b>Nobody can create or resize a machine directly</b> in any environment — every request here goes through infra approval, and PRE/PROD changes are additionally gated by a change request for CAB approval.
+  </div>
+
+  <div class="card">
+    <div class="section-label">Request type</div>
+    <div class="req-type">
+      <label class="active" id="type-new"><input type="radio" name="mr-type" value="new" checked onchange="setType('new')"> New machine</label>
+      <label id="type-upgrade"><input type="radio" name="mr-type" value="upgrade" onchange="setType('upgrade')"> Upgrade existing machine</label>
+    </div>
+
+    <label>Project</label>
+    <select id="mr-project">
+      <option>Service desk (ITSM)</option>
+      <option>Boards &amp; sprints</option>
+      <option>Asset management (SAM)</option>
+      <option>Self-service portal</option>
+      <option>Reporting &amp; compliance</option>
+      <option>Change management (ITSM)</option>
+    </select>
+
+    <label>Environment</label>
+    <select id="mr-env" onchange="updateCabNote()">
+      <option>DEV</option>
+      <option>INT</option>
+      <option>UAT</option>
+      <option>PRE</option>
+      <option>PROD</option>
+    </select>
+    <div class="page-desc" id="mr-cab-note" style="margin:-4px 0 8px;"></div>
+
+    <div id="mr-new-fields">
+      <label>Machine name / purpose</label>
+      <input type="text" id="mr-name" placeholder="e.g. vm-build-agent-04">
+      <label>Operating system</label>
+      <select id="mr-os"><option>Ubuntu 22.04 LTS</option><option>Windows Server 2022</option><option>RHEL 9</option></select>
+      <label>Size</label>
+      <select id="mr-size"><option>Small — 2 vCPU / 8 GB</option><option>Medium — 4 vCPU / 16 GB</option><option>Large — 8 vCPU / 32 GB</option></select>
+    </div>
+
+    <div id="mr-upgrade-fields" style="display:none;">
+      <label>Existing machine</label>
+      <select id="mr-existing">
+        <option>vm-devbox-01 (Small — 2 vCPU / 8 GB)</option>
+        <option>vm-build-03 (Medium — 4 vCPU / 16 GB)</option>
+        <option>vm-app-uat-02 (Medium — 4 vCPU / 16 GB)</option>
+      </select>
+      <label>Target size</label>
+      <select id="mr-target-size"><option>Medium — 4 vCPU / 16 GB</option><option>Large — 8 vCPU / 32 GB</option><option>X-Large — 16 vCPU / 64 GB</option></select>
+    </div>
+
+    <label>Reason</label>
+    <textarea id="mr-reason" placeholder="e.g. New build agent for Sprint 35 — current agent queue is backing up during CI runs"></textarea>
+
+    <div id="mr-error" class="hint" style="display:none;background:var(--coral-bg);border-color:#F0C1B6;color:var(--coral-text);"></div>
+    <button class="btn primary" id="mr-submit" style="margin-top:16px;" onclick="submitMachine()">Submit machine request</button>
+
+    <div class="trail" id="mr-trail"></div>
+    <div class="result-card" id="mr-result" style="display:none;"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Recent machine requests</div>
+    <table>
+      <thead><tr><th>Request</th><th>Project</th><th>Type</th><th>Environment</th><th>Status</th></tr></thead>
+      <tbody id="mr-history">
+        <tr><td class="id-mono">MR-0052</td><td>Boards &amp; sprints</td><td>New</td><td class="id-mono">DEV</td><td><span class="badge ok">Provisioned</span></td></tr>
+        <tr><td class="id-mono">MR-0049</td><td>Asset management (SAM)</td><td>Upgrade</td><td class="id-mono">UAT</td><td><span class="badge ok">Provisioned</span></td></tr>
+        <tr><td class="id-mono">MR-0044</td><td>Reporting &amp; compliance</td><td>New</td><td class="id-mono">PROD</td><td><span class="badge ok">Provisioned — via CR-0079</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function setType(t){
+  document.getElementById('type-new').classList.toggle('active', t==='new');
+  document.getElementById('type-upgrade').classList.toggle('active', t==='upgrade');
+  document.getElementById('mr-new-fields').style.display = t==='new' ? 'block' : 'none';
+  document.getElementById('mr-upgrade-fields').style.display = t==='upgrade' ? 'block' : 'none';
+}
+function updateCabNote(){
+  const env = document.getElementById('mr-env').value;
+  const note = document.getElementById('mr-cab-note');
+  note.textContent = (env === 'PRE' || env === 'PROD')
+    ? `${env} additionally requires a change request for CAB approval before the deployment window is booked.`
+    : `${env} needs infra approval only — no CAB step for this environment.`;
+}
+function genMR(){ return "MR-" + String(53 + Math.floor(Math.random()*40)).padStart(4,'0'); }
+function genCR(){ return "CR-" + String(94 + Math.floor(Math.random()*6)).padStart(4,'0'); }
+
+function submitMachine(){
+  const project = document.getElementById('mr-project').value;
+  const env = document.getElementById('mr-env').value;
+  const type = document.querySelector('input[name="mr-type"]:checked').value;
+  const reason = document.getElementById('mr-reason').value.trim();
+  const errBox = document.getElementById('mr-error');
+
+  if(!reason){
+    errBox.textContent = "Add a short reason for the request before submitting.";
+    errBox.style.display = 'flex';
+    return;
+  }
+  errBox.style.display = 'none';
+
+  const btn = document.getElementById('mr-submit');
+  btn.disabled = true; btn.style.opacity = .6;
+  const trail = document.getElementById('mr-trail');
+  const resultBox = document.getElementById('mr-result');
+  trail.innerHTML = '';
+  resultBox.style.display = 'none';
+
+  const id = genMR();
+  const needsCab = (env === 'PRE' || env === 'PROD');
+  const detail = type === 'new'
+    ? (document.getElementById('mr-name').value.trim() || 'new machine') + ' (' + document.getElementById('mr-size').value + ')'
+    : document.getElementById('mr-existing').value + ' → ' + document.getElementById('mr-target-size').value;
+
+  const steps = [
+    `Request ${id} logged — ${type === 'new' ? 'new machine' : 'upgrade'} for <b>${project}</b> in ${env}.`,
+    `Routed to the Infra on-call lead for approval.`,
+    `Approved — ${type === 'new' ? 'provisioning' : 'resizing'} via the Azure DevOps release pipeline…`
+  ];
+  let crId = null;
+  if(needsCab){
+    crId = genCR();
+    steps.push(`Opened change request ${crId} for CAB approval — ${env} changes need a booked deployment window.`);
+  }
+  steps.push(`Machine ready — added to the <a href="dev-ownership.html" style="color:var(--indigo-text);">asset inventory</a>.`);
+
+  let i = 0;
+  function next(){
+    if(i >= steps.length){
+      resultBox.style.display = 'block';
+      resultBox.innerHTML = `
+        <div class="result-row"><span style="color:var(--ink-2);">Request</span><span class="id-mono">${id}</span></div>
+        <div class="result-row"><span style="color:var(--ink-2);">Project</span><span>${project}</span></div>
+        <div class="result-row"><span style="color:var(--ink-2);">Environment</span><span class="id-mono">${env}</span></div>
+        <div class="result-row"><span style="color:var(--ink-2);">Machine</span><span class="id-mono">${detail}</span></div>
+        ${crId ? `<div class="result-row"><span style="color:var(--ink-2);">Change request</span><a href="desk.html" class="id-mono" style="color:var(--indigo-text);">${crId} →</a></div>` : ''}
+        <div class="result-row"><span style="color:var(--ink-2);">Status</span><span class="badge ok">Provisioned</span></div>`;
+      const hist = document.getElementById('mr-history');
+      hist.insertAdjacentHTML('afterbegin', `<tr><td class="id-mono">${id}</td><td>${project}</td><td>${type === 'new' ? 'New' : 'Upgrade'}</td><td class="id-mono">${env}</td><td><span class="badge ok">Provisioned${crId ? ' — via ' + crId : ''}</span></td></tr>`);
+      btn.disabled = false; btn.style.opacity = 1;
+      return;
+    }
+    const el = document.createElement('div');
+    el.className = 'trail-step';
+    el.innerHTML = `<div class="si">✓</div><div class="st">${steps[i]}</div>`;
+    trail.appendChild(el);
+    i++;
+    setTimeout(next, 450);
+  }
+  next();
+}
+
+updateCabNote();
+</script>
+<script src="app-chrome.js" defer></script>
+</body>
+</html>
