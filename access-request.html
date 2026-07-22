@@ -87,8 +87,8 @@
         <tr><td>Developer</td><td class="id-mono">Server + app</td><td>—</td><td>—</td><td>—</td><td>—</td><td>Pre-approved</td></tr>
         <tr><td>QA / Tester</td><td class="id-mono">App</td><td class="id-mono">App</td><td class="id-mono">App</td><td>—</td><td>—</td><td>Pre-approved</td></tr>
         <tr><td>DBA</td><td class="id-mono">DB only</td><td class="id-mono">DB only</td><td class="id-mono">DB only</td><td class="id-mono">DB only</td><td class="id-mono">DB only</td><td>Pre-approved</td></tr>
-        <tr><td>DevOps engineer</td><td class="id-mono">Server + pipeline</td><td class="id-mono">Server + pipeline</td><td class="id-mono">Server + pipeline</td><td class="id-mono">Server + pipeline</td><td>Elevated request only</td><td>Manager sign-off</td></tr>
-        <tr><td>Release manager</td><td class="id-mono">Pipeline approval</td><td class="id-mono">Pipeline approval</td><td class="id-mono">Pipeline approval</td><td class="id-mono">Pipeline approval</td><td class="id-mono">Pipeline approval</td><td>Manager sign-off</td></tr>
+        <tr><td>DevOps engineer</td><td class="id-mono">Server + pipeline</td><td class="id-mono">Server + pipeline</td><td class="id-mono">Server + pipeline</td><td class="id-mono">Server + pipeline</td><td>Elevated request only</td><td>Project's approval group</td></tr>
+        <tr><td>Release manager</td><td class="id-mono">Pipeline approval</td><td class="id-mono">Pipeline approval</td><td class="id-mono">Pipeline approval</td><td class="id-mono">Pipeline approval</td><td class="id-mono">Pipeline approval</td><td>Project's approval group</td></tr>
       </tbody>
     </table>
     <div class="page-desc" style="margin-top:10px;">No role gets OS/server access <i>and</i> database access at once, and nobody but Infra can create or resize the machines behind these environments — see <a href="machine-request.html" style="color:var(--indigo-text);">Machine request</a> for that.</div>
@@ -100,10 +100,18 @@ const POLICY = {
   "Developer":       {envs:["DEV"],                          kind:"Server + app access",   approval:"pre",  note:"Developers get server and app access to their project's DEV environment only — nothing upstream."},
   "QA / Tester":     {envs:["DEV","INT","UAT"],               kind:"App access",             approval:"pre",  note:"QA gets app-level access through UAT to test promoted builds — no server login, no PRE/PROD."},
   "DBA":             {envs:["DEV","INT","UAT","PRE","PROD"],  kind:"Database access only",   approval:"pre",  note:"DBAs get database access across every environment, including PROD — but never OS/server login and never machine admin rights."},
-  "DevOps engineer": {envs:["DEV","INT","UAT","PRE"],         kind:"Server + pipeline access",approval:"mgr",  note:"DevOps engineers get server and Azure DevOps pipeline access through PRE. PROD needs a separate elevated request, reviewed by the project manager."},
+  "DevOps engineer": {envs:["DEV","INT","UAT","PRE"],         kind:"Server + pipeline access",approval:"mgr",  note:"DevOps engineers get server and Azure DevOps pipeline access through PRE. PROD needs a separate elevated request, reviewed by the project's approval group."},
   "Release manager": {envs:["DEV","INT","UAT","PRE","PROD"],  kind:"Pipeline approval rights",approval:"mgr",  note:"Release managers get Azure DevOps release-approval permissions across every environment — no direct server or database access of their own."}
 };
 const ENVS = ["DEV","INT","UAT","PRE","PROD"];
+const PROJECT_APPROVAL_GROUP = {
+  "Service desk (ITSM)": "Platform Reliability approvers",
+  "Boards & sprints": "Platform Reliability approvers",
+  "Asset management (SAM)": "Self-Service Experience approvers",
+  "Self-service portal": "Self-Service Experience approvers",
+  "Reporting & compliance": "Compliance & Reporting approvers",
+  "Change management (ITSM)": "Compliance & Reporting approvers"
+};
 
 function renderPolicy(){
   const role = document.getElementById('ar-role').value;
@@ -151,7 +159,7 @@ function submitAccess(){
     : [
         `Request ${id} logged — ${role} access to <b>${project}</b>.`,
         `Validating against the role-based access policy…`,
-        `Routed to the project manager for approval — ${role} requests on ${project} need sign-off.`,
+        `Routed to <b>${PROJECT_APPROVAL_GROUP[project]}</b> for approval — ${role} requests on ${project} need sign-off from that group.`,
         `Approved — access granted: ${p.kind} on ${scope}.`,
         `Logged to the audit trail.`
       ];
@@ -165,6 +173,7 @@ function submitAccess(){
         <div class="result-row"><span style="color:var(--ink-2);">Project</span><span>${project}</span></div>
         <div class="result-row"><span style="color:var(--ink-2);">Role</span><span>${role}</span></div>
         <div class="result-row"><span style="color:var(--ink-2);">Scope granted</span><span class="id-mono">${p.kind} · ${scope}</span></div>
+        ${p.approval === 'mgr' ? `<div class="result-row"><span style="color:var(--ink-2);">Approval group</span><span>${PROJECT_APPROVAL_GROUP[project]}</span></div>` : ''}
         <div class="result-row"><span style="color:var(--ink-2);">Status</span><span class="badge ok">${p.approval === 'pre' ? 'Granted' : 'Approved'}</span></div>`;
       btn.disabled = false; btn.style.opacity = 1;
       return;

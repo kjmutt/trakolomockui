@@ -678,6 +678,16 @@
       </div>
 
       <div class="card">
+        <div class="section-label">Approval groups</div>
+        <div class="page-desc" style="margin:-4px 0 10px;">Who signs off — change requests route to the project's owning scrum team, business-side requests (shared drives, cost-center items) route to Business users approval instead of one central approver.</div>
+        <div id="approval-groups"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <input type="text" id="new-approval-group-name" placeholder="New group name, e.g. Security approvers" style="margin:0;flex:1;">
+          <button class="btn sm" onclick="createApprovalGroup()">+ Add group</button>
+        </div>
+      </div>
+
+      <div class="card">
         <div class="section-label">Routing rules</div>
         <div class="rule-row" style="font-family:var(--font-mono);font-size:10.5px;color:var(--ink-muted);text-transform:uppercase;border-bottom:1px solid var(--border);"><span>Category</span><span>Routes to</span><span></span></div>
         <div class="rule-row"><span>Hardware</span><span>IT Ops</span><button class="btn sm">Edit</button></div>
@@ -1180,6 +1190,54 @@
     renderSupportGroups();
   }
   renderSupportGroups();
+
+  const APPROVAL_GROUPS = {
+    'Business users approval': ['NP','LA','DF'],
+    'Platform Reliability approvers': ['RK','SM','TK'],
+    'Self-Service Experience approvers': ['NP','DF'],
+    'Compliance & Reporting approvers': ['TK','SM']
+  };
+  function renderApprovalGroups(){
+    const el = document.getElementById('approval-groups');
+    el.innerHTML = Object.keys(APPROVAL_GROUPS).map(g=>{
+      const members = APPROVAL_GROUPS[g];
+      const available = Object.keys(ROSTER).filter(id=>!members.includes(id));
+      const chips = members.map(id=>`<div class="who" style="background:var(--surface-2);padding:4px 10px 4px 4px;border-radius:20px;">
+          <div class="av">${id}</div>${ROSTER[id]}
+          <button onclick="removeApprovalMember('${g}','${id}')" style="border:none;background:none;cursor:pointer;color:var(--ink-muted);font-size:13px;padding:0 0 0 2px;line-height:1;" title="Remove">×</button>
+        </div>`).join('');
+      const memberCount = members.length;
+      const addRow = available.length ? `
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <select id="add-appr-sel-${g.replace(/\s+/g,'-')}" style="margin:0;width:auto;flex:1;">${available.map(id=>`<option value="${id}">${ROSTER[id]}</option>`).join('')}</select>
+          <button class="btn sm" onclick="addApprovalMember('${g}')">+ Add member</button>
+        </div>` : '';
+      return `<div class="sub-card">
+          <div class="sc-head">${g} <span class="badge ${memberCount?'neutral':'warn'}" style="font-weight:500;">${memberCount} member${memberCount===1?'':'s'}</span></div>
+          ${memberCount ? `<div style="display:flex;gap:10px;flex-wrap:wrap;">${chips}</div>` : `<div style="font-size:12.5px;color:var(--ink-muted);">No one assigned yet — approvals routed here sit pending until someone joins.</div>`}
+          ${addRow}
+        </div>`;
+    }).join('');
+  }
+  function addApprovalMember(g){
+    const sel = document.getElementById('add-appr-sel-'+g.replace(/\s+/g,'-'));
+    if(!sel || !sel.value) return;
+    APPROVAL_GROUPS[g].push(sel.value);
+    renderApprovalGroups();
+  }
+  function removeApprovalMember(g, id){
+    APPROVAL_GROUPS[g] = APPROVAL_GROUPS[g].filter(x=>x!==id);
+    renderApprovalGroups();
+  }
+  function createApprovalGroup(){
+    const input = document.getElementById('new-approval-group-name');
+    const name = input.value.trim();
+    if(!name || APPROVAL_GROUPS[name]) return;
+    APPROVAL_GROUPS[name] = [];
+    input.value = '';
+    renderApprovalGroups();
+  }
+  renderApprovalGroups();
 
   const PERM_AREAS = ['Tickets & desk','Assets (SAM)','Dev boards','Reporting','Business rules','Billing & license','Users & roles'];
   const PERM_LEVELS = ['None','View','Edit','Full'];

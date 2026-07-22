@@ -11,7 +11,7 @@
   .appr-title{font-size:14px;font-weight:600;}
   .appr-meta{font-size:12px;color:var(--ink-muted);margin-top:3px;font-family:var(--font-mono);}
   .appr-body{font-size:13px;color:var(--ink-2);margin-top:10px;line-height:1.55;}
-  .appr-facts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px;}
+  .appr-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:12px;}
   .appr-fact{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 10px;}
   .appr-fact .fl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-muted);font-family:var(--font-mono);}
   .appr-fact .fv{font-size:12.5px;font-weight:600;margin-top:3px;}
@@ -48,7 +48,7 @@
 
 <div class="wrap" style="max-width:900px;">
   <div class="page-head">
-    <div><div class="page-title">Approvals</div><div class="page-desc">Signed in as Nadia P. — everything waiting on you, in one queue. Approve here or from the Slack notification.</div></div>
+    <div><div class="page-title">Approvals</div><div class="page-desc">Signed in as Nadia P. — everything waiting on your approval groups, in one queue. Change requests route to the project's owning team; business-side requests route to Business users approval. Approve here or from the Slack notification.</div></div>
     <span class="badge warn" id="pending-badge" style="font-size:12px;">2 pending</span>
   </div>
 
@@ -65,6 +65,7 @@
         <div class="appr-fact"><div class="fl">Risk</div><div class="fv">Low</div></div>
         <div class="appr-fact"><div class="fl">Sprint card</div><div class="fv"><a href="dev.html" style="color:var(--indigo-text);">DEV-1063</a></div></div>
         <div class="appr-fact"><div class="fl">Rollback plan</div><div class="fv">On file</div></div>
+        <div class="appr-fact"><div class="fl">Approval group</div><div class="fv">Self-Service Experience approvers</div></div>
       </div>
       <div class="appr-actions" id="actions-cr92">
         <button class="btn primary sm" onclick="decide('cr92', true)">Approve for this window</button>
@@ -78,12 +79,13 @@
         <div class="appr-meta">AR-0233 · requested by M. Alvarez · today, 10:12</div></div>
         <span class="badge warn" id="badge-ar233">Pending approval</span>
       </div>
-      <div class="appr-body">Not in a pre-approved group, so the AI agent routed it to you as data owner. Requested for the Q3 close — access auto-expires in 30 days unless renewed.</div>
+      <div class="appr-body">Not in a pre-approved group, so the AI agent routed it to the business users approval group as data owner. Requested for the Q3 close — access auto-expires in 30 days unless renewed.</div>
       <div class="appr-facts">
         <div class="appr-fact"><div class="fl">Scope</div><div class="fv">/Finance/Q3-close</div></div>
         <div class="appr-fact"><div class="fl">Duration</div><div class="fv">30 days, auto-expiry</div></div>
         <div class="appr-fact"><div class="fl">Requested via</div><div class="fv">Service catalog</div></div>
         <div class="appr-fact"><div class="fl">Manager</div><div class="fv">L. Adeyemi</div></div>
+        <div class="appr-fact"><div class="fl">Approval group</div><div class="fv">Business users approval</div></div>
       </div>
       <div class="appr-actions" id="actions-ar233">
         <button class="btn primary sm" onclick="decide('ar233', true)">Approve — 30 days</button>
