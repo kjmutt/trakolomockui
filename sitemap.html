@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="styles.css">
 <script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
 <style>
-  .sm-section{margin-bottom:26px;}
+  .sm-section{margin-bottom:26px;scroll-margin-top:104px;}
   .sm-label{display:flex;align-items:center;gap:10px;margin:0 0 10px;}
   .sm-label .name{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--ink-muted);font-family:var(--font-mono);font-weight:600;}
   .sm-label .rule{flex:1;height:1px;background:var(--border);}
@@ -16,6 +16,17 @@
   table.sm a{color:var(--indigo-text);font-weight:600;text-decoration:none;}
   table.sm a:hover{text-decoration:underline;}
   table.sm .path{font-family:var(--font-mono);font-size:11px;color:var(--ink-muted);margin-top:2px;}
+
+  .dist-wrap{margin:18px 0 26px;}
+  .dist-bar{display:flex;width:100%;height:9px;border-radius:6px;overflow:hidden;background:var(--surface-2);border:1px solid var(--border);}
+  .dist-seg{height:100%;}
+  .dist-legend{display:flex;flex-wrap:wrap;gap:7px 16px;margin-top:10px;font-size:12px;color:var(--ink-2);}
+  .dist-legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
+  .dist-legend i{width:8px;height:8px;border-radius:2px;display:inline-block;flex-shrink:0;}
+  .dist-legend b{color:var(--ink);font-family:var(--font-mono);font-weight:600;}
+
+  .sm-qnav{position:sticky;top:57px;z-index:50;display:flex;flex-wrap:wrap;gap:6px;padding:10px 0;margin-bottom:8px;background:var(--paper);border-bottom:1px solid var(--border);}
+  .sm-qnav a.chip{text-decoration:none;font-family:var(--font-mono);font-size:11px;}
 </style>
 </head>
 <body>
@@ -42,7 +53,26 @@
     <a href="index.html" class="btn">← Tile view</a>
   </div>
 
-  <div class="sm-section">
+  <div class="dist-wrap">
+    <div class="dist-bar" id="dist-bar"></div>
+    <div class="dist-legend" id="dist-legend"></div>
+  </div>
+
+  <div class="sm-qnav" id="sm-qnav">
+    <a class="chip" href="#sm-website" data-target="sm-website">Website</a>
+    <a class="chip" href="#sm-it" data-target="sm-it">IT</a>
+    <a class="chip" href="#sm-sam" data-target="sm-sam">SAM</a>
+    <a class="chip" href="#sm-dev" data-target="sm-dev">Dev</a>
+    <a class="chip" href="#sm-ops" data-target="sm-ops">Ops</a>
+    <a class="chip" href="#sm-docs" data-target="sm-docs">Docs</a>
+    <a class="chip" href="#sm-cross" data-target="sm-cross">Cross-module</a>
+    <a class="chip" href="#sm-signin" data-target="sm-signin">Sign in</a>
+    <a class="chip" href="#sm-platform" data-target="sm-platform">Platform</a>
+    <a class="chip" href="#sm-portal" data-target="sm-portal">Portal</a>
+    <a class="chip" href="#sm-admin" data-target="sm-admin">Admin</a>
+  </div>
+
+  <div class="sm-section" id="sm-website">
     <div class="sm-label"><span class="name">Website · public marketing site</span><span class="rule"></span><span class="count">8 pages</span></div>
     <div class="panel">
       <table class="sm">
@@ -61,7 +91,7 @@
     </div>
   </div>
 
-  <div class="sm-section">
+  <div class="sm-section" id="sm-it">
     <div class="sm-label"><span class="name">IT · service desk</span><span class="rule"></span><span class="count">10 pages</span></div>
     <div class="panel">
       <table class="sm">
@@ -82,7 +112,7 @@
     </div>
   </div>
 
-  <div class="sm-section">
+  <div class="sm-section" id="sm-sam">
     <div class="sm-label"><span class="name">SAM · asset tracking</span><span class="rule"></span><span class="count">4 pages</span></div>
     <div class="panel">
       <table class="sm">
@@ -97,7 +127,7 @@
     </div>
   </div>
 
-  <div class="sm-section">
+  <div class="sm-section" id="sm-dev">
     <div class="sm-label"><span class="name">Dev · boards &amp; sprints</span><span class="rule"></span><span class="count">7 pages</span></div>
     <div class="panel">
       <table class="sm">
@@ -115,7 +145,7 @@
     </div>
   </div>
 
-  <div class="sm-section">
+  <div class="sm-section" id="sm-ops">
     <div class="sm-label"><span class="name">Ops · reporting</span><span class="rule"></span><span class="count">2 pages</span></div>
     <div class="panel">
       <table class="sm">
@@ -128,7 +158,7 @@
     </div>
   </div>
 
-  <div class="sm-section">
+  <div class="sm-section" id="sm-docs">
     <div class="sm-label"><span class="name">Docs · knowledge management</span><span class="rule"></span><span class="count">2 pages</span></div>
     <div class="panel">
       <table class="sm">
@@ -141,7 +171,7 @@
     </div>
   </div>
 
-  <div class="sm-section">
+  <div class="sm-section" id="sm-cross">
     <div class="sm-label"><span class="name">Cross-module · lifecycle</span><span class="rule"></span><span class="count">3 pages</span></div>
     <div class="panel">
       <table class="sm">
@@ -155,7 +185,7 @@
     </div>
   </div>
 
-  <div class="sm-section">
+  <div class="sm-section" id="sm-signin">
     <div class="sm-label"><span class="name">Sign in</span><span class="rule"></span><span class="count">5 pages</span></div>
     <div class="panel">
       <table class="sm">
@@ -171,7 +201,7 @@
     </div>
   </div>
 
-  <div class="sm-section">
+  <div class="sm-section" id="sm-platform">
     <div class="sm-label"><span class="name">Platform · Trakolo staff only</span><span class="rule"></span><span class="count">4 pages</span></div>
     <div class="panel">
       <table class="sm">
@@ -186,7 +216,7 @@
     </div>
   </div>
 
-  <div class="sm-section">
+  <div class="sm-section" id="sm-portal">
     <div class="sm-label"><span class="name">Portal · self-service</span><span class="rule"></span><span class="count">4 pages</span></div>
     <div class="panel">
       <table class="sm">
@@ -201,7 +231,7 @@
     </div>
   </div>
 
-  <div class="sm-section">
+  <div class="sm-section" id="sm-admin">
     <div class="sm-label"><span class="name">Admin · settings</span><span class="rule"></span><span class="count">4 pages</span></div>
     <div class="panel">
       <table class="sm">
@@ -228,6 +258,40 @@
     </div>
   </div>
 </div>
+<script>
+const AREA_COUNTS = [
+  ['Website','sm-website',8,'var(--indigo)'],
+  ['IT','sm-it',10,'var(--indigo-2)'],
+  ['SAM','sm-sam',4,'var(--amber)'],
+  ['Dev','sm-dev',7,'var(--violet)'],
+  ['Ops','sm-ops',2,'var(--green)'],
+  ['Docs','sm-docs',2,'var(--ink-muted)'],
+  ['Cross-module','sm-cross',3,'var(--coral)'],
+  ['Sign in','sm-signin',5,'var(--border-strong)'],
+  ['Platform','sm-platform',4,'var(--indigo)'],
+  ['Portal','sm-portal',4,'var(--indigo-2)'],
+  ['Admin','sm-admin',4,'var(--amber)'],
+  ['This page','sitemap.html',1,'var(--border-strong)']
+];
+const smTotal = AREA_COUNTS.reduce((n,a)=>n+a[2],0);
+document.getElementById('dist-bar').innerHTML = AREA_COUNTS.map(([name,id,count,color]) =>
+  `<div class="dist-seg" style="width:${(count/smTotal*100).toFixed(2)}%;background:${color};" title="${name} — ${count} pages"></div>`
+).join('');
+document.getElementById('dist-legend').innerHTML = AREA_COUNTS.map(([name,id,count,color]) =>
+  `<span><i style="background:${color};"></i>${name} <b>${count}</b></span>`
+).join('');
+
+const smLinks = [...document.querySelectorAll('#sm-qnav a')];
+const smAreas = [...document.querySelectorAll('.sm-section')];
+const smIo = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      smLinks.forEach(l => l.classList.toggle('active', l.dataset.target === e.target.id));
+    }
+  });
+}, {rootMargin:'-110px 0px -75% 0px'});
+smAreas.forEach(a => smIo.observe(a));
+</script>
 <script src="app-chrome.js" defer></script>
 </body>
 </html>
