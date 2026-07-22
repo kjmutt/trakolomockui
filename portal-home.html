@@ -6,20 +6,51 @@
 <link rel="stylesheet" href="styles.css">
 <script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
 <style>
-  .ph-search{position:relative;max-width:560px;margin:22px auto 0;}
-  .ph-search input{margin:0;padding:13px 16px 13px 42px;border-radius:999px;font-size:14px;}
-  .ph-search svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--ink-muted);}
-  .ph-tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:30px 0;}
-  .ph-tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 14px;text-align:center;text-decoration:none;color:var(--ink);box-shadow:var(--shadow-sm);transition:box-shadow .15s ease,transform .15s ease;}
-  .ph-tile:hover{box-shadow:var(--shadow-md);transform:translateY(-1px);}
-  .ph-tile .ic{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12.5px;font-family:var(--font-display);margin:0 auto 10px;}
+  @keyframes phIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  @media (prefers-reduced-motion: reduce){ .ph-fade{animation:none !important;} }
+  .ph-hero{
+    position:relative;overflow:hidden;border-radius:var(--r-xl);
+    padding:42px 32px 34px;text-align:center;margin-bottom:26px;
+    background:
+      radial-gradient(circle at 15% 0%, rgba(93,202,165,.22), transparent 55%),
+      radial-gradient(circle at 88% 15%, rgba(12,130,102,.16), transparent 50%),
+      var(--surface);
+    border:1px solid var(--border);
+  }
+  .ph-eyebrow{font-family:var(--font-mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--indigo-text);opacity:0;animation:phIn .5s ease forwards;}
+  .ph-hero h1{font-family:var(--font-display);font-size:clamp(26px,3.4vw,34px);font-weight:700;letter-spacing:-.5px;margin:8px 0 6px;opacity:0;animation:phIn .5s ease .05s forwards;}
+  .ph-hero p{color:var(--ink-2);font-size:14px;opacity:0;animation:phIn .5s ease .1s forwards;}
+  .ph-search{position:relative;max-width:520px;margin:22px auto 0;opacity:0;animation:phIn .5s ease .15s forwards;}
+  .ph-search input{margin:0;padding:14px 70px 14px 44px;border-radius:999px;font-size:14px;border-color:var(--border-strong);box-shadow:var(--shadow-sm);}
+  .ph-search input:focus{box-shadow:var(--shadow-md);}
+  .ph-search svg{position:absolute;left:17px;top:50%;transform:translateY(-50%);color:var(--ink-muted);pointer-events:none;}
+  .ph-kbd{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-family:var(--font-mono);font-size:10.5px;color:var(--ink-muted);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:3px 7px;}
+  .ph-suggest{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-top:12px;}
+  .ph-suggest button{font-size:12px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--border);border-radius:20px;padding:6px 13px;cursor:pointer;transition:background .15s,border-color .15s;}
+  .ph-suggest button:hover{background:var(--indigo-bg);border-color:#A9E0CD;color:var(--indigo-text);}
+
+  .ph-tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin:0 0 22px;}
+  .ph-tile{position:relative;border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 14px;text-align:center;text-decoration:none;color:var(--ink);box-shadow:var(--shadow-sm);transition:box-shadow .18s ease,transform .18s ease,border-color .18s ease;opacity:0;animation:phIn .45s ease forwards;overflow:hidden;}
+  .ph-tile:nth-child(1){animation-delay:.05s;} .ph-tile:nth-child(2){animation-delay:.09s;} .ph-tile:nth-child(3){animation-delay:.13s;}
+  .ph-tile:nth-child(4){animation-delay:.17s;} .ph-tile:nth-child(5){animation-delay:.21s;} .ph-tile:nth-child(6){animation-delay:.25s;}
+  .ph-tile:hover{box-shadow:var(--shadow-lg);transform:translateY(-3px);border-color:transparent;}
+  .ph-tile .ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;transition:transform .18s ease;}
+  .ph-tile:hover .ic{transform:scale(1.08) rotate(-3deg);}
   .ph-tile .tt{font-size:12.5px;font-weight:600;}
-  .ph-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:start;}
-  .ph-list-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+
+  .ph-bento{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:16px;align-items:start;}
+  .ph-panel{opacity:0;animation:phIn .5s ease .3s forwards;}
+  .ph-panel .section-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;}
+  .ph-panel .section-label a{font-size:12px;color:var(--indigo-text);font-weight:600;text-decoration:none;text-transform:none;letter-spacing:0;font-family:var(--font-body);}
+  .ph-t-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+  .ph-t-row:last-child{border-bottom:none;}
+  .ph-t-row .t{font-weight:600;color:var(--ink);}
+  .ph-t-row .s{color:var(--ink-muted);margin-top:2px;}
+  .ph-confirm{font-size:11.5px;font-weight:600;color:#fff;background:var(--indigo);border:none;border-radius:20px;padding:6px 12px;cursor:pointer;white-space:nowrap;transition:background .15s;}
+  .ph-confirm:hover{background:var(--indigo-2);}
+  .ph-list-row{padding:9px 0;border-bottom:1px solid var(--border);font-size:12.5px;display:flex;align-items:center;gap:8px;}
   .ph-list-row:last-child{border-bottom:none;}
-  .ph-list-row .t{font-weight:600;color:var(--ink);}
-  .ph-list-row .s{color:var(--ink-muted);margin-top:2px;}
-  @media (max-width:900px){ .ph-tiles{grid-template-columns:repeat(3,1fr);} .ph-cols{grid-template-columns:1fr;} }
+  @media (max-width:960px){ .ph-tiles{grid-template-columns:repeat(3,1fr);} .ph-bento{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
@@ -37,60 +68,77 @@
 </div>
 
 <div class="portal-wrap wide">
-  <div style="text-align:center;">
-    <div class="page-title" style="font-size:28px;">Hello J. Okoye</div>
-    <div class="page-desc">Welcome to the Self-Service Portal.</div>
+  <div class="ph-hero">
+    <div class="ph-eyebrow" id="ph-eyebrow">Self-Service Portal</div>
+    <h1 id="ph-greeting">Good day, J.</h1>
+    <p>Search for a fix, request something new, or jump straight to what needs you.</p>
     <div class="ph-search">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="7" cy="7" r="5.2"/><path d="M11 11l3.5 3.5"/></svg>
       <input type="text" placeholder="Search for help, articles, or a service…">
+      <span class="ph-kbd">⌘K</span>
+    </div>
+    <div class="ph-suggest">
+      <button onclick="location.href='desk-catalog.html'">Request a laptop</button>
+      <button onclick="location.href='desk-kb.html'">Reset my password</button>
+      <button onclick="location.href='desk-log-ticket.html'">Report VPN issue</button>
+      <button onclick="location.href='portal-assets.html'">View my assets</button>
     </div>
   </div>
 
   <div class="ph-tiles">
-    <a class="ph-tile" href="desk-log-ticket.html"><div class="ic" style="background:var(--indigo-bg);color:var(--indigo-text);">RR</div><div class="tt">Record &amp; Report</div></a>
-    <a class="ph-tile" href="desk-catalog.html"><div class="ic" style="background:var(--violet-bg);color:var(--violet-text);">RS</div><div class="tt">Request Service</div></a>
-    <a class="ph-tile" href="portal-workcentre.html"><div class="ic" style="background:var(--amber-bg);color:var(--amber-text);">WC</div><div class="tt">Work Centre</div></a>
-    <a class="ph-tile" href="portal-assets.html"><div class="ic" style="background:var(--coral-bg);color:var(--coral-text);">MA</div><div class="tt">My Assets</div></a>
-    <a class="ph-tile" href="desk-kb.html"><div class="ic" style="background:var(--green-bg);color:var(--green-text);">KB</div><div class="tt">Knowledge</div></a>
-    <a class="ph-tile" href="contact.html"><div class="ic" style="background:var(--surface-2);color:var(--ink-2);">CU</div><div class="tt">Contact Us</div></a>
+    <a class="ph-tile" href="desk-log-ticket.html"><div class="ic" style="background:var(--indigo-bg);"><svg width="19" height="19" viewBox="0 0 19 19" fill="none" stroke="#066249" stroke-width="1.5"><path d="M4 3h8l3 3v10H4V3z"/><path d="M12 3v3h3"/><path d="M6.5 10h6M6.5 12.5h6M6.5 7.5h3"/></svg></div><div class="tt">Record &amp; Report</div></a>
+    <a class="ph-tile" href="desk-catalog.html"><div class="ic" style="background:var(--violet-bg);"><svg width="19" height="19" viewBox="0 0 19 19" fill="none" stroke="#534AB7" stroke-width="1.5"><rect x="3" y="3" width="5.5" height="5.5" rx="1.3"/><rect x="10.5" y="3" width="5.5" height="5.5" rx="1.3"/><rect x="3" y="10.5" width="5.5" height="5.5" rx="1.3"/><rect x="10.5" y="10.5" width="5.5" height="5.5" rx="1.3"/></svg></div><div class="tt">Request Service</div></a>
+    <a class="ph-tile" href="portal-workcentre.html"><div class="ic" style="background:var(--amber-bg);"><svg width="19" height="19" viewBox="0 0 19 19" fill="none" stroke="#854F0B" stroke-width="1.5"><rect x="2.5" y="6" width="14" height="9.5" rx="1.5"/><path d="M6.5 6V4.5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2V6"/><path d="M2.5 10h14"/></svg></div><div class="tt">Work Centre</div></a>
+    <a class="ph-tile" href="portal-assets.html"><div class="ic" style="background:var(--coral-bg);"><svg width="19" height="19" viewBox="0 0 19 19" fill="none" stroke="#993C1D" stroke-width="1.5"><rect x="3" y="3.5" width="13" height="8.5" rx="1.2"/><path d="M1.5 15.5h16"/><path d="M8 15.5l.5-3.5h2l.5 3.5"/></svg></div><div class="tt">My Assets</div></a>
+    <a class="ph-tile" href="desk-kb.html"><div class="ic" style="background:var(--green-bg);"><svg width="19" height="19" viewBox="0 0 19 19" fill="none" stroke="#3B6D11" stroke-width="1.5"><path d="M3 4.5c0-.8.7-1.3 1.5-1.2 1.8.2 3.5.9 4.5 1.9 1-1 2.7-1.7 4.5-1.9.8-.1 1.5.4 1.5 1.2v9c0 .7-.6 1.1-1.3 1.2-1.7.2-3.4.8-4.4 1.8h-1.6c-1-1-2.7-1.6-4.4-1.8-.7-.1-1.3-.5-1.3-1.2v-9z"/><path d="M9 5.2v10"/></svg></div><div class="tt">Knowledge</div></a>
+    <a class="ph-tile" href="contact.html"><div class="ic" style="background:var(--surface-2);"><svg width="19" height="19" viewBox="0 0 19 19" fill="none" stroke="var(--ink-2)" stroke-width="1.5"><path d="M3 4h13v9H8l-3.5 3v-3H3V4z"/></svg></div><div class="tt">Contact Us</div></a>
   </div>
 
-  <div class="ph-cols">
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div class="section-label" style="margin-bottom:0;">My tickets</div>
-        <a href="track.html" style="font-size:12px;color:var(--indigo-text);font-weight:600;text-decoration:none;">View all →</a>
-      </div>
-      <div class="ph-list-row"><div><div class="t">TS-4790</div><div class="s">VPN disconnects on my laptop</div></div><span class="badge info">In progress</span></div>
-      <div class="ph-list-row"><div><div class="t">TS-4833</div><div class="s">Password reset — locked out</div></div><span class="badge ok">Resolved</span></div>
-      <div class="ph-list-row"><div><div class="t">TS-4842</div><div class="s">Figma license renewal</div></div><span class="badge warn">Awaiting your confirmation</span></div>
+  <div class="ph-bento">
+    <div class="card ph-panel">
+      <div class="section-label">My tickets <a href="track.html">View all →</a></div>
+      <div class="ph-t-row"><div><div class="t">TS-4790</div><div class="s">VPN disconnects on my laptop</div></div><span class="badge info">In progress</span></div>
+      <div class="ph-t-row"><div><div class="t">TS-4833</div><div class="s">Password reset — locked out</div></div><span class="badge ok">Resolved</span></div>
+      <div class="ph-t-row" id="ph-confirm-row"><div><div class="t">TS-4842</div><div class="s">Figma license renewal</div></div><button class="ph-confirm" onclick="quickConfirm()">Confirm ✓</button></div>
     </div>
 
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div class="section-label" style="margin-bottom:0;">Top services</div>
-        <a href="desk-catalog.html" style="font-size:12px;color:var(--indigo-text);font-weight:600;text-decoration:none;">View all →</a>
-      </div>
-      <div class="ph-list-row"><div class="t">⭐ New starter onboarding</div></div>
-      <div class="ph-list-row"><div class="t">⭐ Laptop request</div></div>
-      <div class="ph-list-row"><div class="t">⭐ Software license</div></div>
-      <div class="ph-list-row"><div class="t">⭐ Access request</div></div>
-      <div class="ph-list-row"><div class="t">⭐ Mobile device</div></div>
+    <div class="card ph-panel" style="animation-delay:.35s;">
+      <div class="section-label">Top services <a href="desk-catalog.html">View all →</a></div>
+      <div class="ph-list-row"><span class="t">⭐ New starter onboarding</span></div>
+      <div class="ph-list-row"><span class="t">⭐ Laptop request</span></div>
+      <div class="ph-list-row"><span class="t">⭐ Software license</span></div>
+      <div class="ph-list-row"><span class="t">⭐ Access request</span></div>
+      <div class="ph-list-row"><span class="t">⭐ Mobile device</span></div>
     </div>
 
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div class="section-label" style="margin-bottom:0;">Knowledge share</div>
-        <a href="desk-kb.html" style="font-size:12px;color:var(--indigo-text);font-weight:600;text-decoration:none;">View all →</a>
-      </div>
-      <div class="ph-list-row"><div class="t">❓ Password &amp; MFA self-service</div></div>
-      <div class="ph-list-row"><div class="t">❓ VPN troubleshooting</div></div>
-      <div class="ph-list-row"><div class="t">❓ How to request a laptop</div></div>
-      <div class="ph-list-row"><div class="t">❓ Setting up email on mobile</div></div>
-      <div class="ph-list-row"><div class="t">❓ Booking a meeting room</div></div>
+    <div class="card ph-panel" style="animation-delay:.4s;">
+      <div class="section-label">Knowledge share <a href="desk-kb.html">View all →</a></div>
+      <div class="ph-list-row"><span class="t">❓ Password &amp; MFA self-service</span></div>
+      <div class="ph-list-row"><span class="t">❓ VPN troubleshooting</span></div>
+      <div class="ph-list-row"><span class="t">❓ How to request a laptop</span></div>
+      <div class="ph-list-row"><span class="t">❓ Setting up email on mobile</span></div>
+      <div class="ph-list-row"><span class="t">❓ Booking a meeting room</span></div>
     </div>
   </div>
 </div>
+
+<script>
+(function(){
+  var h = new Date().getHours();
+  var part = h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
+  document.getElementById('ph-greeting').textContent = 'Good ' + part + ', J.';
+})();
+document.addEventListener('keydown', function(e){
+  if((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k'){
+    e.preventDefault();
+    document.querySelector('.ph-search input').focus();
+  }
+});
+function quickConfirm(){
+  const row = document.getElementById('ph-confirm-row');
+  row.innerHTML = '<div><div class="t">TS-4842</div><div class="s">Figma license renewal</div></div><span class="badge ok">Closed — thanks!</span>';
+}
+</script>
 <script src="portal-chrome.js" defer></script>
 </body>
 </html>

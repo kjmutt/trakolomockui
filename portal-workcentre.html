@@ -6,14 +6,23 @@
 <link rel="stylesheet" href="styles.css">
 <script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
 <style>
-  .wc-row{display:grid;grid-template-columns:110px 1fr 160px 90px;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);font-size:13px;}
-  .wc-row > .badge{justify-self:start;}
-  .wc-row:last-child{border-bottom:none;}
-  .wc-subject{font-weight:600;}
+  .wc-group-label{font-family:var(--font-mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted);margin:26px 0 10px;}
+  .wc-group-label:first-child{margin-top:0;}
+  .wc-card{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--border-strong);border-radius:var(--r-md);padding:14px 16px;margin-bottom:10px;transition:box-shadow .15s ease,transform .15s ease;}
+  .wc-card:hover{box-shadow:var(--shadow-sm);transform:translateX(2px);}
+  .wc-card.needs{border-left-color:var(--amber);}
+  .wc-card.progress{border-left-color:var(--indigo);}
+  .wc-card.done{border-left-color:var(--green);opacity:.75;}
+  .wc-id{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-muted);width:70px;flex-shrink:0;}
+  .wc-subject{font-weight:600;font-size:13.5px;}
   .wc-meta{font-size:12px;color:var(--ink-muted);margin-top:2px;}
-  .wc-eye{background:none;border:1px solid var(--border);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--indigo-text);}
-  .wc-eye:hover{background:var(--indigo-bg);}
-  @media (max-width:700px){ .wc-row{grid-template-columns:1fr;gap:4px;} }
+  .wc-actions{display:flex;gap:8px;align-items:center;margin-left:auto;flex-shrink:0;}
+  .wc-eye{background:none;border:1px solid var(--border);border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-2);flex-shrink:0;}
+  .wc-eye:hover{background:var(--surface-2);}
+  .wc-confirm{font-size:12px;font-weight:600;color:#fff;background:var(--indigo);border:none;border-radius:20px;padding:8px 14px;cursor:pointer;white-space:nowrap;transition:background .15s;}
+  .wc-confirm:hover{background:var(--indigo-2);}
+  .wc-empty{text-align:center;padding:30px 0;color:var(--ink-muted);font-size:13px;}
+  @media (max-width:700px){ .wc-card{flex-wrap:wrap;} .wc-id{width:auto;} }
 </style>
 </head>
 <body>
@@ -35,12 +44,7 @@
     <div><div class="page-title">Work Centre</div><div class="page-desc">Tickets and tasks that need your input — quick view, update, or close without leaving this page.</div></div>
   </div>
 
-  <div class="card">
-    <div class="wc-row" style="font-family:var(--font-mono);font-size:10.5px;color:var(--ink-muted);text-transform:uppercase;border-bottom:1px solid var(--border);">
-      <span>Ticket</span><span>Subject</span><span>Status</span><span></span>
-    </div>
-    <div id="wc-rows"></div>
-  </div>
+  <div id="wc-rows"></div>
 </div>
 
 <div class="overlay" id="overlay" onclick="closeSO()"></div>
@@ -76,14 +80,37 @@ const TICKETS = {
     ], canClose:true}
 };
 
+function ticketCard(id, t){
+  const cls = t.canClose ? 'needs' : t.status === 'In progress' ? 'progress' : t.status === 'Closed' ? 'done' : t.statusBadge === 'ok' ? 'done' : '';
+  return `
+    <div class="wc-card ${cls}">
+      <span class="wc-id">${id}</span>
+      <div style="flex:1;min-width:0;"><div class="wc-subject">${t.subject}</div><div class="wc-meta">${t.category} · updated ${t.updated}</div></div>
+      <div class="wc-actions">
+        <span class="badge ${t.statusBadge}">${t.status}</span>
+        ${t.canClose ? `<button class="wc-confirm" onclick="quickClose('${id}')">Confirm &amp; close ✓</button>` : ''}
+        <button class="wc-eye" title="Details" onclick="openTicket('${id}')">👁</button>
+      </div>
+    </div>`;
+}
+
 function renderRows(){
-  document.getElementById('wc-rows').innerHTML = Object.entries(TICKETS).map(([id,t]) => `
-    <div class="wc-row">
-      <span class="id-mono">${id}</span>
-      <div><div class="wc-subject">${t.subject}</div><div class="wc-meta">${t.category} · updated ${t.updated}</div></div>
-      <span class="badge ${t.statusBadge}">${t.status}</span>
-      <button class="wc-eye" title="Quick view" onclick="openTicket('${id}')">👁</button>
-    </div>`).join('');
+  const entries = Object.entries(TICKETS);
+  const needsInput = entries.filter(([,t]) => t.canClose);
+  const rest = entries.filter(([,t]) => !t.canClose);
+  let html = '';
+  if(needsInput.length){
+    html += `<div class="wc-group-label">Needs your input (${needsInput.length})</div>` + needsInput.map(([id,t]) => ticketCard(id,t)).join('');
+  }
+  html += `<div class="wc-group-label">Everything else</div>` + (rest.length ? rest.map(([id,t]) => ticketCard(id,t)).join('') : `<div class="wc-empty">Nothing else waiting on you.</div>`);
+  document.getElementById('wc-rows').innerHTML = html;
+}
+function quickClose(id){
+  TICKETS[id].status = 'Closed';
+  TICKETS[id].statusBadge = 'ok';
+  TICKETS[id].canClose = false;
+  TICKETS[id].timeline.unshift({av:'JO', name:'You', time:'Just now', text:'Confirmed and closed directly from the Work Centre.'});
+  renderRows();
 }
 
 function openTicket(id){
