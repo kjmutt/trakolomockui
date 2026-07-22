@@ -5,6 +5,23 @@
 <title>Trakolo — service desk</title>
 <link rel="stylesheet" href="styles.css">
 <script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px;}
+  .dash-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow-sm);}
+  .donut{width:112px;height:112px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:6px auto 0;}
+  .donut span{background:var(--surface);width:78px;height:78px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:20px;font-weight:700;}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:12.5px;}
+  .bar-row .bl{width:110px;color:var(--ink-2);flex-shrink:0;}
+  .bar-row .bt{flex:1;height:16px;background:var(--surface-2);border-radius:5px;overflow:hidden;}
+  .bar-row .bt i{display:block;height:100%;background:var(--indigo);border-radius:5px;}
+  .bar-row .bv{width:32px;text-align:right;font-family:var(--font-mono);color:var(--ink-muted);flex-shrink:0;}
+  .legend-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-2);margin-top:8px;}
+  .legend-row i{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+  .legend-row b{margin-left:auto;font-family:var(--font-mono);color:var(--ink);}
+  .tree{display:flex;gap:4px;height:150px;margin-top:12px;}
+  .tree-seg{border-radius:8px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;font-size:13px;text-align:center;padding:4px;}
+  .tree-seg small{font-weight:500;font-size:11px;opacity:.85;}
+</style>
 </head>
 <body>
 <div class="topbar">
@@ -30,6 +47,7 @@
   <a href="desk-workload.html">Workload</a>
   <a href="desk-approvals.html">Approvals</a>
   <a href="desk-problems.html">Problems</a>
+  <a href="desk-contacts.html">Contacts</a>
   <a href="desk-kb.html">Knowledge base</a>
   <a href="desk-oncall.html">On-call</a>
 </div>
@@ -42,12 +60,13 @@
         <button class="active" data-view="list" onclick="setView('list')">☰ List</button>
         <button data-view="cards" onclick="setView('cards')">▦ Cards</button>
         <button data-view="cal" onclick="setView('cal')">▤ Calendar</button>
+        <button data-view="dash" onclick="setView('dash')">📊 Dashboard</button>
       </div>
       <button class="btn primary">New ticket</button>
     </div>
   </div>
 
-  <div class="strip">
+  <div class="strip" id="desk-strip">
     <div class="mcard info"><div class="mlabel">Open tickets</div><div class="mval">128</div><div class="mdelta">+9 since yesterday</div></div>
     <div class="mcard warn"><div class="mlabel">SLA at risk</div><div class="mval">14</div><div class="mdelta">breaching within 2h</div></div>
     <div class="mcard crit"><div class="mlabel">Escalated</div><div class="mval">5</div><div class="mdelta">awaiting L3</div></div>
@@ -74,6 +93,65 @@
     <div class="cal-title"><span>July 2026</span><span class="id-mono" style="font-size:11px;">colored by priority · click a ticket to open it</span></div>
     <div class="cal-head"><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div></div>
     <div class="cal-grid" id="cal-grid"></div>
+  </div>
+
+  <div class="dash" id="view-dash" style="display:none;">
+    <div class="strip">
+      <div class="mcard crit"><div class="mlabel">Overdue</div><div class="mval">9</div><div class="mdelta">past SLA, unresolved</div></div>
+      <div class="mcard warn"><div class="mlabel">Due today</div><div class="mval">6</div></div>
+      <div class="mcard info"><div class="mlabel">Due in 7 days</div><div class="mval">23</div></div>
+      <div class="mcard ok"><div class="mlabel">MTTA</div><div class="mval">14<span style="font-size:13px;font-weight:500;"> min</span></div><div class="mdelta">mean time to acknowledge</div></div>
+    </div>
+
+    <div class="dash-grid" style="grid-template-columns:1fr 1fr;">
+      <div class="dash-card" style="text-align:center;">
+        <div class="section-label">SLA performance</div>
+        <div class="donut" style="background:conic-gradient(var(--indigo) 0% 92%, var(--border) 92% 100%);"><span>92%</span></div>
+        <div class="page-desc" style="margin-top:10px;">Tickets resolved within their SLA window, last 30 days.</div>
+      </div>
+      <div class="dash-card" style="text-align:center;">
+        <div class="section-label">Resolved %</div>
+        <div class="donut" style="background:conic-gradient(var(--green) 0% 71%, var(--border) 71% 100%);"><span>71%</span></div>
+        <div class="page-desc" style="margin-top:10px;">Of all 128 open + closed tickets this period.</div>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="dash-card">
+        <div class="section-label">Groups</div>
+        <div class="bar-row"><span class="bl">IT Ops</span><div class="bt"><i style="width:100%;"></i></div><span class="bv">52</span></div>
+        <div class="bar-row"><span class="bl">Product &amp; Engineering</span><div class="bt"><i style="width:60%;"></i></div><span class="bv">31</span></div>
+        <div class="bar-row"><span class="bl">Infrastructure</span><div class="bt"><i style="width:35%;"></i></div><span class="bv">18</span></div>
+        <div class="bar-row"><span class="bl">Change Advisory Board</span><div class="bt"><i style="width:27%;"></i></div><span class="bv">14</span></div>
+        <div class="bar-row"><span class="bl">Security</span><div class="bt"><i style="width:17%;"></i></div><span class="bv">9</span></div>
+        <div class="bar-row"><span class="bl">Workplace</span><div class="bt"><i style="width:8%;"></i></div><span class="bv">4</span></div>
+        <div class="page-desc" style="margin-top:10px;">Open tickets by <a href="admin.html#desk" style="color:var(--indigo-text);">support group</a>.</div>
+      </div>
+
+      <div class="dash-card" style="text-align:center;">
+        <div class="section-label" style="text-align:left;">Ticket types</div>
+        <div class="donut" style="background:conic-gradient(var(--indigo) 0% 29.7%, var(--indigo-2) 29.7% 46.9%, var(--amber) 46.9% 61.7%, var(--coral) 61.7% 73.4%, var(--violet) 73.4% 82.8%, var(--green) 82.8% 100%);"><span>128</span></div>
+        <div style="text-align:left;">
+          <div class="legend-row"><i style="background:var(--indigo);"></i>Software &amp; access<b>38</b></div>
+          <div class="legend-row"><i style="background:var(--indigo-2);"></i>Network &amp; wifi<b>22</b></div>
+          <div class="legend-row"><i style="background:var(--amber);"></i>Account security<b>19</b></div>
+          <div class="legend-row"><i style="background:var(--coral);"></i>Hardware<b>15</b></div>
+          <div class="legend-row"><i style="background:var(--violet);"></i>Use case<b>12</b></div>
+          <div class="legend-row"><i style="background:var(--green);"></i>Change request<b>22</b></div>
+        </div>
+      </div>
+
+      <div class="dash-card">
+        <div class="section-label">Priority</div>
+        <div class="tree">
+          <div class="tree-seg" style="flex:53.1;background:var(--indigo);">Normal<small>68</small></div>
+          <div class="tree-seg" style="flex:24.2;background:var(--amber);">High<small>31</small></div>
+          <div class="tree-seg" style="flex:11.7;background:var(--green);">Low<small>15</small></div>
+          <div class="tree-seg" style="flex:10.9;background:var(--coral);">Urgent<small>14</small></div>
+        </div>
+        <div class="page-desc" style="margin-top:10px;">Sized by ticket count — 128 open tickets total.</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -171,7 +249,15 @@ function openTicket(id){
       <div class="track"><div class="dot done"></div><div class="seg-line done"></div><div class="dot done"></div><div class="seg-line done"></div><div class="dot current"></div><div class="seg-line"></div><div class="dot"></div></div>
       <div class="track-labels"><span>L1 triage</span><span>L2 investigation</span><span class="current">L3 on-call</span><span>Resolved</span></div>`;
   }
-  html += `<div class="section-label" style="margin-top:20px;">SLA</div>
+  html += `${t.mergedInto ? `<div class="hint" style="margin-bottom:12px;">Merged into <a href="#" onclick="openTicket('${t.mergedInto}');return false;" style="color:var(--indigo-text);font-weight:600;">${t.mergedInto} →</a> — closed as a duplicate.</div>` : `
+    <div style="display:flex;gap:8px;">
+      <button class="btn sm" onclick="toggleAction('${id}','merge')">🔗 Merge</button>
+      <button class="btn sm" onclick="toggleAction('${id}','link')">🔀 Link</button>
+      <button class="btn sm" onclick="cloneTicket('${id}')">⧉ Clone</button>
+    </div>
+    <div id="action-panel"></div>`}
+
+    <div class="section-label" style="margin-top:20px;">SLA</div>
     <div class="beam" style="width:100%;height:7px;"><i style="width:${t.slaPct}%;background:${t.slaColor}"></i></div>
     <div class="beam-label" style="margin-top:6px;">${t.slaLabel}</div>
 
@@ -212,6 +298,57 @@ function closeSO(){
   document.getElementById('slideover').classList.remove('open');
 }
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSO(); });
+
+function genNewTicketId(){ return "TS-" + (4850 + Math.floor(Math.random()*900)); }
+function otherTicketIds(id){ return Object.keys(tickets).filter(x => x !== id); }
+
+function toggleAction(id, kind){
+  const panel = document.getElementById('action-panel');
+  const others = otherTicketIds(id);
+  if(kind === 'merge'){
+    panel.innerHTML = `<div class="hint" style="margin-top:10px;flex-direction:column;align-items:stretch;gap:8px;">
+      <span>Merge <b>${id}</b> into another ticket — this one closes as a duplicate, all activity carries over.</span>
+      <div style="display:flex;gap:8px;">
+        <select id="merge-target" style="margin:0;flex:1;">${others.map(o => `<option value="${o}">${o} — ${tickets[o].subject}</option>`).join('')}</select>
+        <button class="btn sm primary" onclick="confirmMerge('${id}')">Merge</button>
+      </div>
+    </div>`;
+  } else if(kind === 'link'){
+    panel.innerHTML = `<div class="hint" style="margin-top:10px;flex-direction:column;align-items:stretch;gap:8px;">
+      <span>Link <b>${id}</b> to a related ticket — both stay open, cross-referenced under Linked work.</span>
+      <div style="display:flex;gap:8px;">
+        <select id="link-target" style="margin:0;flex:1;">${others.map(o => `<option value="${o}">${o} — ${tickets[o].subject}</option>`).join('')}</select>
+        <button class="btn sm primary" onclick="confirmLink('${id}')">Link</button>
+      </div>
+    </div>`;
+  }
+}
+
+function confirmMerge(id){
+  const target = document.getElementById('merge-target').value;
+  tickets[id].status = 'Closed — merged';
+  tickets[id].statusBadge = 'neutral';
+  tickets[id].mergedInto = target;
+  tickets[id].activity.unshift({av:'SY', name:'System', time:'Just now', text:`Merged into ${target} — closed as a duplicate.`});
+  renderRows();
+  openTicket(id);
+}
+function confirmLink(id){
+  const target = document.getElementById('link-target').value;
+  tickets[id].linked = tickets[id].linked || [];
+  tickets[id].linked.push(['Linked ticket', target, 'desk.html']);
+  tickets[target].linked = tickets[target].linked || [];
+  tickets[target].linked.push(['Linked ticket', id, 'desk.html']);
+  openTicket(id);
+}
+function cloneTicket(id){
+  const src = tickets[id];
+  const newId = genNewTicketId();
+  tickets[newId] = {due:src.due, subject:src.subject + ' (clone)', requester:src.requester, priority:src.priority, priorityLabel:src.priorityLabel, category:src.category, source:'Cloned', slaLabel:'not started', slaPct:0, slaColor:'var(--indigo)', assigneeAv:'—', assignee:'Unassigned', status:'Open', statusBadge:'neutral', escalation:null,
+    activity:[{av:'SY', name:'System', time:'Just now', text:`Cloned from ${id}.`}]};
+  renderRows();
+  openTicket(newId);
+}
 function renderCardsView(){
   document.getElementById('view-cards').innerHTML = Object.entries(tickets).map(([id,t]) => `
     <div class="tcard" onclick="openTicket('${id}')">
@@ -244,6 +381,8 @@ function setView(v){
   document.getElementById('view-list').style.display = v==='list' ? '' : 'none';
   document.getElementById('view-cards').style.display = v==='cards' ? '' : 'none';
   document.getElementById('view-cal').style.display = v==='cal' ? '' : 'none';
+  document.getElementById('view-dash').style.display = v==='dash' ? '' : 'none';
+  document.getElementById('desk-strip').style.display = v==='dash' ? 'none' : '';
 }
 
 renderRows();

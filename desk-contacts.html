@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — contacts</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .ct-row{cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a class="active" href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="docs.html">Docs</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="desk-log-ticket.html">Log a ticket</a>
+  <a href="desk-catalog.html">Service catalog</a>
+  <a href="desk.html">Service desk</a>
+  <a href="desk-workload.html">Workload</a>
+  <a href="desk-approvals.html">Approvals</a>
+  <a href="desk-problems.html">Problems</a>
+  <a class="active" href="desk-contacts.html">Contacts</a>
+  <a href="desk-kb.html">Knowledge base</a>
+  <a href="desk-oncall.html">On-call</a>
+</div>
+
+<div class="wrap">
+  <div class="page-head">
+    <div><div class="page-title">Contacts</div><div class="page-desc">Everyone who's raised a ticket — not internal users &amp; roles, that's in <a href="admin.html#users" style="color:var(--indigo-text);">Admin</a>.</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="filters">
+      <input type="text" placeholder="Search contacts…" style="margin:0;max-width:260px;">
+    </div>
+    <table>
+      <thead><tr><th>Contact</th><th>Department</th><th>Email</th><th>Tickets</th><th>Last contact</th></tr></thead>
+      <tbody id="contact-rows"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeSO()"></div>
+<div class="slideover" id="slideover">
+  <div class="so-head">
+    <div>
+      <div class="id-mono" id="so-id" style="margin-bottom:4px;"></div>
+      <div style="font-family:var(--font-display);font-size:18px;font-weight:700;" id="so-subject"></div>
+    </div>
+    <button class="so-close" onclick="closeSO()">✕</button>
+  </div>
+  <div class="so-body" id="so-body"></div>
+</div>
+
+<script>
+const CONTACTS = {
+  'J. Okoye': {dept:'Engineering', title:'Senior Product Analyst', email:'j.okoye@acme.com', tickets:['TS-4833'], last:'3 days ago'},
+  'D. Ferreira': {dept:'Engineering', title:'Software Engineer', email:'d.ferreira@acme.com', tickets:['TS-4821'], last:'25m ago'},
+  'L. Adeyemi': {dept:'Finance', title:'Finance Manager', email:'l.adeyemi@acme.com', tickets:['TS-4819'], last:'1h 40m ago'},
+  'M. Alvarez': {dept:'Finance', title:'Financial Analyst', email:'m.alvarez@acme.com', tickets:['TS-4809'], last:'3h ago'},
+  'Payroll team': {dept:'Finance', title:'Shared team account', email:'payroll@acme.com', tickets:['TS-4816'], last:'7m left on SLA'},
+  'People ops': {dept:'People Ops', title:'Shared team account', email:'peopleops@acme.com', tickets:['TS-4812'], last:'1d ago'}
+};
+
+function renderContacts(){
+  document.getElementById('contact-rows').innerHTML = Object.entries(CONTACTS).map(([name,c]) => `
+    <tr class="ct-row" onclick="openContact('${name}')">
+      <td><div class="who"><div class="av">${name.split(' ').map(w=>w[0]).join('').slice(0,2)}</div>${name}</div></td>
+      <td>${c.dept}</td>
+      <td class="id-mono">${c.email}</td>
+      <td>${c.tickets.length}</td>
+      <td class="id-mono">${c.last}</td>
+    </tr>`).join('');
+}
+
+function openContact(name){
+  const c = CONTACTS[name];
+  document.getElementById('so-id').textContent = c.dept.toUpperCase();
+  document.getElementById('so-subject').textContent = name;
+  document.getElementById('so-body').innerHTML = `
+    <div class="section-label">Details</div>
+    <table style="width:100%;font-size:13px;">
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Title</td><td style="text-align:right;">${c.title}</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Department</td><td style="text-align:right;">${c.dept}</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Email</td><td style="text-align:right;" class="id-mono">${c.email}</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Last contact</td><td style="text-align:right;" class="id-mono">${c.last}</td></tr>
+    </table>
+    <div class="section-label" style="margin-top:20px;">Ticket history</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      ${c.tickets.map(t => `<a href="desk.html" style="display:flex;justify-content:space-between;align-items:center;text-decoration:none;color:var(--ink);font-size:12.5px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;"><span style="color:var(--ink-muted);">Ticket</span><span class="id-mono" style="color:var(--indigo-text);">${t} →</span></a>`).join('')}
+    </div>`;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('slideover').classList.add('open');
+}
+function closeSO(){
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('slideover').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSO(); });
+renderContacts();
+</script>
+<script src="app-chrome.js" defer></script>
+</body>
+</html>
