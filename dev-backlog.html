@@ -5,6 +5,12 @@
 <title>Trakolo — backlog &amp; planning</title>
 <link rel="stylesheet" href="styles.css">
 <script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  #backlog-rows tr{cursor:pointer;}
+  .link-row{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border:1px solid var(--border);border-radius:9px;font-size:12.5px;margin-bottom:8px;}
+  .link-row .lk-label{color:var(--ink-muted);}
+  .link-row a{color:var(--indigo-text);font-weight:600;text-decoration:none;}
+</style>
 </head>
 <body>
 <div class="topbar">
@@ -48,13 +54,8 @@
         <div class="chip">Needs estimate</div>
       </div>
       <table>
-        <thead><tr><th>Item</th><th>Tag</th><th>Points</th><th>Priority</th><th>Owner</th></tr></thead>
-        <tbody>
-          <tr><td class="id-mono">DEV-1051</td><td>Bulk asset reassignment tool</td><td class="id-mono">5</td><td><span class="badge warn">P2</span></td><td><div class="who"><div class="av">TK</div></div></td></tr>
-          <tr><td class="id-mono">DEV-1048</td><td>Ticket macros for common requests</td><td class="id-mono">3</td><td><span class="badge crit">P1</span></td><td><div class="who"><div class="av">RK</div></div></td></tr>
-          <tr><td class="id-mono">DEV-1046</td><td>Sprint velocity chart on reports page</td><td class="id-mono">—</td><td><span class="badge neutral">Unestimated</span></td><td><div class="who"><div class="av">—</div></div></td></tr>
-          <tr><td class="id-mono">DEV-1044</td><td>Dark mode for board view</td><td class="id-mono">2</td><td><span class="badge neutral">P3</span></td><td><div class="who"><div class="av">NP</div></div></td></tr>
-        </tbody>
+        <thead><tr><th>Item</th><th>Title</th><th>Tag</th><th>Points</th><th>Priority</th><th>Owner</th><th>Linked</th></tr></thead>
+        <tbody id="backlog-rows"></tbody>
       </table>
     </div>
   </div>
@@ -79,6 +80,96 @@
     </div>
   </div>
 </div>
+
+<div class="overlay" id="overlay" onclick="closeSO()"></div>
+<div class="slideover" id="slideover">
+  <div class="so-head">
+    <div>
+      <div class="id-mono" id="so-id" style="margin-bottom:4px;"></div>
+      <div style="font-family:var(--font-display);font-size:18px;font-weight:700;" id="so-subject"></div>
+    </div>
+    <button class="so-close" onclick="closeSO()">✕</button>
+  </div>
+  <div class="so-body" id="so-body"></div>
+</div>
+
+<script>
+const INCIDENTS = ['TS-4809','TS-4812','TS-4816','TS-4819','TS-4821','TS-4830','TS-4833'];
+const PROBLEMS = ['PRB-0005','PRB-0006','PRB-0007'];
+const CHANGES = ['CR-0091','CR-0092','CR-0093'];
+
+const BACKLOG = {
+  'DEV-1051': {title:'Bulk asset reassignment tool', tag:'backend', pts:5, priority:'warn', priorityLabel:'P2', ownerAv:'TK', owner:'Tomas K.', incident:null, problem:null, change:null},
+  'DEV-1048': {title:'Ticket macros for common requests', tag:'backend', pts:3, priority:'crit', priorityLabel:'P1', ownerAv:'RK', owner:'Raj K.', incident:null, problem:null, change:null},
+  'DEV-1046': {title:'Sprint velocity chart on reports page', tag:'frontend', pts:null, priority:'neutral', priorityLabel:'Unestimated', ownerAv:'—', owner:'Unassigned', incident:null, problem:null, change:null},
+  'DEV-1044': {title:'Dark mode for board view', tag:'frontend', pts:2, priority:'neutral', priorityLabel:'P3', ownerAv:'NP', owner:'Nadia P.', incident:null, problem:null, change:null}
+};
+
+function priorityBadge(p, label){ return `<span class="badge ${p}">${label}</span>`; }
+
+function renderBacklog(){
+  document.getElementById('backlog-rows').innerHTML = Object.entries(BACKLOG).map(([id,b]) => {
+    const linkCount = [b.incident,b.problem,b.change].filter(Boolean).length;
+    return `<tr onclick="openItem('${id}')">
+      <td class="id-mono">${id}</td><td>${b.title}</td><td><span class="tag-pill">${b.tag}</span></td><td class="id-mono">${b.pts ?? '—'}</td>
+      <td>${priorityBadge(b.priority,b.priorityLabel)}</td>
+      <td><div class="who"><div class="av">${b.ownerAv}</div></div></td>
+      <td>${linkCount ? `<span class="badge info">${linkCount} linked</span>` : `<span style="color:var(--ink-muted);font-size:12px;">—</span>`}</td>
+    </tr>`;
+  }).join('');
+}
+
+const LINK_HREF = {incident:'desk.html', problem:'desk-problems.html', change:'desk.html'};
+
+function linkRow(id, kind, label, options, current){
+  if(current){
+    return `<div class="link-row"><span class="lk-label">${label}</span><a href="${LINK_HREF[kind]}" style="color:var(--indigo-text);font-weight:600;">${current} →</a></div>`;
+  }
+  const selId = `sel-${kind}-${id}`;
+  return `<div class="link-row">
+    <span class="lk-label">${label}</span>
+    <span style="display:flex;gap:6px;align-items:center;">
+      <select id="${selId}" style="margin:0;padding:4px 8px;font-size:12px;width:auto;">${options.map(o=>`<option value="${o}">${o}</option>`).join('')}</select>
+      <button class="btn sm" onclick="linkItem('${id}','${kind}')">+ Link</button>
+    </span>
+  </div>`;
+}
+
+function openItem(id){
+  const b = BACKLOG[id];
+  document.getElementById('so-id').textContent = id;
+  document.getElementById('so-subject').textContent = b.title;
+  document.getElementById('so-body').innerHTML = `
+    <div class="section-label">Details</div>
+    <table style="width:100%;font-size:13px;">
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Tag</td><td style="text-align:right;">${b.tag}</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Points</td><td style="text-align:right;">${b.pts ?? 'Unestimated'}</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Priority</td><td style="text-align:right;">${priorityBadge(b.priority,b.priorityLabel)}</td></tr>
+      <tr><td style="color:var(--ink-2);padding:6px 0;">Owner</td><td style="text-align:right;">${b.owner}</td></tr>
+    </table>
+
+    <div class="section-label" style="margin-top:20px;">Linked work</div>
+    <div class="page-desc" style="margin:-4px 0 10px;">Trace this item back to why it exists — an incident it came from, a problem it fixes, or the change request that ships it.</div>
+    ${linkRow(id, 'incident', 'Incident', INCIDENTS.filter(x=>x!==b.incident), b.incident)}
+    ${linkRow(id, 'problem', 'Problem', PROBLEMS.filter(x=>x!==b.problem), b.problem)}
+    ${linkRow(id, 'change', 'Change request', CHANGES.filter(x=>x!==b.change), b.change)}`;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('slideover').classList.add('open');
+}
+function linkItem(id, kind){
+  const sel = document.getElementById(`sel-${kind}-${id}`);
+  if(!sel || !sel.value) return;
+  BACKLOG[id][kind] = sel.value;
+  renderBacklog();
+  openItem(id);
+}
+function closeSO(){
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('slideover').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSO(); });
+renderBacklog();
+</script>
 <script src="app-chrome.js" defer></script>
 </body>
 </html>
