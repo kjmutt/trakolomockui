@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Investors — Trakolo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .stat-band { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .stat-tile { background: var(--teal-50); border: 1px solid var(--teal-100); border-radius: 14px; padding: 22px 20px; text-align: center; }
+  .stat-tile .num { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 30px; color: var(--teal-800); line-height: 1.1; }
+  .stat-tile .lbl { font-size: 13px; color: var(--ink-soft); margin-top: 6px; }
+
+  .inv-table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+  .inv-table th, .inv-table td { text-align: left; padding: 13px 15px; border-bottom: 1px solid var(--line); font-size: 13.5px; vertical-align: top; }
+  .inv-table th { font-family: 'Sora', sans-serif; font-weight: 600; color: var(--ink); background: var(--teal-50); }
+  .inv-table td { color: var(--ink-soft); }
+  .inv-table tr td:first-child { color: var(--ink); font-weight: 500; }
+  .inv-note { font-size: 12.5px; color: var(--ink-faint); margin-top: 8px; }
+
+  .inv-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+  .inv-list li { list-style: none; display: flex; gap: 10px; font-size: 14.5px; color: var(--ink-soft); }
+  .inv-list li b { color: var(--ink); }
+  .inv-list li::before { content: "→"; color: var(--teal-600); font-weight: 700; flex-shrink: 0; }
+
+  .phase-card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; }
+  .phase-card + .phase-card { margin-top: 12px; }
+  .phase-card .phase-num { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 12px; color: var(--teal-600); text-transform: uppercase; letter-spacing: 0.05em; }
+  .phase-card h4 { font-size: 16.5px; margin: 4px 0 6px; }
+  .phase-card p { font-size: 13.5px; color: var(--ink-soft); }
+
+  .outcome-callout {
+    background: linear-gradient(135deg, var(--teal-800), var(--teal-600)); color: #fff;
+    border-radius: 16px; padding: 28px 30px; margin-top: 18px;
+  }
+  .outcome-callout .lbl { font-size: 12.5px; color: var(--teal-100); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .outcome-callout .val { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.4; }
+
+  @media (max-width: 780px) {
+    .stat-band { grid-template-columns: 1fr; }
+    .inv-table { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a href="index.html" class="logo">
+      <svg width="30" height="30" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+      trakolo
+    </a>
+    <div class="nav-links">
+      <a href="how-it-works.html">How it works</a>
+      <a href="features.html">Features</a>
+      <a href="use-cases.html">Use cases</a>
+      <a href="customer-stories.html">Customer stories</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="docs.html">Docs</a>
+      <a href="../login.html" class="nav-signin-mobile">Sign in</a>
+    </div>
+    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+    <div class="nav-actions">
+      <a href="../login.html" class="btn btn-ghost">Sign in</a>
+      <a href="../login.html" class="btn btn-primary">Start free</a>
+    </div>
+  </nav>
+</div>
+
+<div class="page-header">
+  <div class="wrap">
+    <h1>For investors</h1>
+    <p>The market Trakolo is entering, the gap it targets, and a realistic Year 1 plan — not a pitch deck, just the numbers.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="stat-band">
+      <div class="stat-tile"><div class="num">$14.95B</div><div class="lbl">Global ITSM market, 2026</div></div>
+      <div class="stat-tile"><div class="num">16.45%</div><div class="lbl">ITSM market CAGR through 2031</div></div>
+      <div class="stat-tile"><div class="num">44.4%</div><div class="lbl">Share held by the single largest vendor</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">Market sizing</span>
+    </div>
+    <h2>A horizontal bet across markets that are each already large</h2>
+    <p class="lead">Trakolo unifies five categories companies currently buy separately. Each is individually sizable and separately dominated — there is no single reported "unified workspace" market to point to.</p>
+
+    <div class="phase-card">
+      <div class="phase-num">Core wedge</div>
+      <h4>IT service management (ITSM)</h4>
+      <p>The global ITSM market reached an estimated $14.95B in 2026, forecast to reach $32.01B by 2031 (16.45% CAGR). This is the largest and most strategically important underlying market — and the entry point for the go-to-market plan below.</p>
+    </div>
+    <div class="phase-card">
+      <div class="phase-num">Expansion module</div>
+      <h4>Software asset management (SAM)</h4>
+      <p>The global SAM software market is valued at approximately $3.5B, with the U.S. segment alone at $1.05B in 2025, projected to reach $4.68B by 2035 (16.13% CAGR). Smaller than ITSM, but sold to the same buyer — a natural second purchase.</p>
+    </div>
+    <div class="phase-card">
+      <div class="phase-num">Retention features</div>
+      <h4>Dev boards &amp; ops reporting</h4>
+      <p>Not separately sized in third-party research — they're sub-features of the much larger, more mature project-management and BI markets, dominated by deep user habit (Jira, Linear, Asana). These are not led with commercially; they're positioned as included-once-you're-in, not acquisition drivers.</p>
+    </div>
+    <p class="inv-note">Sources: Mordor Intelligence, ResearchAndMarkets, Fundamental Business Insights, SNS Insider / OpenPR (SAM).</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">Competitive landscape</span>
+    </div>
+    <h2>Concentrated at the top, fragmented underneath</h2>
+    <p class="lead">The top 10 ITSM vendors hold roughly 83.3% of the market (2024 data); ServiceNow alone holds an estimated 44.4%. The remaining ~16.7% is hundreds of smaller vendors — that fragment is the addressable long tail.</p>
+    <table class="inv-table">
+      <tr><th>Vendor</th><th>Est. share (2024)</th><th>Position</th></tr>
+      <tr><td>ServiceNow</td><td>44.4%</td><td>Enterprise leader — dominant at 500+ employee orgs</td></tr>
+      <tr><td>Atlassian</td><td>part of ~39%*</td><td>Dev-adjacent; strong mid-market via Jira Service Management</td></tr>
+      <tr><td>BMC Software</td><td>part of ~39%*</td><td>Enterprise, legacy on-prem heritage</td></tr>
+      <tr><td>GoTo</td><td>part of ~39%*</td><td>SMB remote-support heritage</td></tr>
+      <tr><td>Ivanti</td><td>part of ~39%*</td><td>Mid-market / IT asset + service combined</td></tr>
+      <tr><td>Microsoft</td><td>part of ~39%*</td><td>Bundled with M365 / Azure ecosystem</td></tr>
+      <tr><td>Broadcom</td><td>part of ~39%*</td><td>Enterprise, via CA/Symantec legacy assets</td></tr>
+      <tr><td>Kaseya + Datto</td><td>part of ~39%*</td><td>MSP-focused</td></tr>
+      <tr><td>Freshworks (Freshservice)</td><td>part of ~39%*</td><td>SMB/mid-market — closest direct comparable</td></tr>
+      <tr><td>Zoho / ManageEngine</td><td>part of ~39%*</td><td>SMB, price-led</td></tr>
+      <tr><td>Long tail (hundreds of vendors)</td><td>~16.7%</td><td>Fragmented — includes the open niche Trakolo targets</td></tr>
+    </table>
+    <p class="inv-note">*Top 10 combined hold ~83.3% share; individual splits beyond ServiceNow are not separately published. Source: appsruntheworld.com Top 10 ITSM vendor forecast, 2024 data.</p>
+
+    <ul class="inv-list" style="margin-top:22px;">
+      <li><b>Pricing friction:</b> ServiceNow involves complex custom quotes, high per-user costs, and mandatory modules — total cost of ownership routinely exceeds SMB/mid-market budgets.</li>
+      <li><b>Setup friction:</b> buyers in this segment want fast setup with no dependency on specialized consultants for routine configuration changes.</li>
+      <li><b>Price anchor:</b> SMB ITSM contracts commonly start at $1,200–$2,500/year — an order of magnitude below typical ServiceNow deployments.</li>
+      <li><b>Validated demand:</b> even large competitors are re-entering this fight from the outside (e.g. Salesforce's Agentforce IT Service launch in 2026) — confirming the mid-market gap is recognized as valuable, not saturated.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">Regional breakdown</span>
+    </div>
+    <h2>Launch in North America, expand into the fastest-growing regions next</h2>
+    <table class="inv-table">
+      <tr><th>Region</th><th>Share of ITSM market</th><th>Growth outlook</th><th>Strategic read</th></tr>
+      <tr><td>North America</td><td>~37–47%*</td><td>Mature, steady</td><td>Highest ACV but most expensive and crowded to acquire in; incumbents deeply entrenched</td></tr>
+      <tr><td>Europe</td><td>~$10B (2024)</td><td>~2x by 2035</td><td>Fragmented by country/language; GDPR &amp; data-residency needs favor smaller, compliance-first vendors</td></tr>
+      <tr><td>Asia-Pacific</td><td>Smallest today</td><td>&gt;16% CAGR, 2026–2035 — fastest-growing</td><td>Least penetrated by incumbents at SMB tier; price-sensitive, self-serve friendly</td></tr>
+    </table>
+    <p class="inv-note">*Estimates vary by source (36.8%–47%); directionally North America is the largest single region by a wide margin.</p>
+    <p style="font-size:14.5px;color:var(--ink-soft);margin-top:18px;max-width:680px;">Recommended sequencing: prove the model in North America first (largest pool of the target 20–1,000 employee segment, familiar buying process), expand to Europe with data-residency positioning as a differentiator, then APAC once there's a repeatable self-serve motion that doesn't depend on high-touch local sales.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">Go-to-market</span>
+    </div>
+    <h2>A phased wedge, not a horizontal launch</h2>
+    <p class="lead">The five modules are not sold as one equal-weight bundle from day one — that reduces both messaging complexity and competitive exposure.</p>
+
+    <div class="phase-card">
+      <div class="phase-num">Phase 1</div>
+      <h4>ITSM only</h4>
+      <p>Widest category, clearest SMB/mid-market gap, and the category buyers actively search alternatives for. Undercut Freshservice/HaloITSM on price, self-serve signup, fast time-to-value.</p>
+    </div>
+    <div class="phase-card">
+      <div class="phase-num">Phase 2</div>
+      <h4>SAM as in-account expansion</h4>
+      <p>Same buyer, natural second sale once trust is established — "you already have the data, now track licenses and renewals in the same place."</p>
+    </div>
+    <div class="phase-card">
+      <div class="phase-num">Phase 3</div>
+      <h4>Dev boards &amp; ops reporting as retention</h4>
+      <p>These compete against deep user habit (Jira, Linear) — positioned as "already included" once a customer is in, not a reason to switch from day one.</p>
+    </div>
+
+    <ul class="inv-list" style="margin-top:22px;">
+      <li><b>Product-led growth:</b> self-serve signup with a generous free trial; the AI-assisted onboarding/copilot experience is a genuine differentiator worth leading marketing with.</li>
+      <li><b>SEO/content:</b> target high-intent "[competitor] alternative" search terms — a proven category with buyer-guide articles already published for ServiceNow, Freshservice, and others.</li>
+      <li><b>Targeted outbound:</b> IT managers at 50–500 employee companies — the explicitly underserved band identified by multiple industry analyses.</li>
+      <li><b>Community &amp; partnerships:</b> MSPs and IT consultancies serving the same company-size band, once case studies exist.</li>
+      <li><b>Pricing posture:</b> anchor below the $1,200–$2,500/year SMB band for the entry tier, with a published price list — a direct contrast to ServiceNow's custom-quote model.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">Year 1 plan</span>
+    </div>
+    <h2>A fundable, honest Year 1 — not a category-share claim</h2>
+    <table class="inv-table">
+      <tr><th>Period</th><th>Motion</th><th>Target activity</th><th>New logos</th></tr>
+      <tr><td>Months 1–3</td><td>Private beta</td><td>Design-partner pilots, heavy product iteration, case studies</td><td>5–15 (unpaid)</td></tr>
+      <tr><td>Months 4–8</td><td>Self-serve launch</td><td>Open signup, SEO content live, early paid conversion</td><td>5–10 / month</td></tr>
+      <tr><td>Months 9–12</td><td>Compounding growth</td><td>Word-of-mouth + outbound layered on, referral loop from MSP partners</td><td>10–20 / month</td></tr>
+    </table>
+
+    <div class="outcome-callout">
+      <div class="lbl">Year 1 outcome range</div>
+      <div class="val">60–120 paying customers · roughly $100K–$300K ARR under a lean, PLG-led team.<br>Outbound-led mid-market alternative: 15–30 customers at $5–15K ACV, similar total ARR, longer sales cycles.</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">Unit economics benchmarks</span>
+    </div>
+    <table class="inv-table">
+      <tr><th>Metric</th><th>Early-stage benchmark</th><th>Target</th></tr>
+      <tr><td>CAC (per customer, &lt;$5M ARR)</td><td>$500–$2,000</td><td>Track toward low end via PLG</td></tr>
+      <tr><td>CAC payback period</td><td>Median 8 months</td><td>&lt; 12 months (SMB)</td></tr>
+      <tr><td>MoM growth rate (&lt;$1M ARR)</td><td>10–20%</td><td>Sustain 15%+</td></tr>
+      <tr><td>LTV : CAC ratio</td><td>Healthy at 3:1+</td><td>Monitor from month 6</td></tr>
+      <tr><td>Gross margin</td><td>Target &gt; 75%</td><td>Standard SaaS infra cost structure</td></tr>
+      <tr><td>Net revenue retention</td><td>Target &gt; 101%</td><td>Driven by Phase 2/3 module expansion</td></tr>
+    </table>
+    <p class="inv-note">Sources: Pavilion 2025 B2B SaaS Benchmarks, GTM 8020 CAC statistics, SaaS Capital 2026 spending benchmarks.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">Risks &amp; mitigations</span>
+    </div>
+    <table class="inv-table">
+      <tr><th>Risk</th><th>Mitigation</th></tr>
+      <tr><td>Horizontal positioning confuses buyers ("what is this, really?")</td><td>Lead all marketing and sales motion with ITSM only in Year 1; keep other modules as in-app discovery, not homepage headlines</td></tr>
+      <tr><td>Incumbents (Salesforce, ServiceNow) move down-market</td><td>Compete on setup speed and transparent pricing, not feature parity — defensible even if incumbents add a "lite" tier</td></tr>
+      <tr><td>PLG motion fails to convert self-serve trials</td><td>Layer in outbound to design-partner-quality accounts by month 4 rather than waiting for pure PLG to prove out</td></tr>
+      <tr><td>SAM/Dev/Ops modules add engineering cost without near-term revenue return</td><td>Sequence build investment to match the Phase 1→2→3 GTM plan, not build all five modules to equal depth before Phase 1 proves out</td></tr>
+    </table>
+  </div>
+</section>
+
+<section style="text-align:center;">
+  <div class="wrap">
+    <h2>The right Year 1 metric isn't market share</h2>
+    <p class="lead" style="margin-left:auto; margin-right:auto;">At 44.4% share and a multi-billion-dollar revenue base, ServiceNow is not a Year 1 competitor in any meaningful sense. Judge Year 1 by logo count, CAC payback, and net revenue retention — chasing the documented mid-market gap, not a slice of the incumbent's share.</p>
+    <a href="../contact.html" class="btn btn-primary">Get in touch →</a>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer>
+    <span>© 2026 Trakolo. Never lose track.</span>
+    <span>Privacy · Terms · Contact · <a href="release-notes.html" style="color:inherit;">Release notes</a> · <a href="investors.html" style="color:inherit;">Investors</a></span>
+  </footer>
+</div>
+
+<script src="nav.js" defer></script>
+</body>
+</html>
