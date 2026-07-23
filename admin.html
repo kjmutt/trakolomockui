@@ -1119,6 +1119,19 @@
         <div class="audit-row"><span>Jul 2 · Report export retry storm after upstream timeout</span><span class="badge warn">P3 · 6m</span></div>
         <div class="audit-row"><span>Jun 24 · Brief webhook delivery delay during deploy</span><span class="badge ok">P3 · 3m</span></div>
       </div>
+
+      <div class="card">
+        <div class="section-label">Debug logging</div>
+        <div class="page-desc" style="margin:-4px 0 10px;">Facing an issue? Turn this on to capture detailed request, webhook, and background-job logs you can hand straight to support. Personal data is masked. Turns off automatically after 24 hours.</div>
+        <div class="row-line"><div><div class="rname">Debug logging</div><div class="rdesc" id="debug-status-desc">Off — no verbose logs are being captured</div></div><div class="switch" id="debug-switch"></div></div>
+        <div id="debug-log-viewer" style="display:none;margin-top:14px;background:#0B120F;border-radius:var(--r-md);padding:14px 16px;font-family:var(--font-mono);font-size:11.5px;line-height:1.7;max-height:260px;overflow-y:auto;">
+          <div id="debug-log-lines"></div>
+        </div>
+        <div id="debug-actions" style="display:none;gap:10px;margin-top:12px;">
+          <button class="btn sm" onclick="copyDebugLogs()">Copy for support</button>
+          <button class="btn sm">Download .log</button>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -1139,6 +1152,55 @@
   });
   if(location.hash) showPanel(location.hash.slice(1));
   document.querySelectorAll('.switch').forEach(s=>s.addEventListener('click', ()=>s.classList.toggle('on')));
+
+  let debugInterval = null;
+  const DEBUG_LOG_TEMPLATES = [
+    ['INFO', 'GET /api/v2/tickets?status=open 200 118ms'],
+    ['INFO', 'Webhook delivered → hooks.slack.com/services/*** 200 84ms'],
+    ['WARN', 'Report export scheduler retry 3/5 — upstream timeout'],
+    ['INFO', 'AI agent classified TS-4833 → Account security (confidence 0.97)'],
+    ['INFO', 'POST /api/v2/tickets 201 142ms'],
+    ['ERROR', 'Email ingestion parse failure — malformed MIME, retried and succeeded'],
+    ['INFO', 'Business rule "VIP fast lane" matched on TS-4844'],
+    ['INFO', 'SSO session refreshed for user e***@acme.com'],
+    ['INFO', 'GET /api/v2/assets?status=active 200 96ms'],
+    ['WARN', 'Webhook delivery to jira.example.com timed out, retrying']
+  ];
+  function appendDebugLog(){
+    const [level, msg] = DEBUG_LOG_TEMPLATES[Math.floor(Math.random()*DEBUG_LOG_TEMPLATES.length)];
+    const time = new Date().toTimeString().slice(0,8);
+    const color = level==='ERROR' ? 'var(--coral)' : level==='WARN' ? 'var(--amber)' : '#5DCAA5';
+    const lines = document.getElementById('debug-log-lines');
+    lines.insertAdjacentHTML('beforeend', `<div style="color:#B9C9C2;"><span style="color:#7C948A;">${time}</span> <span style="color:${color};font-weight:600;">${level}</span> ${msg}</div>`);
+    const viewer = document.getElementById('debug-log-viewer');
+    viewer.scrollTop = viewer.scrollHeight;
+  }
+  const debugSwitch = document.getElementById('debug-switch');
+  if(debugSwitch){
+    debugSwitch.addEventListener('click', () => {
+      const on = debugSwitch.classList.contains('on');
+      document.getElementById('debug-log-viewer').style.display = on ? 'block' : 'none';
+      document.getElementById('debug-actions').style.display = on ? 'flex' : 'none';
+      document.getElementById('debug-status-desc').textContent = on
+        ? 'On — capturing verbose logs, turns off automatically in 24h'
+        : 'Off — no verbose logs are being captured';
+      if(on){
+        document.getElementById('debug-log-lines').innerHTML = '';
+        appendDebugLog();
+        debugInterval = setInterval(appendDebugLog, 1800);
+      } else {
+        clearInterval(debugInterval);
+      }
+    });
+  }
+  function copyDebugLogs(){
+    const lines = document.getElementById('debug-log-lines').innerText;
+    if(navigator.clipboard) navigator.clipboard.writeText(lines).catch(()=>{});
+    const btn = event.target;
+    const original = btn.textContent;
+    btn.textContent = 'Copied ✓';
+    setTimeout(() => { btn.textContent = original; }, 1500);
+  }
 
   const ROSTER = {RK:'Raj K.', SM:'Sara M.', DF:'D. Ferreira', NP:'Nadia P.', TK:'Tomas K.', EM:'E. Moreau', LA:'L. Adeyemi', MA:'M. Alvarez'};
   const SUPPORT_GROUPS = {

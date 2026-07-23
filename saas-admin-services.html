@@ -36,6 +36,9 @@
   .svc-name{color:#fff;font-weight:500;}
   .svc-meta{color:#7C948A;font-size:11.5px;margin-top:2px;font-family:var(--font-mono);}
   .svc-protected{font-size:10.5px;color:#5C7268;font-family:var(--font-mono);}
+  .svc-btn.debug-on{background:#332B1A;border-color:#52431F;color:#DDA234;}
+  .debug-log-viewer{background:#0B120F;border-radius:10px;padding:14px 16px;font-family:var(--font-mono);font-size:11.5px;line-height:1.7;max-height:280px;overflow-y:auto;}
+  .debug-empty{color:#7C948A;font-size:12.5px;padding:6px 0;}
 </style>
 </head>
 <body class="platform-body">
@@ -84,37 +87,61 @@
       <tbody id="rows-jobs"></tbody>
     </table>
   </div>
+
+  <div class="plat-section">Debug logs</div>
+  <div class="plat-card" style="padding:18px 22px;">
+    <div style="font-size:13px;color:#8FA79C;margin-bottom:12px;" id="debug-log-desc">Enable Debug on a service above to stream its verbose logs here — useful when a customer reports something a health check doesn't catch.</div>
+    <div class="debug-log-viewer" id="debug-log-viewer">
+      <div class="debug-empty" id="debug-log-empty">No services in debug mode.</div>
+      <div id="debug-log-lines"></div>
+    </div>
+  </div>
 </div>
 
 <script>
 const services = {
   core: [
-    {id:"api", name:"API service", meta:"api.trakolo.com · 6 instances", region:"us-east", status:"running", protect:false},
-    {id:"db", name:"Database (primary + replica)", meta:"Postgres 16 · multi-AZ", region:"us-east", status:"running", protect:true},
-    {id:"auth", name:"Authentication (SSO + sessions)", meta:"OIDC + session store", region:"us-east", status:"running", protect:false},
-    {id:"storage", name:"File storage", meta:"attachments, exports", region:"us-east", status:"running", protect:false}
+    {id:"api", name:"API service", meta:"api.trakolo.com · 6 instances", region:"us-east", status:"running", protect:false, debug:false},
+    {id:"db", name:"Database (primary + replica)", meta:"Postgres 16 · multi-AZ", region:"us-east", status:"running", protect:true, debug:false},
+    {id:"auth", name:"Authentication (SSO + sessions)", meta:"OIDC + session store", region:"us-east", status:"running", protect:false, debug:false},
+    {id:"storage", name:"File storage", meta:"attachments, exports", region:"us-east", status:"running", protect:false, debug:false}
   ],
   jobs: [
-    {id:"routing", name:"Ticket routing engine", meta:"consumes desk.tickets queue", region:"us-east", status:"running", protect:false},
-    {id:"escalation", name:"SLA escalation worker", meta:"runs every 60s", region:"us-east", status:"running", protect:false},
-    {id:"renewal", name:"Asset renewal nightly scan", meta:"cron · 02:00 UTC", region:"us-east", status:"running", protect:false},
-    {id:"export", name:"Report export scheduler", meta:"retrying since 07:12 UTC", region:"eu-west", status:"degraded", protect:false},
-    {id:"webhook", name:"Webhook delivery queue", meta:"outbound integrations", region:"us-east", status:"running", protect:false}
+    {id:"routing", name:"Ticket routing engine", meta:"consumes desk.tickets queue", region:"us-east", status:"running", protect:false, debug:false},
+    {id:"escalation", name:"SLA escalation worker", meta:"runs every 60s", region:"us-east", status:"running", protect:false, debug:false},
+    {id:"renewal", name:"Asset renewal nightly scan", meta:"cron · 02:00 UTC", region:"us-east", status:"running", protect:false, debug:false},
+    {id:"export", name:"Report export scheduler", meta:"retrying since 07:12 UTC", region:"eu-west", status:"degraded", protect:false, debug:false},
+    {id:"webhook", name:"Webhook delivery queue", meta:"outbound integrations", region:"us-east", status:"running", protect:false, debug:false}
   ]
 };
+const DEBUG_LOG_TEMPLATES = {
+  api: ['GET /v2/tickets?workspace=acme 200 118ms', 'POST /v2/tickets 201 142ms', 'PATCH /v2/tickets/TS-4821 200 76ms', 'Rate limit check passed — 340/1000 req/min'],
+  db: ['Query plan: idx_tickets_workspace_status scan, 4ms', 'Replica lag: 0.3s', 'Connection pool: 42/200 in use'],
+  auth: ['SSO assertion validated for e***@acme.com', 'Session refreshed — token exp in 3600s', 'MFA challenge issued'],
+  storage: ['PUT /attachments/TS-4821/network-diagram.png 200 210ms', 'Signed URL issued, expires in 15m'],
+  routing: ['Routed TS-4844 → IT Ops (rule: category=Hardware)', 'Queue depth: 3, oldest msg age 1.2s'],
+  escalation: ['Checked 128 open tickets for SLA breach', 'No breaches found this cycle'],
+  renewal: ['Scanned 4,210 assets for idle licenses', 'Flagged 12 licenses idle 14+ days'],
+  export: ['Retry 3/5 — upstream timeout after 30s', 'Queued export job export-8841 for retry'],
+  webhook: ['Delivered → hooks.slack.com 200 84ms', 'Delivered → jira.example.com 200 220ms', 'Retry scheduled for endpoint timeout']
+};
+let debugInterval = null;
 
 function badge(status){
   const label = {running:"Running", degraded:"Degraded", stopped:"Stopped", pending:"Restarting…"}[status];
   return `<span class="svc-badge ${status}">${label}</span>`;
 }
 
+function debugBtn(svc){
+  return `<button class="svc-btn ${svc.debug ? 'debug-on' : ''}" onclick="toggleDebug('${svc.id}')" title="Stream verbose logs for this service">${svc.debug ? 'Debug: ON' : 'Debug'}</button>`;
+}
 function actions(svc){
-  if(svc.status === "pending") return `<div class="svc-actions"><button class="svc-btn" disabled>Restart</button><button class="svc-btn" disabled>Stop</button></div>`;
-  if(svc.status === "stopped") return `<div class="svc-actions"><button class="svc-btn primary" onclick="startSvc('${svc.id}')">Start</button></div>`;
+  if(svc.status === "pending") return `<div class="svc-actions"><button class="svc-btn" disabled>Restart</button><button class="svc-btn" disabled>Stop</button>${debugBtn(svc)}</div>`;
+  if(svc.status === "stopped") return `<div class="svc-actions"><button class="svc-btn primary" onclick="startSvc('${svc.id}')">Start</button>${debugBtn(svc)}</div>`;
   const stopBtn = svc.protect
     ? `<button class="svc-btn" disabled title="Protected — cannot be stopped from here">Stop</button>`
     : `<button class="svc-btn danger" onclick="stopSvc('${svc.id}')">Stop</button>`;
-  return `<div class="svc-actions"><button class="svc-btn" onclick="restartSvc('${svc.id}')">Restart</button>${stopBtn}</div>`;
+  return `<div class="svc-actions"><button class="svc-btn" onclick="restartSvc('${svc.id}')">Restart</button>${stopBtn}${debugBtn(svc)}</div>`;
 }
 
 function findSvc(id){
@@ -163,7 +190,46 @@ function restartSvc(id){
   }, wasDegraded ? 1600 : 1000);
 }
 
+function toggleDebug(id){
+  const svc = findSvc(id);
+  svc.debug = !svc.debug;
+  renderRows();
+  renderDebugPanel();
+}
+function appendDebugLine(){
+  const active = [...services.core, ...services.jobs].filter(s=>s.debug);
+  if(!active.length) return;
+  const svc = active[Math.floor(Math.random()*active.length)];
+  const msgs = DEBUG_LOG_TEMPLATES[svc.id] || ['heartbeat ok'];
+  const msg = msgs[Math.floor(Math.random()*msgs.length)];
+  const time = new Date().toTimeString().slice(0,8);
+  const lines = document.getElementById('debug-log-lines');
+  lines.insertAdjacentHTML('beforeend', `<div style="color:#B9C9C2;"><span style="color:#7C948A;">${time}</span> <span style="color:#5DCAA5;font-weight:600;">[${svc.name}]</span> ${msg}</div>`);
+  const viewer = document.getElementById('debug-log-viewer');
+  viewer.scrollTop = viewer.scrollHeight;
+}
+function renderDebugPanel(){
+  const active = [...services.core, ...services.jobs].filter(s=>s.debug);
+  const empty = document.getElementById('debug-log-empty');
+  const desc = document.getElementById('debug-log-desc');
+  if(active.length){
+    empty.style.display = 'none';
+    desc.textContent = 'Streaming verbose logs for: ' + active.map(s=>s.name).join(', ') + '.';
+    if(!debugInterval){
+      appendDebugLine();
+      debugInterval = setInterval(appendDebugLine, 1500);
+    }
+  } else {
+    empty.style.display = 'block';
+    document.getElementById('debug-log-lines').innerHTML = '';
+    desc.textContent = 'Enable Debug on a service above to stream its verbose logs here — useful when a customer reports something a health check doesn\'t catch.';
+    clearInterval(debugInterval);
+    debugInterval = null;
+  }
+}
+
 renderRows();
+renderDebugPanel();
 </script>
 <script src="platform-chrome.js" defer></script>
 </body>
