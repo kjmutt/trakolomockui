@@ -145,9 +145,6 @@
   var rail = document.createElement('div');
   rail.className = 'icon-rail';
   rail.innerHTML =
-    '<a class="rail-brand" href="index.html" title="Trakolo home">' +
-      '<svg width="22" height="22" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="8"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="18" fill="#5DCAA5" stroke="#0C8266" stroke-width="7"/><circle cx="100" cy="100" r="18" fill="#5DCAA5" stroke="#0C8266" stroke-width="7"/><circle cx="150" cy="50" r="23" fill="#0C8266" stroke="#0C8266" stroke-width="7"/></svg>' +
-    '</a>' +
     '<div class="rail-items">' +
     RAIL_ITEMS.map(function(it){
       var active = (it.href === activeHref) || (it.href === page && !activeHref) ? ' active' : '';

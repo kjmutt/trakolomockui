@@ -43,7 +43,6 @@ a{color:inherit;}
 /* vertical icon rail (module switcher) — injected by app-chrome.js; topbar/subnav/content shift right to make room */
 body.has-rail{padding-left:64px;}
 .icon-rail{position:fixed;left:0;top:0;bottom:0;width:64px;background:var(--indigo-bg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:18px 0 14px;gap:8px;z-index:80;overflow-y:auto;}
-.rail-brand{display:flex;align-items:center;justify-content:center;width:34px;height:34px;margin-bottom:6px;border-radius:9px;text-decoration:none;flex-shrink:0;}
 .rail-items{display:flex;flex-direction:column;gap:6px;width:100%;align-items:center;}
 .rail-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:46px;padding:9px 0 7px;border-radius:var(--r-sm);color:var(--indigo-text);text-decoration:none;transition:background .15s,color .15s,transform .15s;}
 .rail-item svg{opacity:.55;transition:opacity .15s;}
