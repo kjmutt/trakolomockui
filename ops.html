@@ -41,7 +41,10 @@
 <div class="wrap">
   <div class="page-head">
     <div><div class="page-title">Reporting</div><div class="page-desc">One report library, grouped by module. Click a report to expand it in place — filters and export stay right there.</div></div>
-    <button class="btn primary">Export all</button>
+    <div style="display:flex;gap:8px;">
+      <button class="btn" onclick="window.print()">🖨 Print</button>
+      <button class="btn primary" onclick="exportAllReports()">Export all</button>
+    </div>
   </div>
 
   <div id="rgroups"></div>
@@ -89,7 +92,7 @@ function renderCards(){
     <div class="rgroup-label"><span class="gl-name">${g}</span><span class="gl-rule"></span></div>
     <div class="rgrid">${reports.filter(r => r.group === g).map(r => `
       <div class="rcard clickable" onclick="toggleReport('${r.id}')">
-        <div class="rhead"><div><div class="rtitle">${r.title}</div><div class="rsub">${r.sub}</div></div><button class="btn sm" onclick="event.stopPropagation()">Export</button></div>
+        <div class="rhead"><div><div class="rtitle">${r.title}</div><div class="rsub">${r.sub}</div></div><button class="btn sm" onclick="event.stopPropagation();exportReport('${r.id}')">Export</button></div>
         <div class="spark">${r.spark.map(v=>`<i style="height:${v}%;background:${r.color}"></i>`).join('')}</div>
         <div class="rmore" id="more-${r.id}">Click to expand ↓</div>
       </div>
@@ -105,6 +108,32 @@ function renderCards(){
         </div>
       </div>`).join('')}
     </div>`).join('');
+}
+
+function toCSV(rows){
+  return rows.map(row => row.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+}
+function downloadBlob(content, filename, mime){
+  const blob = new Blob([content], {type: mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+function exportReport(id){
+  const r = reports.find(x => x.id === id);
+  const csv = toCSV([r.table.head, ...r.table.rows]);
+  downloadBlob(csv, `${r.id}-report.csv`, 'text/csv');
+}
+function exportAllReports(){
+  let out = '';
+  reports.forEach(r => {
+    out += `"${r.title}"\n`;
+    out += toCSV([r.table.head, ...r.table.rows]);
+    out += '\n\n';
+  });
+  downloadBlob(out, 'trakolo-reports-export.csv', 'text/csv');
 }
 
 function toggleReport(id){

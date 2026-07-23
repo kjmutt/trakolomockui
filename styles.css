@@ -460,3 +460,13 @@ html[data-theme="dark"] .switch::after{background:#D6E4DE;}
 .copilot-inputrow input{flex:1;font-size:12.5px;padding:9px 12px;border-radius:20px;}
 .copilot-send{width:34px;height:34px;border-radius:50%;background:var(--grad-primary);color:#fff;border:none;cursor:pointer;font-size:14px;flex-shrink:0;}
 @media (max-width:480px){.copilot-panel{right:10px;bottom:78px;width:calc(100vw - 20px);}.copilot-bubble{right:14px;bottom:14px;}}
+
+/* print — used by pages with a Print button (Gantt, Reports); hides chrome, keeps content full-width */
+@media print{
+  .icon-rail,.topbar,.subnav,.page-head .btn,.chrome-scrim,.chrome-search,.chrome-pop,.overlay,.slideover,.copilot-bubble,.copilot-panel{display:none !important;}
+  body.has-rail{padding-left:0;}
+  .wrap{max-width:none;padding:0;margin:0;}
+  .gg{overflow:visible;border:none;box-shadow:none;}
+  .gg-inner{min-width:0;}
+  .card,.panel{box-shadow:none;border:1px solid #ccc;break-inside:avoid;}
+}

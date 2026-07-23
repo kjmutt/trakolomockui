@@ -249,11 +249,12 @@ function openTicket(id){
       <div class="track"><div class="dot done"></div><div class="seg-line done"></div><div class="dot done"></div><div class="seg-line done"></div><div class="dot current"></div><div class="seg-line"></div><div class="dot"></div></div>
       <div class="track-labels"><span>L1 triage</span><span>L2 investigation</span><span class="current">L3 on-call</span><span>Resolved</span></div>`;
   }
-  html += `${t.mergedInto ? `<div class="hint" style="margin-bottom:12px;">Merged into <a href="#" onclick="openTicket('${t.mergedInto}');return false;" style="color:var(--indigo-text);font-weight:600;">${t.mergedInto} →</a> — closed as a duplicate.</div>` : `
+  html += `${t.mergedInto ? `<div class="hint" style="margin-bottom:12px;flex-direction:column;align-items:stretch;gap:8px;"><span>Merged into <a href="#" onclick="openTicket('${t.mergedInto}');return false;" style="color:var(--indigo-text);font-weight:600;">${t.mergedInto} →</a> — closed as a duplicate.</span><button class="btn sm" style="align-self:flex-start;" onclick="downloadHistory('${id}')">⬇ Download history</button></div>` : `
     <div style="display:flex;gap:8px;">
       <button class="btn sm" onclick="toggleAction('${id}','merge')">🔗 Merge</button>
       <button class="btn sm" onclick="toggleAction('${id}','link')">🔀 Link</button>
       <button class="btn sm" onclick="cloneTicket('${id}')">⧉ Clone</button>
+      <button class="btn sm" onclick="downloadHistory('${id}')">⬇ Download history</button>
     </div>
     <div id="action-panel"></div>`}
 
@@ -298,6 +299,33 @@ function closeSO(){
   document.getElementById('slideover').classList.remove('open');
 }
 document.addEventListener('keydown', e => { if(e.key === 'Escape') closeSO(); });
+
+function downloadBlob(content, filename, mime){
+  const blob = new Blob([content], {type: mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+function downloadHistory(id){
+  const t = tickets[id];
+  const lines = [
+    `Ticket ${id} — ${t.subject}`,
+    `Requester: ${t.requester}`,
+    `Priority: ${t.priorityLabel}    Category: ${t.category}    Source: ${t.source || 'Portal'}`,
+    `Assignee: ${t.assignee}    Status: ${t.status}`,
+    `SLA: ${t.slaLabel}`
+  ];
+  if(t.linked && t.linked.length){
+    lines.push('', 'Linked work:');
+    t.linked.forEach(([label,val]) => lines.push(`  - ${label}: ${val}`));
+  }
+  lines.push('', 'Activity history (most recent first):');
+  t.activity.forEach(a => lines.push(`  [${a.time}] ${a.name}: ${a.text}`));
+  lines.push('', `Exported ${new Date().toLocaleString()} by E. Moreau`);
+  downloadBlob(lines.join('\n'), `${id}-history.txt`, 'text/plain');
+}
 
 function genNewTicketId(){ return "TS-" + (4850 + Math.floor(Math.random()*900)); }
 function otherTicketIds(id){ return Object.keys(tickets).filter(x => x !== id); }
