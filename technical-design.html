@@ -167,6 +167,37 @@
     </div>
   </div>
 
+  <div class="section-label" style="margin:26px 0 12px;">Hosting architecture — Cloud edition</div>
+  <div class="page-desc" style="margin:-6px 0 12px;">Every layer in the diagram above maps onto managed cloud services rather than hand-run infrastructure — the goal is nothing to patch at 3am that a managed service already handles.</div>
+  <div class="panel">
+    <table class="layer-ref">
+      <thead><tr><th>Layer</th><th>Reference implementation</th><th>Why managed, not self-run</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--indigo-2);">Edge</td><td class="mono">Route 53 · ACM wildcard cert · ALB / CloudFront</td><td>DNS, TLS renewal, and edge routing are undifferentiated — a lapsed cert or a DNS misconfig is a self-inflicted outage.</td></tr>
+        <tr><td style="color:var(--indigo-text);">App fleet</td><td class="mono">ECS Fargate (or EKS) · auto-scaling group</td><td>Stateless containers scale on CPU/request metrics without capacity planning by hand.</td></tr>
+        <tr><td style="color:var(--violet-text);">Control plane</td><td class="mono">ElastiCache (Redis) · app-owned registry table</td><td>Managed Redis handles failover; the registry itself is just rows in the data tier below.</td></tr>
+        <tr><td style="color:var(--amber-text);">Data tier</td><td class="mono">RDS Postgres (Multi-AZ) + read replica · S3</td><td>Automated backups, patching, and failover — the single biggest source of 3am pages if self-managed.</td></tr>
+        <tr><td style="color:var(--green-text);">Background services</td><td class="mono">ECS service (separate task def from web) · SQS-backed or Postgres-backed queue</td><td>Scales and deploys on its own schedule, independent of web traffic.</td></tr>
+        <tr><td style="color:var(--ink-2);">Monitoring</td><td class="mono">CloudWatch / Datadog · PagerDuty on-call routing</td><td>Same signals as Admin → System status, wired to actually page someone.</td></tr>
+        <tr><td style="color:var(--ink-2);">Secrets</td><td class="mono">Secrets Manager / Parameter Store</td><td>DB passwords and API keys never sit in a repo or a plain <span class="id-mono">.env</span> in production.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="page-desc" style="margin-top:10px;">Named after AWS here for concreteness; the same shape maps onto Cloud SQL/Memorystore/GCS on GCP or Azure Database/Cache/Blob Storage on Azure without changing the architecture.</div>
+
+  <div class="section-label" style="margin:26px 0 12px;">Standalone / on-premise installation</div>
+  <div class="page-desc" style="margin:-6px 0 12px;">The perpetual-license edition (see <a href="site/pricing.html" style="color:var(--indigo-text);">Pricing</a> and <a href="admin.html#license" style="color:var(--indigo-text);">Admin → License &amp; billing</a>) runs as a single-host Docker Compose stack instead of the multi-tenant cloud topology above — one customer, one install, no shared infrastructure to reason about.</div>
+  <div class="card">
+    <div class="section-label">Reference stack — <span class="id-mono">install/</span></div>
+    <div class="row-line"><div><div class="rname">docker-compose.yml</div><div class="rdesc">Postgres, Redis, a one-shot migrate step that applies db/schema.sql, and the app — one command, one host</div></div><a href="install/docker-compose.yml" class="btn sm">View →</a></div>
+    <div class="row-line"><div><div class="rname">install.sh</div><div class="rdesc">Generates .env with a random DB password if missing, brings up the stack in dependency order, waits for health checks, applies the schema, starts the app</div></div><a href="install/install.sh" class="btn sm">View →</a></div>
+    <div class="row-line" style="border-bottom:none;"><div><div class="rname">.env.example</div><div class="rdesc">Database credentials, app port, and the license file path — copied to .env on first run</div></div><a href="install/.env.example" class="btn sm">View →</a></div>
+  </div>
+  <div class="card" style="margin-top:14px;">
+    <div class="section-label">License activation</div>
+    <div class="page-desc" style="margin-top:2px;">A workspace's <span class="id-mono">.trklic</span> file — a JSON payload signed with Trakolo's private key — is issued whenever seats, modules, or the expiry date change, and verified locally against the public key bundled with the install. Air-gapped networks activate offline: <span class="id-mono">License → Offline activation</span> generates a request code, exchanged for a response code on the customer portal from any machine with outbound access, then pasted back in. See <a href="site/docs.html#onprem-install" style="color:var(--indigo-text);">site/docs.html</a> for the full walkthrough.</div>
+  </div>
+
 </div>
 <script src="app-chrome.js" defer></script>
 </body>

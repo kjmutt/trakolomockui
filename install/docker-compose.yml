@@ -1,0 +1,73 @@
+# Trakolo Standalone / On-premise — single-host reference stack.
+#
+# The `app` service here serves this repo's static mockup — there is no real
+# backend yet. Swap its image for the actual application container once one
+# exists; everything else (db, redis, migrate, network topology) carries over
+# unchanged, matching the "app fleet talks to a pooled Postgres + Redis"
+# shape described in ../technical-design.html.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-trakolo}
+      POSTGRES_USER: ${POSTGRES_USER:-trakolo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    volumes:
+      - trakolo_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-trakolo} -d ${POSTGRES_DB:-trakolo}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [trakolo]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - trakolo_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [trakolo]
+
+  # One-shot: applies db/schema.sql, then exits. install.sh waits for it.
+  migrate:
+    image: postgres:16-alpine
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGHOST: db
+      PGDATABASE: ${POSTGRES_DB:-trakolo}
+      PGUSER: ${POSTGRES_USER:-trakolo}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    volumes:
+      - ../db:/schema:ro
+    entrypoint: ["psql", "-v", "ON_ERROR_STOP=1", "-f", "/schema/schema.sql"]
+    networks: [trakolo]
+
+  app:
+    image: nginx:alpine
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8080}:80"
+    volumes:
+      - ../:/usr/share/nginx/html:ro
+    networks: [trakolo]
+
+networks:
+  trakolo:
+
+volumes:
+  trakolo_db_data:
+  trakolo_redis_data:
