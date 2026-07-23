@@ -20,7 +20,8 @@ Static HTML/CSS/JS mockups for Trakolo: an IT service desk, asset tracking (SAM)
 - `admin.html` — workspace settings (SLAs, routing, users, portal config)
 - `contact.html`, `track.html` — public support pages
 - `styles.css` — shared design system (design tokens, components)
+- `db/schema.sql` — PostgreSQL schema for the data model implied by the mockup (tickets, problems, changes, assets, sprints, docs/wiki, tenancy & roles), for when this becomes a real backend
 
 ## Notes
 
-This is a static, front-end-only mockup — there's no backend, database, or auth behind any of it. Form submissions and "sign in" buttons link to other mockup pages to simulate a flow; nothing is persisted.
+This is a static, front-end-only mockup — there's no backend or auth behind any of it. Form submissions and "sign in" buttons link to other mockup pages to simulate a flow; nothing is persisted. `db/schema.sql` is a forward-looking companion piece, not something the mockup runs against.
