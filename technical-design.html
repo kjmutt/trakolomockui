@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — technical design</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .arch-flow{display:flex;flex-direction:column;align-items:stretch;gap:0;}
+  .arch-layer{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 22px;box-shadow:var(--shadow-sm);border-top:3px solid var(--border-strong);}
+  .arch-layer .al-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .arch-layer .al-num{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--ink-muted);}
+  .arch-layer .al-title{font-family:var(--font-display);font-size:15.5px;font-weight:700;}
+  .arch-layer .al-desc{font-size:12.5px;color:var(--ink-2);margin-bottom:12px;}
+  .arch-nodes{display:flex;flex-wrap:wrap;gap:8px;}
+  .arch-node{font-size:12px;font-weight:600;padding:7px 13px;border-radius:8px;border:1px solid transparent;}
+  .arch-arrow{display:flex;justify-content:center;padding:6px 0;color:var(--ink-muted);font-size:15px;}
+  .arch-layer.l-edge{border-top-color:var(--indigo-2);}
+  .arch-layer.l-app{border-top-color:var(--indigo);}
+  .arch-layer.l-ctrl{border-top-color:var(--violet);}
+  .arch-layer.l-data{border-top-color:var(--amber);}
+  .arch-layer.l-work{border-top-color:var(--green);}
+  .arch-layer.l-obs{border-top-color:var(--border-strong);}
+  .node-edge{background:var(--indigo-2);color:#fff;}
+  html[data-theme="dark"] .node-edge{color:#04222A;}
+  .node-app{background:var(--indigo-bg);color:var(--indigo-text);}
+  .node-ctrl{background:var(--violet-bg);color:var(--violet-text);}
+  .node-data{background:var(--amber-bg);color:var(--amber-text);}
+  .node-work{background:var(--green-bg);color:var(--green-text);}
+  .node-obs{background:var(--surface-2);color:var(--ink-2);border-color:var(--border);}
+
+  .layer-ref td:first-child{font-weight:700;white-space:nowrap;}
+  .layer-ref td.mono{font-family:var(--font-mono);font-size:12px;color:var(--ink-2);}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;}
+  @media (max-width:780px){.grid-2{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="docs.html">Docs</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+
+<div class="wrap" style="max-width:980px;">
+  <div class="page-head">
+    <div><div class="page-title">Technical design</div><div class="page-desc">Reference architecture for building Trakolo as a real product — multi-tenant, subdomain-routed, sized for 10,000 concurrent users. Not part of the product itself; internal engineering documentation.</div></div>
+    <a href="db/schema.sql" class="btn">View db/schema.sql →</a>
+  </div>
+
+  <div class="card" style="margin-bottom:22px;">
+    <div class="section-label">In one line</div>
+    <div class="page-desc" style="margin-top:2px;">One modular-monolith app fleet behind wildcard subdomains, a hybrid data tier — shared clusters for most tenants, dedicated database &amp; storage for Enterprise — and background services that scale independently of the request path.</div>
+  </div>
+
+  <div class="section-label" style="margin-bottom:12px;">Request &amp; data flow</div>
+  <div class="arch-flow">
+
+    <div class="arch-layer l-edge">
+      <div class="al-head"><span class="al-num">①</span><span class="al-title">Edge &amp; routing</span></div>
+      <div class="al-desc">One wildcard DNS record and TLS cert cover every tenant subdomain. <span class="id-mono">portal.trakolo.com</span> is the tenant-agnostic sign-in chooser — the same job <a href="login.html" style="color:var(--indigo-text);">login.html</a> does in this mockup.</div>
+      <div class="arch-nodes">
+        <span class="arch-node node-edge">Wildcard DNS · *.trakolo.com</span>
+        <span class="arch-node node-edge">Load balancer + wildcard TLS</span>
+        <span class="arch-node node-edge">portal.trakolo.com — sign-in</span>
+      </div>
+    </div>
+    <div class="arch-arrow">▼</div>
+
+    <div class="arch-layer l-app">
+      <div class="al-head"><span class="al-num">②</span><span class="al-title">App fleet — stateless, horizontally scaled</span></div>
+      <div class="al-desc">No per-tenant pinning — any pod serves any tenant's request once it's resolved. The API stays a modular monolith: one deployable, module boundaries as internal packages.</div>
+      <div class="arch-nodes">
+        <span class="arch-node node-app">apps/web (SPA)</span>
+        <span class="arch-node node-app">apps/api — itsm</span>
+        <span class="arch-node node-app">apps/api — sam</span>
+        <span class="arch-node node-app">apps/api — dev</span>
+        <span class="arch-node node-app">apps/api — docs</span>
+      </div>
+    </div>
+    <div class="arch-arrow">▼</div>
+
+    <div class="arch-layer l-ctrl">
+      <div class="al-head"><span class="al-num">③</span><span class="al-title">Control plane</span></div>
+      <div class="al-desc">Resolves subdomain → tenant_id → DB host + storage bucket on every request, cached so tenant resolution never costs a database round-trip.</div>
+      <div class="arch-nodes">
+        <span class="arch-node node-ctrl">Tenant registry (slug → db host, bucket, plan)</span>
+        <span class="arch-node node-ctrl">Redis — tenant cache + sessions</span>
+      </div>
+    </div>
+    <div class="arch-arrow">▼</div>
+
+    <div class="arch-layer l-data">
+      <div class="al-head"><span class="al-num">④</span><span class="al-title">Data tier</span></div>
+      <div class="al-desc">Shared, pooled cluster with row-level tenant_id scoping (see <a href="db/schema.sql" style="color:var(--amber-text);font-weight:600;">db/schema.sql</a>) for Free/Team/Business; a dedicated database + bucket per Enterprise tenant. A read replica isolates reporting from ticket-write traffic.</div>
+      <div class="arch-nodes">
+        <span class="arch-node node-data">PgBouncer / RDS Proxy</span>
+        <span class="arch-node node-data">Shared Postgres — Free · Team · Business</span>
+        <span class="arch-node node-data">Dedicated Postgres — per Enterprise tenant</span>
+        <span class="arch-node node-data">Read replica — reporting</span>
+        <span class="arch-node node-data">Object storage — shared bucket + prefix, dedicated for Enterprise</span>
+      </div>
+    </div>
+    <div class="arch-arrow">▼</div>
+
+    <div class="arch-layer l-work">
+      <div class="al-head"><span class="al-num">⑤</span><span class="al-title">Background services — apps/worker</span></div>
+      <div class="al-desc">Deploy and scale independently of the request/response app tier, off a shared job queue. These are the exact jobs already listed in <a href="admin.html#status" style="color:var(--green-text);font-weight:600;">Admin → System status</a>.</div>
+      <div class="arch-nodes">
+        <span class="arch-node node-work">Job queue (Postgres-backed)</span>
+        <span class="arch-node node-work">SLA escalation</span>
+        <span class="arch-node node-work">Business rules engine</span>
+        <span class="arch-node node-work">AI agent worker</span>
+        <span class="arch-node node-work">Webhook delivery</span>
+        <span class="arch-node node-work">Report export scheduler</span>
+      </div>
+    </div>
+    <div class="arch-arrow">▼</div>
+
+    <div class="arch-layer l-obs">
+      <div class="al-head"><span class="al-num">⑥</span><span class="al-title">Monitoring</span></div>
+      <div class="al-desc">The same health registry behind Admin → System status feeds real dashboards and alerts in production.</div>
+      <div class="arch-nodes">
+        <span class="arch-node node-obs">platform.services — health registry</span>
+        <span class="arch-node node-obs">Dashboards + alerts</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin:26px 0 12px;">Layer reference</div>
+  <div class="panel">
+    <table class="layer-ref">
+      <thead><tr><th>Layer</th><th>Component</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--indigo-2);">Edge</td><td class="mono">*.trakolo.com, portal.trakolo.com</td><td>One wildcard cert and DNS record for every tenant subdomain; the sign-in chooser matches <span class="id-mono">login.html</span> in this mockup.</td></tr>
+        <tr><td style="color:var(--indigo-text);">App fleet</td><td class="mono">apps/web, apps/api</td><td>Stateless, horizontally scaled, no per-tenant pinning. <span class="id-mono">apps/api</span> stays a modular monolith.</td></tr>
+        <tr><td style="color:var(--violet-text);">Control plane</td><td class="mono">tenant registry, Redis</td><td>Resolves subdomain → tenant_id → DB host + bucket on every request; cached to avoid a DB hit per lookup.</td></tr>
+        <tr><td style="color:var(--amber-text);">Data tier</td><td class="mono">PgBouncer, Postgres, object storage</td><td>Shared pooled cluster with row-level tenant_id scoping for most plans; dedicated DB + bucket for Enterprise. Read replica isolates reporting.</td></tr>
+        <tr><td style="color:var(--green-text);">Background services</td><td class="mono">apps/worker</td><td>SLA escalation, business rules, AI agent, webhook delivery, report export — deploy and scale independently of the web tier.</td></tr>
+        <tr><td style="color:var(--ink-2);">Monitoring</td><td class="mono">platform.services, dashboards</td><td>Drives Admin → System status in the product and real dashboards/alerts in production — SLA breach rate, queue depth, replica lag, per-tenant error rate.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-label" style="margin:26px 0 12px;">Two things this design depends on</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="section-label" style="color:var(--indigo-text);">Route everything through the registry</div>
+      <div class="page-desc" style="margin-top:4px;">No service hardcodes which database or bucket a tenant lives in — every lookup goes through the control-plane registry. That's what makes "shared for most, dedicated for Enterprise" a config difference instead of two codebases.</div>
+    </div>
+    <div class="card" style="background:var(--coral-bg);border-color:#F0C4B2;">
+      <div class="section-label" style="color:var(--coral-text);">Shared infrastructure shares fate</div>
+      <div class="page-desc" style="margin-top:4px;color:var(--coral-text);">Tenants on the shared cluster share connection pool, disk I/O, and query load. Per-tenant rate limits and the reporting read replica exist specifically to stop one noisy tenant from becoming everyone else's incident.</div>
+    </div>
+  </div>
+
+</div>
+<script src="app-chrome.js" defer></script>
+</body>
+</html>

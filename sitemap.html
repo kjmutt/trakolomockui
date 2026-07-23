@@ -49,7 +49,7 @@
 
 <div class="wrap" style="max-width:960px;">
   <div class="page-head">
-    <div><div class="page-title">Site map</div><div class="page-desc">Every page in the mockup — 58 pages across 11 areas, as one flat list.</div></div>
+    <div><div class="page-title">Site map</div><div class="page-desc">Every page in the mockup — 62 pages across 12 areas, as one flat list.</div></div>
     <a href="index.html" class="btn">← Tile view</a>
   </div>
 
@@ -70,10 +70,11 @@
     <a class="chip" href="#sm-platform" data-target="sm-platform">Platform</a>
     <a class="chip" href="#sm-portal" data-target="sm-portal">Portal</a>
     <a class="chip" href="#sm-admin" data-target="sm-admin">Admin</a>
+    <a class="chip" href="#sm-techdesign" data-target="sm-techdesign">Technical design</a>
   </div>
 
   <div class="sm-section" id="sm-website">
-    <div class="sm-label"><span class="name">Website · public marketing site</span><span class="rule"></span><span class="count">8 pages</span></div>
+    <div class="sm-label"><span class="name">Website · public marketing site</span><span class="rule"></span><span class="count">10 pages</span></div>
     <div class="panel">
       <table class="sm">
         <thead><tr><th>Page</th><th>What's on it</th></tr></thead>
@@ -252,6 +253,19 @@
     </div>
   </div>
 
+  <div class="sm-section" id="sm-techdesign">
+    <div class="sm-label"><span class="name">Technical design · engineering reference</span><span class="rule"></span><span class="count">2 pages</span></div>
+    <div class="panel">
+      <table class="sm">
+        <thead><tr><th>Page</th><th>What's on it</th></tr></thead>
+        <tbody>
+          <tr><td><a href="technical-design.html">Technical design</a><div class="path">technical-design.html</div></td><td>Reference architecture — edge/routing, app fleet, control plane, hybrid data tier, background services, monitoring</td></tr>
+          <tr><td><a href="db/schema.sql">Database schema</a><div class="path">db/schema.sql</div></td><td>PostgreSQL schema for the full data model, organized by module (core, itsm, sam, dev, docs, platform)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <div class="sm-section">
     <div class="sm-label"><span class="name">This page</span><span class="rule"></span><span class="count">1 page</span></div>
     <div class="panel">
@@ -266,7 +280,7 @@
 </div>
 <script>
 const AREA_COUNTS = [
-  ['Website','sm-website',8,'var(--indigo)'],
+  ['Website','sm-website',10,'var(--indigo)'],
   ['IT','sm-it',11,'var(--indigo-2)'],
   ['SAM','sm-sam',4,'var(--amber)'],
   ['Dev','sm-dev',7,'var(--violet)'],
@@ -277,6 +291,7 @@ const AREA_COUNTS = [
   ['Platform','sm-platform',4,'var(--indigo)'],
   ['Portal','sm-portal',7,'var(--indigo-2)'],
   ['Admin','sm-admin',4,'var(--amber)'],
+  ['Technical design','sm-techdesign',2,'var(--violet)'],
   ['This page','sitemap.html',1,'var(--border-strong)']
 ];
 const smTotal = AREA_COUNTS.reduce((n,a)=>n+a[2],0);
