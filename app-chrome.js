@@ -135,6 +135,7 @@
     {href:'docs.html', label:'Docs', icon:'<path d="M4 2h6l3 3v9H4z"/><path d="M10 2v3h3"/><path d="M6 9h4M6 11.5h4"/>'},
     {href:'admin.html', label:'Admin', icon:'<circle cx="8" cy="8" r="2.3"/><path d="M8 2v2M8 12v2M2 8h2M12 8h2M3.8 3.8l1.4 1.4M10.8 10.8l1.4 1.4M3.8 12.2l1.4-1.4M10.8 5.2l1.4-1.4"/>'},
     {href:'portal-admin-login.html', label:'Portal', icon:'<rect x="2" y="2" width="12" height="12" rx="2"/><path d="M2 6h12"/>'},
+    {href:'technical-design.html', label:'Technical', icon:'<rect x="2" y="2" width="4" height="3" rx=".5"/><rect x="10" y="2" width="4" height="3" rx=".5"/><rect x="6" y="11" width="4" height="3" rx=".5"/><path d="M4 5v3M12 5v3M4 8h8M8 8v3"/>'},
     {href:'profile.html', label:'Profile', icon:'<circle cx="8" cy="5.5" r="2.8"/><path d="M2.5 14c0-2.9 2.5-4.8 5.5-4.8s5.5 1.9 5.5 4.8"/>'}
   ];
   var modNav = document.querySelector('.mod-nav');
