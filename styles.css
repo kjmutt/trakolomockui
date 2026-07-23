@@ -40,6 +40,20 @@ a{color:inherit;}
 .subnav a.active{color:var(--ink);border-color:var(--indigo);font-weight:500;}
 .subnav a.active svg{opacity:1;}
 
+/* vertical icon rail (module switcher) — injected by app-chrome.js; topbar/subnav/content shift right to make room */
+body.has-rail{padding-left:64px;}
+.icon-rail{position:fixed;left:0;top:0;bottom:0;width:64px;background:var(--violet-bg);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:18px 0 14px;gap:8px;z-index:80;overflow-y:auto;}
+.rail-brand{display:flex;align-items:center;justify-content:center;width:34px;height:34px;margin-bottom:6px;border-radius:9px;text-decoration:none;flex-shrink:0;}
+.rail-items{display:flex;flex-direction:column;gap:6px;width:100%;align-items:center;}
+.rail-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:46px;padding:9px 0 7px;border-radius:var(--r-sm);color:var(--violet-text);text-decoration:none;transition:background .15s,color .15s,transform .15s;}
+.rail-item svg{opacity:.55;transition:opacity .15s;}
+.rail-item:hover{background:rgba(255,255,255,.5);transform:translateY(-1px);}
+.rail-item:hover svg{opacity:.85;}
+.rail-item.active{background:var(--surface);box-shadow:var(--shadow-sm);}
+.rail-item.active svg{opacity:1;}
+.rail-label{font-size:8.5px;font-weight:600;letter-spacing:.15px;opacity:0;height:0;overflow:hidden;}
+.rail-item.active .rail-label,.rail-item:hover .rail-label{opacity:1;height:auto;overflow:visible;}
+
 .wrap{max-width:1180px;margin:0 auto;padding:32px 40px 60px;}
 .wrap.split{display:grid;grid-template-columns:1.6fr 1fr;gap:26px;align-items:start;}
 .page-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px;gap:20px;}

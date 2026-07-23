@@ -124,4 +124,39 @@
     if((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k'){ e.preventDefault(); openPop(search); }
     if(e.key === 'Escape') closeAll();
   });
+
+  /* ---- vertical icon rail (module switcher) ---- */
+  var RAIL_ITEMS = [
+    {href:'home.html', label:'Home', icon:'<path d="M2 7.5L8 2.5l6 5"/><path d="M3.5 6.5V13.5H12.5V6.5"/><path d="M6.5 13.5V10h3v3.5"/>'},
+    {href:'desk-log-ticket.html', label:'IT', icon:'<path d="M2 5l6-3 6 3-6 3-6-3z"/><path d="M2 5v6l6 3 6-3V5"/>'},
+    {href:'sam.html', label:'SAM', icon:'<rect x="2" y="3" width="12" height="8" rx="1"/><path d="M6 13h4M8 11v2"/>'},
+    {href:'dev.html', label:'Dev', icon:'<rect x="2" y="2" width="12" height="12" rx="1.5"/><path d="M6 2v12M10.5 5.5v3"/>'},
+    {href:'ops.html', label:'Ops', icon:'<path d="M2 4h6M2 8h9M2 12h4"/>'},
+    {href:'docs.html', label:'Docs', icon:'<path d="M4 2h6l3 3v9H4z"/><path d="M10 2v3h3"/><path d="M6 9h4M6 11.5h4"/>'},
+    {href:'admin.html', label:'Admin', icon:'<circle cx="8" cy="8" r="2.3"/><path d="M8 2v2M8 12v2M2 8h2M12 8h2M3.8 3.8l1.4 1.4M10.8 10.8l1.4 1.4M3.8 12.2l1.4-1.4M10.8 5.2l1.4-1.4"/>'},
+    {href:'portal-admin-login.html', label:'Portal', icon:'<rect x="2" y="2" width="12" height="12" rx="2"/><path d="M2 6h12"/>'},
+    {href:'profile.html', label:'Profile', icon:'<circle cx="8" cy="5.5" r="2.8"/><path d="M2.5 14c0-2.9 2.5-4.8 5.5-4.8s5.5 1.9 5.5 4.8"/>'}
+  ];
+  var modNav = document.querySelector('.mod-nav');
+  var activeModEl = modNav ? modNav.querySelector('a.active') : null;
+  var activeHref = activeModEl ? activeModEl.getAttribute('href') : null;
+  var page = location.pathname.split('/').pop();
+
+  var rail = document.createElement('div');
+  rail.className = 'icon-rail';
+  rail.innerHTML =
+    '<a class="rail-brand" href="index.html" title="Trakolo home">' +
+      '<svg width="22" height="22" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="8"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="18" fill="#5DCAA5" stroke="#0C8266" stroke-width="7"/><circle cx="100" cy="100" r="18" fill="#5DCAA5" stroke="#0C8266" stroke-width="7"/><circle cx="150" cy="50" r="23" fill="#0C8266" stroke="#0C8266" stroke-width="7"/></svg>' +
+    '</a>' +
+    '<div class="rail-items">' +
+    RAIL_ITEMS.map(function(it){
+      var active = (it.href === activeHref) || (it.href === page && !activeHref) ? ' active' : '';
+      return '<a class="rail-item' + active + '" href="' + it.href + '" title="' + it.label + '">' +
+        '<svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">' + it.icon + '</svg>' +
+        '<span class="rail-label">' + it.label + '</span>' +
+      '</a>';
+    }).join('') +
+    '</div>';
+  document.body.classList.add('has-rail');
+  document.body.appendChild(rail);
 })();
