@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer stories — Trakolo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .logo-strip { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .logo-mark {
+    font-family: 'Sora', sans-serif; font-weight: 700; font-size: 14px; color: var(--ink-faint);
+    border: 1px solid var(--line); border-radius: 999px; padding: 9px 18px; background: var(--panel);
+  }
+
+  .story-card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+    padding: 36px; display: grid; grid-template-columns: 1.3fr 1fr; gap: 32px; align-items: start;
+  }
+  .story-card + .story-card { margin-top: 20px; }
+  .story-tag {
+    display: inline-block; font-size: 12px; font-weight: 600; color: var(--teal-800);
+    background: var(--teal-50); border: 1px solid var(--teal-100);
+    padding: 5px 12px; border-radius: 999px; margin-bottom: 14px;
+  }
+  .story-card h3 { font-size: 23px; margin-bottom: 10px; }
+  .story-card .story-meta { font-size: 13.5px; color: var(--ink-faint); margin-bottom: 16px; }
+  .story-card p.body { font-size: 14.5px; color: var(--ink-soft); max-width: 520px; }
+  .story-quote {
+    margin-top: 18px; padding-left: 16px; border-left: 3px solid var(--teal-200);
+    font-size: 14.5px; color: var(--ink); font-style: italic;
+  }
+  .story-quote .attrib { display: block; margin-top: 8px; font-size: 13px; font-style: normal; color: var(--ink-faint); }
+
+  .story-metrics { display: flex; flex-direction: column; gap: 16px; }
+  .metric-tile { background: var(--teal-50); border: 1px solid var(--teal-100); border-radius: 12px; padding: 16px 18px; }
+  .metric-tile .num { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 26px; color: var(--teal-800); line-height: 1.1; }
+  .metric-tile .lbl { font-size: 12.5px; color: var(--ink-soft); margin-top: 4px; }
+  .story-link {
+    font-size: 14px; font-weight: 600; color: var(--teal-800);
+    border: 1.5px solid var(--line); border-radius: 8px; padding: 9px 16px;
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; margin-top: 4px;
+  }
+  .story-link:hover { border-color: var(--teal-600); color: var(--teal-600); }
+
+  .quote-band {
+    background: linear-gradient(135deg, var(--teal-800), var(--teal-600)); color: #fff;
+  }
+  .quote-band .wrap { max-width: 760px; text-align: center; }
+  .quote-band blockquote { font-family: 'Sora', sans-serif; font-size: 26px; font-weight: 500; line-height: 1.45; margin-bottom: 22px; }
+  .quote-band .attrib { color: var(--teal-100); font-size: 14px; }
+
+  @media (max-width: 780px) {
+    .story-card { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a href="index.html" class="logo">
+      <svg width="30" height="30" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#E1F5EE" stroke="#0F6E56" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0F6E56" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0F6E56" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0F6E56" stroke="#0F6E56" stroke-width="6"/></svg>
+      trakolo
+    </a>
+    <div class="nav-links">
+      <a href="how-it-works.html">How it works</a>
+      <a href="features.html">Features</a>
+      <a href="use-cases.html">Use cases</a>
+      <a href="customer-stories.html" class="current">Customer stories</a>
+      <a href="integrations.html">Integrations</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="docs.html">Docs</a>
+      <a href="../login.html" class="nav-signin-mobile">Sign in</a>
+    </div>
+    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+    <div class="nav-actions">
+      <a href="../login.html" class="btn btn-ghost">Sign in</a>
+      <a href="../login.html" class="btn btn-primary">Start free</a>
+    </div>
+  </nav>
+</div>
+
+<div class="page-header">
+  <div class="wrap">
+    <h1>Customer stories</h1>
+    <p>Three teams who replaced a stack of point tools with one workspace — what changed, in their own numbers.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="path-track">
+      <div class="node"></div><div class="node"></div><div class="node end"></div>
+      <div class="rule"></div>
+      <span class="tag">Trusted by IT and engineering teams at</span>
+    </div>
+    <div class="logo-strip">
+      <span class="logo-mark">NORTHFIELD LOGISTICS</span>
+      <span class="logo-mark">LUMEN HEALTH ANALYTICS</span>
+      <span class="logo-mark">CARTWAY RETAIL GROUP</span>
+      <span class="logo-mark">PEBBLE &amp; CO.</span>
+      <span class="logo-mark">HARBOR POINT INSURANCE</span>
+      <span class="logo-mark">GRAYFIELD MANUFACTURING</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+
+    <div class="story-card">
+      <div>
+        <div class="story-tag">Service desk + SAM · replaced ServiceNow &amp; a license spreadsheet</div>
+        <h3>Northfield Logistics cut IT tooling cost 60% and stopped losing renewal dates</h3>
+        <div class="story-meta">Logistics &amp; freight · 340 employees · IT team of 6</div>
+        <p class="body">Northfield ran ServiceNow for tickets and tracked software licenses in a shared spreadsheet that only one person really understood. When that person left, so did the renewal calendar. They moved both onto Trakolo in the same week — one login, one place to look, and asset renewals now flag themselves.</p>
+        <div class="story-quote">"We weren't using 80% of what we paid ServiceNow for. Trakolo does the 20% we actually needed, plus the asset tracking we were doing in a spreadsheet — for a third of the cost."
+          <span class="attrib">— Director of IT, Northfield Logistics</span>
+        </div>
+        <div style="margin-top:18px;"><a class="story-link" href="../sam-renewals.html">See renewals &amp; compliance →</a></div>
+      </div>
+      <div class="story-metrics">
+        <div class="metric-tile"><div class="num">60%</div><div class="lbl">lower annual tooling spend vs. ServiceNow + spreadsheets</div></div>
+        <div class="metric-tile"><div class="num">$41K</div><div class="lbl">in idle software licenses reclaimed in the first quarter</div></div>
+        <div class="metric-tile"><div class="num">1 week</div><div class="lbl">to migrate tickets and assets off the old stack</div></div>
+      </div>
+    </div>
+
+    <div class="story-card">
+      <div>
+        <div class="story-tag">Sprint board + Change management · compliance-driven engineering org</div>
+        <h3>Lumen Health Analytics ships to production without missing an audit trail</h3>
+        <div class="story-meta">Healthcare SaaS · 210 employees · Engineering team of 34</div>
+        <p class="body">Every deploy at Lumen needs a documented approval — a HIPAA auditor asks for it every year. Jira tracked the work; a separate change-management tool (that nobody liked) tracked the sign-off. Trakolo put both on the same card, so the approval trail is just... there, instead of reconstructed from two systems every March.</p>
+        <div class="story-quote">"Audit prep used to take a week of cross-referencing Jira against our change log. Now the auditor clicks through from the sprint card to the approval to the deploy window, in one place."
+          <span class="attrib">— VP of Engineering, Lumen Health Analytics</span>
+        </div>
+        <div style="margin-top:18px;"><a class="story-link" href="../ops-compliance-audit.html">See the compliance audit →</a></div>
+      </div>
+      <div class="story-metrics">
+        <div class="metric-tile"><div class="num">5 days → 4 hrs</div><div class="lbl">time to assemble evidence for the annual compliance audit</div></div>
+        <div class="metric-tile"><div class="num">100%</div><div class="lbl">of production changes carry a linked, approved change request</div></div>
+        <div class="metric-tile"><div class="num">2</div><div class="lbl">tools retired (standalone change-management + spreadsheet log)</div></div>
+      </div>
+    </div>
+
+    <div class="story-card">
+      <div>
+        <div class="story-tag">Service desk + AI agent · high ticket-volume retail IT</div>
+        <h3>Cartway Retail Group lets the AI agent close the tickets that don't need a human</h3>
+        <div class="story-meta">Retail · 890 employees across 60 stores · IT team of 9</div>
+        <p class="body">Password resets and access requests from store staff made up nearly half of Cartway's ticket volume. Trakolo's AI agent now verifies identity, resets access, and closes the ticket end-to-end for the routine cases — with anything unusual, urgent, or from a frustrated requester still routed to a person.</p>
+        <div class="story-quote">"Our team of nine covers sixty stores. The AI agent handling routine resets is the difference between drowning every Monday morning and actually getting to the interesting work."
+          <span class="attrib">— Head of IT Operations, Cartway Retail Group</span>
+        </div>
+        <div style="margin-top:18px;"><a class="story-link" href="../desk.html">See an AI-resolved ticket →</a></div>
+      </div>
+      <div class="story-metrics">
+        <div class="metric-tile"><div class="num">44%</div><div class="lbl">of tickets resolved by the AI agent with no human touch</div></div>
+        <div class="metric-tile"><div class="num">2h 14m → 38m</div><div class="lbl">average time to resolution across the whole queue</div></div>
+        <div class="metric-tile"><div class="num">4.7 / 5</div><div class="lbl">CSAT score on AI-resolved tickets, on par with human agents</div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="quote-band">
+  <div class="wrap">
+    <blockquote>"We replaced three tools with Trakolo in a week. Our IT team finally has one place to look, instead of four."</blockquote>
+    <div class="attrib">— Nadia P., Engineering Manager, Acme Corp</div>
+  </div>
+</section>
+
+<section style="text-align:center;">
+  <div class="wrap">
+    <h2>Write your own story next</h2>
+    <p class="lead" style="margin-left:auto; margin-right:auto;">Start free, and see how much of your current stack Trakolo replaces in the first week.</p>
+    <a href="../login.html" class="btn btn-primary">Start free →</a>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer>
+    <span>© 2026 Trakolo. Never lose track.</span>
+    <span>Privacy · Terms · Contact · <a href="release-notes.html" style="color:inherit;">Release notes</a></span>
+  </footer>
+</div>
+
+<script src="nav.js" defer></script>
+</body>
+</html>
