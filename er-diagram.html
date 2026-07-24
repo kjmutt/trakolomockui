@@ -48,7 +48,7 @@
 
 <div class="wrap" style="max-width:980px;">
   <div class="page-head">
-    <div><div class="page-title">Entity relationships</div><div class="page-desc">How the 53 tables in db/schema.sql relate — every foreign key here was extracted from a live PostgreSQL instance running the real schema via pg_constraint, not typed from memory.</div></div>
+    <div><div class="page-title">Entity relationships</div><div class="page-desc">How the 56 tables in db/schema.sql relate — every foreign key here was extracted from a live PostgreSQL instance running the real schema via pg_constraint, not typed from memory.</div></div>
     <a href="technical-design.html" class="btn">← Technical design</a>
   </div>
 
@@ -58,8 +58,8 @@
   </div>
 
   <div class="strip">
-    <div class="mcard info"><div class="mlabel">Tables</div><div class="mval">53</div><div class="mdelta">across 6 module schemas</div></div>
-    <div class="mcard info"><div class="mlabel">Foreign keys</div><div class="mval">108</div><div class="mdelta">extracted from pg_constraint</div></div>
+    <div class="mcard info"><div class="mlabel">Tables</div><div class="mval">56</div><div class="mdelta">across 6 module schemas</div></div>
+    <div class="mcard info"><div class="mlabel">Foreign keys</div><div class="mval">117</div><div class="mdelta">extracted from pg_constraint</div></div>
     <div class="mcard info"><div class="mlabel">Module schemas</div><div class="mval">6</div><div class="mdelta">core · itsm · sam · dev · docs · platform</div></div>
     <div class="mcard ok"><div class="mlabel">Tenant scoping</div><div class="mval">Every row</div><div class="mdelta">tenant_id → core.tenants, everywhere</div></div>
   </div>
@@ -85,6 +85,7 @@
         <li><b>tickets</b> ↔ problems (via problem_incidents)</li>
         <li><b>tickets</b> → change_requests (source_ticket_id)</li>
         <li><b>change_requests</b> → change_approvals ← approval_groups</li>
+        <li><b>ticket_categories</b>, <b>kb_categories</b>, <b>service_catalog_categories</b> → themselves (nested, self-referencing)</li>
       </ul>
     </div>
     <div class="rel-card s-dev">
@@ -131,9 +132,9 @@
 
   <div class="section-label" style="margin:26px 0 12px;">Every foreign key, extracted from the live schema</div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="fk-filters">
-    <div class="chip active" data-schema="all">All (108)</div>
+    <div class="chip active" data-schema="all">All (117)</div>
     <div class="chip" data-schema="core">core (21)</div>
-    <div class="chip" data-schema="itsm">itsm (36)</div>
+    <div class="chip" data-schema="itsm">itsm (45)</div>
     <div class="chip" data-schema="dev">dev (20)</div>
     <div class="chip" data-schema="sam">sam (8)</div>
     <div class="chip" data-schema="docs">docs (20)</div>
@@ -218,7 +219,10 @@
 <tr data-schema="itsm"><td class="mono">itsm.change_requests</td><td class="mono">requested_by_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.change_requests</td><td class="mono">source_ticket_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.change_requests</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.kb_articles</td><td class="mono">category_id</td><td>→</td><td class="mono">itsm.kb_categories</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.kb_articles</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.kb_categories</td><td class="mono">parent_category_id</td><td>→</td><td class="mono">itsm.kb_categories</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.kb_categories</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.oncall_rotations</td><td class="mono">schedule_id</td><td>→</td><td class="mono">itsm.oncall_schedules</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.oncall_rotations</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.oncall_rotations</td><td class="mono">user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
@@ -227,6 +231,9 @@
 <tr data-schema="itsm"><td class="mono">itsm.problem_incidents</td><td class="mono">ticket_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.problems</td><td class="mono">owner_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.problems</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.service_catalog_categories</td><td class="mono">parent_category_id</td><td>→</td><td class="mono">itsm.service_catalog_categories</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.service_catalog_categories</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.service_catalog_items</td><td class="mono">category_id</td><td>→</td><td class="mono">itsm.service_catalog_categories</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.service_catalog_items</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.sla_policies</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.ticket_activity</td><td class="mono">actor_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
@@ -235,9 +242,12 @@
 <tr data-schema="itsm"><td class="mono">itsm.ticket_attachments</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.ticket_attachments</td><td class="mono">ticket_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.ticket_attachments</td><td class="mono">uploaded_by</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.ticket_categories</td><td class="mono">parent_category_id</td><td>→</td><td class="mono">itsm.ticket_categories</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.ticket_categories</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.ticket_links</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.ticket_links</td><td class="mono">ticket_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.tickets</td><td class="mono">assignee_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.tickets</td><td class="mono">category_id</td><td>→</td><td class="mono">itsm.ticket_categories</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.tickets</td><td class="mono">merged_into_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.tickets</td><td class="mono">requester_contact_id</td><td>→</td><td class="mono">core.contacts</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.tickets</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>

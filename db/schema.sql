@@ -190,12 +190,25 @@ CREATE TYPE itsm.ticket_status AS ENUM (
   'open', 'in_progress', 'awaiting_customer', 'escalated', 'resolved', 'closed', 'merged'
 );
 
+-- Tree-structured, unlimited depth (e.g. Hardware > Laptops > Battery), same
+-- self-referencing pattern as docs.folders. One tenant's category tree is
+-- independent of another's.
+CREATE TABLE itsm.ticket_categories (
+  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id           uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
+  parent_category_id  uuid REFERENCES itsm.ticket_categories(id),
+  name                text NOT NULL,
+  sort_order          int NOT NULL DEFAULT 0
+);
+CREATE INDEX idx_ticket_categories_parent ON itsm.ticket_categories(parent_category_id);
+CREATE INDEX idx_ticket_categories_tenant ON itsm.ticket_categories(tenant_id);
+
 CREATE TABLE itsm.tickets (
   id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id          uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   ticket_number      text NOT NULL,        -- display id, e.g. 'TS-4833'
   subject            text NOT NULL,
-  category            text,
+  category_id        uuid REFERENCES itsm.ticket_categories(id),
   priority           itsm.priority NOT NULL DEFAULT 'normal',
   source             itsm.ticket_source NOT NULL DEFAULT 'portal',
   status             itsm.ticket_status NOT NULL DEFAULT 'open',
@@ -212,6 +225,7 @@ CREATE TABLE itsm.tickets (
 );
 CREATE INDEX idx_tickets_tenant_status ON itsm.tickets(tenant_id, status);
 CREATE INDEX idx_tickets_assignee ON itsm.tickets(assignee_user_id);
+CREATE INDEX idx_tickets_category ON itsm.tickets(category_id);
 CREATE INDEX idx_tickets_sla_due ON itsm.tickets(sla_due_at) WHERE status NOT IN ('resolved', 'closed', 'merged');
 CREATE TRIGGER trg_tickets_updated BEFORE UPDATE ON itsm.tickets
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
@@ -337,16 +351,27 @@ CREATE TABLE itsm.business_rules (
 );
 CREATE INDEX idx_business_rules_tenant_order ON itsm.business_rules(tenant_id, run_order);
 
+CREATE TABLE itsm.service_catalog_categories (
+  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id           uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
+  parent_category_id  uuid REFERENCES itsm.service_catalog_categories(id),
+  name                text NOT NULL,
+  sort_order          int NOT NULL DEFAULT 0
+);
+CREATE INDEX idx_service_catalog_categories_parent ON itsm.service_catalog_categories(parent_category_id);
+CREATE INDEX idx_service_catalog_categories_tenant ON itsm.service_catalog_categories(tenant_id);
+
 CREATE TABLE itsm.service_catalog_items (
   id                      uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id               uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   name                    text NOT NULL,
   description             text,
-  category                text,
+  category_id             uuid REFERENCES itsm.service_catalog_categories(id),
   approval_required       boolean NOT NULL DEFAULT false,
   fulfillment_sla_minutes int,
   automated               boolean NOT NULL DEFAULT false
 );
+CREATE INDEX idx_service_catalog_items_category ON itsm.service_catalog_items(category_id);
 
 CREATE TABLE itsm.catalog_requests (
   id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -358,18 +383,29 @@ CREATE TABLE itsm.catalog_requests (
   created_at          timestamptz NOT NULL DEFAULT now()
 );
 
+CREATE TABLE itsm.kb_categories (
+  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id           uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
+  parent_category_id  uuid REFERENCES itsm.kb_categories(id),
+  name                text NOT NULL,
+  sort_order          int NOT NULL DEFAULT 0
+);
+CREATE INDEX idx_kb_categories_parent ON itsm.kb_categories(parent_category_id);
+CREATE INDEX idx_kb_categories_tenant ON itsm.kb_categories(tenant_id);
+
 CREATE TABLE itsm.kb_articles (
   id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id         uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   article_number    text,                 -- 'KB-0041'
   title             text NOT NULL,
   body              text NOT NULL,
-  category          text,
+  category_id       uuid REFERENCES itsm.kb_categories(id),
   view_count        int NOT NULL DEFAULT 0,
   deflection_count  int NOT NULL DEFAULT 0,
   created_at        timestamptz NOT NULL DEFAULT now(),
   updated_at        timestamptz NOT NULL DEFAULT now()
 );
+CREATE INDEX idx_kb_articles_category ON itsm.kb_articles(category_id);
 CREATE TRIGGER trg_kb_articles_updated BEFORE UPDATE ON itsm.kb_articles
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
