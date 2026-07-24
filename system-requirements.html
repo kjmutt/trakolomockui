@@ -24,6 +24,13 @@
   .src-list a:hover{text-decoration:underline;}
   .src-list .src-url{display:block;font-family:var(--font-mono);font-size:11px;color:var(--ink-muted);margin-top:2px;word-break:break-all;}
   .verdate{font-size:11px;color:var(--ink-muted);font-family:var(--font-mono);}
+  .cap-scroll{overflow-x:auto;}
+  table.cap{border-collapse:collapse;width:100%;min-width:860px;}
+  table.cap th,table.cap td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);font-size:12.5px;vertical-align:top;}
+  table.cap th{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted);background:var(--surface-2);font-weight:600;white-space:nowrap;}
+  table.cap td:first-child{font-weight:700;white-space:nowrap;color:var(--ink);}
+  table.cap tr:last-child td{border-bottom:none;}
+  table.cap tr.inflect td{background:var(--coral-bg);color:var(--coral-text);}
 </style>
 </head>
 <body>
@@ -52,7 +59,7 @@
 
 <div class="wrap" style="max-width:980px;">
   <div class="page-head">
-    <div><div class="page-title">System requirements</div><div class="page-desc">Service versions and hardware sizing for the standalone/on-premise install (<span class="id-mono">install/docker-compose.yml</span>) — current as of <span class="verdate">July 2026</span>, re-check the source links before every release.</div></div>
+    <div><div class="page-title">System requirements</div><div class="page-desc">Service versions and hardware sizing for the standalone/on-premise install (<span class="id-mono">install/docker-compose.yml</span>), plus capacity planning for the multi-tenant cloud SaaS tier by concurrent-user count — current as of <span class="verdate">July 2026</span>, re-check the source links before every release.</div></div>
     <div style="display:flex;gap:8px;">
       <a href="cloud-hosting-azure.html" class="btn">Cloud hosting →</a>
       <a href="install/docker-compose.yml" class="btn">View docker-compose.yml →</a>
@@ -110,6 +117,28 @@
     </div>
   </div>
   <div class="page-desc" style="margin-top:10px;">Past ~500 concurrent users, move <span class="id-mono">db</span> onto its own VM/host rather than co-locating everything in the same Compose stack, even though Compose supports it.</div>
+
+  <div class="section-label" style="margin:26px 0 12px;">Cloud SaaS capacity planning</div>
+  <div class="page-desc" style="margin:-6px 0 12px;">This is the multi-tenant cloud tier from <a href="technical-design.html" style="color:var(--indigo-text);">Application architecture</a> and <a href="cloud-hosting-azure.html" style="color:var(--indigo-text);">Cloud hosting</a> — shared Postgres cluster + dedicated-per-Enterprise-tenant — not the on-prem install above. Sizing is by <b>concurrent</b> users, not registered users, since that's what actually drives connections, cache footprint, and job throughput.</div>
+  <div class="panel" style="margin-bottom:10px;">
+    <div class="cap-scroll">
+      <table class="cap">
+        <thead><tr><th>Layer</th><th>100–1,000</th><th>1,000–5,000</th><th>5,000–10,000</th><th>10,000–50,000</th><th>50,000+</th></tr></thead>
+        <tbody>
+          <tr><td>App fleet</td><td>2–3 instances, 2 vCPU/4GB, autoscale 2–4</td><td>4–8 instances, 2–4 vCPU/8GB</td><td>10–20 instances, 4 vCPU/8–16GB</td><td>20–60 instances, 4–8 vCPU/16GB, multi-AZ</td><td>100+ instances, multi-region</td></tr>
+          <tr><td>Control plane (Redis)</td><td>1 primary, 1–2GB, no replica needed</td><td>primary + 1 replica, 4–8GB</td><td>primary + 2 replicas, 8–16GB</td><td>sharded cluster, 3–6 nodes, 32–64GB total</td><td>multi-shard cluster, 100GB+ aggregate</td></tr>
+          <tr><td>DB primary (shared Postgres)</td><td>4 vCPU / 16GB RAM</td><td>8–16 vCPU / 64GB RAM</td><td>16–32 vCPU / 128GB RAM</td><td>32–64 vCPU / 256–512GB RAM</td><td>single primary no longer viable — see below</td></tr>
+          <tr><td>Read replicas</td><td>none</td><td>1 (reporting)</td><td>1–2</td><td>2–3</td><td>per-shard replicas</td></tr>
+          <tr><td>PgBouncer pool</td><td>20–30 conns</td><td>~100 conns</td><td>200–300 conns</td><td>500+ conns, transaction pooling mandatory</td><td>per-shard pools</td></tr>
+          <tr><td>Storage</td><td>50–100GB SSD</td><td>250–500GB SSD</td><td>500GB–1TB NVMe</td><td>2–5TB+ NVMe</td><td>multi-TB, sharded</td></tr>
+          <tr><td>worker-sla / rules / webhooks / reports</td><td>1 instance each, 0.5–1 vCPU/1GB</td><td>2 instances each, 1–2 vCPU/2GB</td><td>3–4 instances each</td><td>8–15 instances each</td><td>dozens each, own message bus (Kafka/Service Bus Premium) instead of Postgres-backed queue</td></tr>
+          <tr><td>worker-ai-agent</td><td>1 instance, small</td><td>1–2 instances</td><td>scaled to LLM call volume, not user count</td><td>own autoscaling policy tied to token throughput/GPU</td><td>dedicated pool, likely separate from the other 4 workers entirely</td></tr>
+          <tr class="inflect"><td>Architecture inflection</td><td>—</td><td>dedicated Enterprise DBs start appearing</td><td>roughly the "10K concurrent" baseline the current design targets</td><td>dedicated-DB-per-Enterprise becomes operational necessity; largest shared tables (tickets, audit logs) need partitioning by tenant_id or time</td><td>shared tier must shard — split into 4–8 Postgres clusters by tenant_id range, each sized like a 10K–50K-tier DB on its own</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="page-desc" style="margin:0 0 22px;">Every row scales linearly except the shared Postgres primary at 50K+ — no single box, however large, clears the write-throughput and connection fan-in ceiling past that point. That's the one place this is an architecture change (sharding the shared tier), not just a bigger VM. These are informed capacity-planning estimates from standard Postgres/Redis/app-server sizing heuristics, not benchmarked numbers for this product — actual load depends heavily on attachment/file volume, tenant activity distribution, and per-module query patterns.</div>
 
   <div class="section-label" style="margin:26px 0 12px;">Sources</div>
   <div class="panel">
