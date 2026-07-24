@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — release engineering &amp; DR</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .layer-ref td:first-child{font-weight:700;white-space:nowrap;}
+  .layer-ref td.mono{font-family:var(--font-mono);font-size:12px;color:var(--ink-2);}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;}
+  @media (max-width:780px){.grid-2{grid-template-columns:1fr;}}
+
+  .diagram-svg{width:100%;height:auto;display:block;}
+  .diagram-svg .dedge{stroke:var(--ink-muted);stroke-width:1.6;}
+  .diagram-svg .dedge.dashed{stroke-dasharray:5 4;opacity:.8;}
+  .diagram-svg text.dtxt{font-family:var(--font-body);}
+  .diagram-svg .node-edge{fill:var(--indigo-2);stroke:var(--indigo-2);}
+  .diagram-svg .node-edge + text.dtxt{fill:#fff;}
+  .diagram-svg .node-app{fill:var(--indigo-bg);stroke:var(--indigo);}
+  .diagram-svg .node-app + text.dtxt{fill:var(--indigo-text);}
+  .diagram-svg .node-ctrl{fill:var(--violet-bg);stroke:var(--violet);}
+  .diagram-svg .node-ctrl + text.dtxt{fill:var(--violet-text);}
+  .diagram-svg .node-data{fill:var(--amber-bg);stroke:var(--amber);}
+  .diagram-svg .node-data + text.dtxt{fill:var(--amber-text);}
+  .diagram-svg .node-work{fill:var(--green-bg);stroke:var(--green);}
+  .diagram-svg .node-work + text.dtxt{fill:var(--green-text);}
+  .diagram-svg .node-obs{fill:var(--surface-2);stroke:var(--border-strong);}
+  .diagram-svg .node-obs + text.dtxt{fill:var(--ink-2);}
+  .diagram-scroll{overflow-x:auto;padding:4px 2px 8px;}
+
+  .step-list{counter-reset:step;list-style:none;margin:10px 0 0;padding:0;}
+  .step-list li{position:relative;padding:6px 0 6px 34px;font-size:13px;color:var(--ink-2);}
+  .step-list li b{color:var(--ink);}
+  .step-list li::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:6px;width:22px;height:22px;border-radius:50%;background:var(--indigo-bg);color:var(--indigo-text);font-size:11px;font-weight:700;font-family:var(--font-mono);display:flex;align-items:center;justify-content:center;}
+
+  .rpo-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;box-shadow:var(--shadow-sm);}
+  .rpo-card .tname{font-family:var(--font-display);font-weight:700;font-size:14px;margin-bottom:8px;}
+  .rpo-card .tspec{font-size:12.5px;color:var(--ink-2);display:flex;justify-content:space-between;padding:5px 0;border-top:1px solid var(--border);}
+  .rpo-card .tspec:first-of-type{border-top:none;}
+  .rpo-card .tspec b{color:var(--ink);font-weight:600;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="docs.html">Docs</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+    <a href="technical-design.html" class="active">Technical</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="technical-design.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="4" height="3" rx=".5"/><rect x="10" y="2" width="4" height="3" rx=".5"/><rect x="6" y="11" width="4" height="3" rx=".5"/><path d="M4 5v3M12 5v3M4 8h8M8 8v3"/></svg>Application architecture</a>
+  <a href="cloud-hosting-azure.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4.5 12.5a3 3 0 010-6 4 4 0 017.5-1.5A3.2 3.2 0 0111.5 12.5h-7z"/></svg>Cloud hosting</a>
+  <a href="system-requirements.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="12" height="8" rx="1"/><path d="M5 13.5h6M8 10v3.5"/></svg>System requirements</a>
+  <a href="how-it-works.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6"/><path d="M8 5.5v3.2M8 11v.1"/></svg>How it works</a>
+  <a class="active" href="release-engineering.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="4.5" cy="4" r="1.8"/><circle cx="4.5" cy="12" r="1.8"/><circle cx="11.5" cy="8" r="1.8"/><path d="M4.5 5.8V10.2M6 4.5c3 0 3.5 1.5 3.8 2.2M6 11.5c3 0 3.5-1.5 3.8-2.2"/></svg>Release &amp; DR</a>
+</div>
+
+<div class="wrap" style="max-width:980px;">
+  <div class="page-head">
+    <div><div class="page-title">Release engineering &amp; disaster recovery</div><div class="page-desc">Branching strategy, environment creation (first-time and ongoing), the code-promotion pipeline, testing gates, production updates, and DR — how a change gets from a developer's laptop to every customer safely, and what happens if a whole region goes down.</div></div>
+    <div style="display:flex;gap:8px;">
+      <a href="technical-design.html" class="btn">Application architecture →</a>
+      <a href="cloud-hosting-azure.html" class="btn">Cloud hosting →</a>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:22px;">
+    <div class="section-label">In one line</div>
+    <div class="page-desc" style="margin-top:2px;">Trunk-based development with short-lived branches, four environments (Dev, QA, Staging, Production) provisioned identically from the same Infrastructure-as-Code modules, one build artifact promoted unchanged through all of them behind testing gates, and a paired-region DR setup with async replication so a full region loss is a promotable standby, not a rebuild from backup.</div>
+  </div>
+
+  <div class="section-label" style="margin-bottom:12px;">Branching strategy</div>
+  <div class="card" style="margin-bottom:22px;">
+    <div class="page-desc" style="margin-top:0;">Trunk-based development — <span class="id-mono">main</span> is always deployable, branches are short-lived (days, not weeks), and incomplete work ships behind feature flags instead of living on a branch. Long-lived branches are the thing this avoids: the longer a branch lives, the more merge pain it stores up.</div>
+    <ul class="step-list">
+      <li><b>Branch naming</b> — <span class="id-mono">feature/&lt;ticket-id&gt;-short-desc</span>, <span class="id-mono">fix/&lt;ticket-id&gt;-short-desc</span>, cut directly from <span class="id-mono">main</span>.</li>
+      <li><b>Every PR requires</b> — passing CI (build, unit tests, lint, SAST/dependency scan), at least one review, no direct pushes to <span class="id-mono">main</span>.</li>
+      <li><b>Feature flags</b> decouple "merged" from "released" — a half-finished feature merges to main continuously behind a flag that's off in production, instead of sitting unmerged on a branch for weeks.</li>
+      <li><b>Hotfix path</b> — branch directly off the current production tag, PR back into <span class="id-mono">main</span> and cherry-picked forward if main has diverged. Rare in practice, since trunk-based keeps <span class="id-mono">main</span> ≈ production most of the time.</li>
+    </ul>
+  </div>
+
+  <div class="section-label" style="margin-bottom:12px;">Code promotion pipeline</div>
+  <div class="page-desc" style="margin:-6px 0 12px;">One build artifact — never rebuilt per environment, only reconfigured (connection strings, feature flags) — is promoted through every stage. What passed testing in Staging is byte-for-byte what ships to Production.</div>
+  <div class="card" style="margin-bottom:16px;padding:20px 22px 14px;">
+    <div class="diagram-scroll"><svg class="diagram-svg" viewBox="0 0 970 210" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arrowhead2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-muted)"/>
+  </marker>
+</defs>
+<path class="dedge" d="M190,45 L210,45" fill="none" marker-end="url(#arrowhead2)"/>
+<path class="dedge" d="M380,45 L400,45" fill="none" marker-end="url(#arrowhead2)"/>
+<path class="dedge" d="M485,70 L485,105 L105,105 L105,140" fill="none" marker-end="url(#arrowhead2)"/>
+<path class="dedge" d="M190,165 L210,165" fill="none" marker-end="url(#arrowhead2)"/>
+<path class="dedge" d="M380,165 L400,165" fill="none" marker-end="url(#arrowhead2)"/>
+<path class="dedge" d="M570,165 L590,165" fill="none" marker-end="url(#arrowhead2)"/>
+<path class="dedge" d="M760,165 L780,165" fill="none" marker-end="url(#arrowhead2)"/>
+<path class="dedge dashed" d="M865,140 L865,95 L675,95 L675,120" fill="none" marker-end="url(#arrowhead2)"/>
+<rect class="node-edge" x="20" y="20" width="170" height="50" rx="8"/><text class="dtxt" text-anchor="middle" font-size="12"><tspan x="105" y="41" font-weight="700">Feature branch</tspan><tspan x="105" y="56">short-lived</tspan></text>
+<rect class="node-app" x="210" y="20" width="170" height="50" rx="8"/><text class="dtxt" text-anchor="middle" font-size="12"><tspan x="295" y="41" font-weight="700">PR + CI checks</tspan><tspan x="295" y="56">build · unit · lint · SAST</tspan></text>
+<rect class="node-edge" x="400" y="20" width="170" height="50" rx="8"/><text class="dtxt" text-anchor="middle" font-size="12"><tspan x="485" y="41" font-weight="700">main (trunk)</tspan><tspan x="485" y="56">always deployable</tspan></text>
+<rect class="node-ctrl" x="20" y="140" width="170" height="50" rx="8"/><text class="dtxt" text-anchor="middle" font-size="12"><tspan x="105" y="161" font-weight="700">Dev</tspan><tspan x="105" y="176">auto-deploy on merge</tspan></text>
+<rect class="node-ctrl" x="210" y="140" width="170" height="50" rx="8"/><text class="dtxt" text-anchor="middle" font-size="12"><tspan x="295" y="161" font-weight="700">QA / Test</tspan><tspan x="295" y="176">integration + E2E</tspan></text>
+<rect class="node-data" x="400" y="140" width="170" height="50" rx="8"/><text class="dtxt" text-anchor="middle" font-size="12"><tspan x="485" y="161" font-weight="700">Staging</tspan><tspan x="485" y="176">perf · security · UAT</tspan></text>
+<rect class="node-work" x="590" y="140" width="170" height="50" rx="8"/><text class="dtxt" text-anchor="middle" font-size="12"><tspan x="675" y="161" font-weight="700">Production</tspan><tspan x="675" y="176">canary / blue-green</tspan></text>
+<rect class="node-obs" x="780" y="140" width="170" height="50" rx="8"/><text class="dtxt" text-anchor="middle" font-size="12"><tspan x="865" y="161" font-weight="700">Monitoring</tspan><tspan x="865" y="176">health probes + rollback</tspan></text>
+</svg></div>
+  </div>
+  <div class="page-desc" style="margin:0 0 22px;">Container Apps revisions provide canary/blue-green natively: a new revision takes a small slice of traffic, ramps up automatically while health probes and error rate stay clean, and the dashed line back from Monitoring is the automatic rollback signal — a bad revision gets pulled without a human needing to notice first.</div>
+
+  <div class="section-label" style="margin-bottom:12px;">Environments &amp; first-time infrastructure creation</div>
+  <div class="panel" style="margin-bottom:14px;">
+    <table class="layer-ref">
+      <thead><tr><th>Environment</th><th>Purpose</th><th>Data</th><th>Sizing</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--violet-text);">Dev</td><td>Every merge to main auto-deploys here — smoke tests, internal dogfooding</td><td>Synthetic/seeded, reset regularly</td><td>Smallest SKUs</td></tr>
+        <tr><td style="color:var(--violet-text);">QA / Test</td><td>Automated integration + E2E suite runs here on every promotion</td><td>Synthetic, refreshed per run</td><td>Small, isolated resource group</td></tr>
+        <tr><td style="color:var(--amber-text);">Staging</td><td>Performance/security testing and manual UAT sign-off before release</td><td>Anonymized copy of production, or prod-scale synthetic</td><td>Matched to Production SKUs</td></tr>
+        <tr><td style="color:var(--green-text);">Production</td><td>Live customer traffic</td><td>Real tenant data</td><td>Full SKUs + DR pairing (see below)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="grid-2" style="margin-bottom:22px;">
+    <div class="card">
+      <div class="section-label" style="color:var(--indigo-text);">First-time infra creation</div>
+      <div class="page-desc" style="margin-top:4px;">One set of Bicep/Terraform modules — matching the layers in <a href="cloud-hosting-azure.html" style="color:var(--indigo-text);">Cloud hosting</a> — parameterized per environment. Running <span class="id-mono">terraform apply</span> (or <span class="id-mono">az deployment group create</span> for Bicep) with an environment-specific parameters file creates that environment's entire resource group from scratch: DNS, Front Door, Container Apps environment, Postgres Flexible Server, Redis, Storage, Key Vault, Service Bus. Secrets are generated straight into Key Vault as part of that same apply — never hand-typed anywhere.</div>
+    </div>
+    <div class="card">
+      <div class="section-label" style="color:var(--amber-text);">Ongoing infra updates</div>
+      <div class="page-desc" style="margin-top:4px;">Same modules, same command. <span class="id-mono">terraform plan</span> / <span class="id-mono">bicep what-if</span> runs in CI on every infra-repo PR so reviewers see the exact diff before anything applies. Apply goes through the same pipeline gates as code — auto-apply to Dev, approval required for Staging/Production. A nightly drift-detection plan (expecting zero changes) catches manual portal edits that bypassed the pipeline.</div>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-bottom:12px;">Testing strategy by stage</div>
+  <div class="panel" style="margin-bottom:22px;">
+    <table class="layer-ref">
+      <thead><tr><th>Stage</th><th>What runs</th></tr></thead>
+      <tbody>
+        <tr><td>PR (before merge)</td><td>Unit tests per module, lint, SAST/dependency scanning — must pass before merge to <span class="id-mono">main</span> is even possible</td></tr>
+        <tr><td>Dev</td><td>Smoke test suite, internal dogfooding</td></tr>
+        <tr><td>QA / Test</td><td>Automated integration tests (API contracts across itsm/sam/dev/docs), E2E UI tests</td></tr>
+        <tr><td>Staging</td><td>Performance/load testing, security/penetration testing, manual UAT sign-off — the last gate before Production</td></tr>
+        <tr><td>Production</td><td>Canary health checks, synthetic monitoring, real-user monitoring</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-label" style="margin-bottom:12px;">Production update process</div>
+  <div class="card" style="margin-bottom:22px;">
+    <ul class="step-list">
+      <li><b>Build once</b> — the exact artifact that passed Staging is what deploys to Production, never rebuilt per environment.</li>
+      <li><b>DB migrations use expand-contract</b> — a backward-compatible migration (new columns/tables) deploys before the code that uses them; old columns are dropped only after the new code path has run clean in production for a verified period. A mid-rollout rollback never leaves the database in a shape the old code can't read.</li>
+      <li><b>Canary rollout</b> — the new Container Apps revision takes a small percentage of traffic first, ramping automatically while health probes and error rate stay within budget.</li>
+      <li><b>Feature flags</b> gate user-facing behavior separately from deployment — "deployed" and "released" are different events, reversible without a redeploy.</li>
+      <li><b>Automatic rollback</b> — if health probes or error rate cross a threshold during ramp-up, the canary revision is pulled and traffic reverts to the last known-good revision without waiting for a human to notice.</li>
+    </ul>
+  </div>
+
+  <div class="section-label" style="margin-bottom:12px;">Disaster recovery strategy</div>
+  <div class="page-desc" style="margin:-6px 0 12px;">Primary region active, a paired region on standby — async replication keeps it current, and Front Door fails over on health-probe failure without a manual DNS change.</div>
+  <div class="card" style="margin-bottom:16px;padding:20px 22px 14px;">
+    <div class="diagram-scroll"><svg class="diagram-svg" viewBox="0 0 840 220" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arrowhead3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-muted)"/>
+  </marker>
+</defs>
+<path class="dedge" d="M390,70 L390,100 L240,100 L240,130" fill="none" marker-end="url(#arrowhead3)"/>
+<path class="dedge dashed" d="M450,70 L450,100 L600,100 L600,130" fill="none" marker-end="url(#arrowhead3)"/>
+<path class="dedge dashed" d="M380,165 L460,165" fill="none" marker-end="url(#arrowhead3)"/>
+<rect class="node-edge" x="320" y="20" width="200" height="50" rx="8"/><text class="dtxt" text-anchor="middle" font-size="12"><tspan x="420" y="41" font-weight="700">Azure Front Door</tspan><tspan x="420" y="56">health-probe routing</tspan></text>
+<rect class="node-work" x="100" y="130" width="280" height="70" rx="8"/><text class="dtxt" text-anchor="middle" font-size="12.5"><tspan x="240" y="156" font-weight="700">Primary region — East US 2</tspan><tspan x="240" y="173">active · serves all traffic</tspan></text>
+<rect class="node-data" x="460" y="130" width="280" height="70" rx="8"/><text class="dtxt" text-anchor="middle" font-size="12.5"><tspan x="600" y="156" font-weight="700">DR region — West US</tspan><tspan x="600" y="173">standby · promotable</tspan></text>
+<text x="420" y="122" text-anchor="middle" font-size="10.5" fill="var(--ink-muted)" font-family="var(--font-mono)">async replication + geo-redundant backups</text>
+</svg></div>
+  </div>
+  <div class="grid-2" style="margin-bottom:14px;">
+    <div class="rpo-card">
+      <div class="tname" style="color:var(--green-text);">Shared tier — Free · Team · Business</div>
+      <div class="tspec"><span>RTO</span><b>&lt; 1 hour</b></div>
+      <div class="tspec"><span>RPO</span><b>&lt; 15 minutes</b></div>
+    </div>
+    <div class="rpo-card">
+      <div class="tname" style="color:var(--amber-text);">Dedicated tier — Enterprise</div>
+      <div class="tspec"><span>RTO</span><b>&lt; 30 minutes</b></div>
+      <div class="tspec"><span>RPO</span><b>&lt; 5 minutes</b></div>
+    </div>
+  </div>
+  <div class="card">
+    <ul class="step-list">
+      <li><b>Postgres Flexible Server</b> — geo-redundant backups plus a replica in the DR region, promotable to primary on failover.</li>
+      <li><b>Blob Storage</b> — geo-redundant storage (GRS/RA-GRS); data is replicated automatically, no separate DR job to run.</li>
+      <li><b>Redis</b> — not on the DR-critical path. It's a cache; the DR region starts with an empty one and rebuilds from Postgres, which is acceptable since sessions can simply be re-established.</li>
+      <li><b>Front Door</b> — automatic health-probe-based failover to the DR region; no manual DNS cutover required.</li>
+      <li><b>DR drills</b> — a quarterly failover game-day exercises the actual runbook and verifies real RTO/RPO against the targets above, not just the theoretical design.</li>
+    </ul>
+  </div>
+
+</div>
+<script src="app-chrome.js" defer></script>
+</body>
+</html>
