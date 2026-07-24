@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Trakolo — technical design</title>
+<title>Trakolo — application architecture</title>
 <link rel="stylesheet" href="styles.css">
 <script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
 <style>
@@ -14,6 +14,7 @@
   .arch-layer .al-desc{font-size:12.5px;color:var(--ink-2);margin-bottom:12px;}
   .arch-nodes{display:flex;flex-wrap:wrap;gap:8px;}
   .arch-node{font-size:12px;font-weight:600;padding:7px 13px;border-radius:8px;border:1px solid transparent;}
+  .arch-node.split{border-style:dashed;border-color:currentColor;opacity:.9;}
   .arch-arrow{display:flex;justify-content:center;padding:6px 0;color:var(--ink-muted);font-size:15px;}
   .arch-layer.l-edge{border-top-color:var(--indigo-2);}
   .arch-layer.l-app{border-top-color:var(--indigo);}
@@ -33,7 +34,8 @@
   .layer-ref td.mono{font-family:var(--font-mono);font-size:12px;color:var(--ink-2);}
 
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;}
-  @media (max-width:780px){.grid-2{grid-template-columns:1fr;}}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px;}
+  @media (max-width:780px){.grid-2,.grid-3{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -54,10 +56,14 @@
   </div>
   <div class="top-right"><div class="avatar">EM</div></div>
 </div>
+<div class="subnav">
+  <a class="active" href="technical-design.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="4" height="3" rx=".5"/><rect x="10" y="2" width="4" height="3" rx=".5"/><rect x="6" y="11" width="4" height="3" rx=".5"/><path d="M4 5v3M12 5v3M4 8h8M8 8v3"/></svg>Application architecture</a>
+  <a href="cloud-hosting-azure.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4.5 12.5a3 3 0 010-6 4 4 0 017.5-1.5A3.2 3.2 0 0111.5 12.5h-7z"/></svg>Cloud hosting</a>
+</div>
 
 <div class="wrap" style="max-width:980px;">
   <div class="page-head">
-    <div><div class="page-title">Technical design</div><div class="page-desc">Reference architecture for building Trakolo as a real product — multi-tenant, subdomain-routed, sized for 10,000 concurrent users. Not part of the product itself; internal engineering documentation.</div></div>
+    <div><div class="page-title">Application architecture</div><div class="page-desc">Reference architecture for building Trakolo as a real product — multi-tenant, subdomain-routed, sized for 10,000 concurrent users. Not part of the product itself; internal engineering documentation.</div></div>
     <div style="display:flex;gap:8px;">
       <a href="er-diagram.html" class="btn">Entity relationships →</a>
       <a href="db/schema.sql" class="btn">View db/schema.sql →</a>
@@ -66,7 +72,7 @@
 
   <div class="card" style="margin-bottom:22px;">
     <div class="section-label">In one line</div>
-    <div class="page-desc" style="margin-top:2px;">One modular-monolith app fleet behind wildcard subdomains, a hybrid data tier — shared clusters for most tenants, dedicated database &amp; storage for Enterprise — and background services that scale independently of the request path.</div>
+    <div class="page-desc" style="margin-top:2px;">One modular-monolith app fleet behind wildcard subdomains, a hybrid data tier — shared cluster for most tenants, dedicated database &amp; storage for Enterprise — and background services split by job type so one failure never takes down every job for every customer.</div>
   </div>
 
   <div class="section-label" style="margin-bottom:12px;">Request &amp; data flow</div>
@@ -85,22 +91,23 @@
 
     <div class="arch-layer l-app">
       <div class="al-head"><span class="al-num">②</span><span class="al-title">App fleet — stateless, horizontally scaled</span></div>
-      <div class="al-desc">No per-tenant pinning — any pod serves any tenant's request once it's resolved. The API stays a modular monolith: one deployable, module boundaries as internal packages.</div>
+      <div class="al-desc">Shared compute pool for every tenant by default, including Enterprise — no per-tenant pinning, any instance serves any tenant's request once resolved. A <span class="id-mono">compute_pool</span> field on the tenant registry is the escape hatch: it can pin one contractually-demanding tenant to a dedicated pool without a second codebase.</div>
       <div class="arch-nodes">
         <span class="arch-node node-app">apps/web (SPA)</span>
         <span class="arch-node node-app">apps/api — itsm</span>
         <span class="arch-node node-app">apps/api — sam</span>
         <span class="arch-node node-app">apps/api — dev</span>
         <span class="arch-node node-app">apps/api — docs</span>
+        <span class="arch-node node-app split">compute_pool: shared (default) / dedicated (opt-in)</span>
       </div>
     </div>
     <div class="arch-arrow">▼</div>
 
     <div class="arch-layer l-ctrl">
       <div class="al-head"><span class="al-num">③</span><span class="al-title">Control plane</span></div>
-      <div class="al-desc">Resolves subdomain → tenant_id → DB host + storage bucket on every request, cached so tenant resolution never costs a database round-trip.</div>
+      <div class="al-desc">Resolves subdomain → tenant_id → DB host + storage bucket + compute_pool on every request, cached so tenant resolution never costs a database round-trip.</div>
       <div class="arch-nodes">
-        <span class="arch-node node-ctrl">Tenant registry (slug → db host, bucket, plan)</span>
+        <span class="arch-node node-ctrl">Tenant registry (slug → db host, bucket, plan, compute_pool)</span>
         <span class="arch-node node-ctrl">Redis — tenant cache + sessions</span>
       </div>
     </div>
@@ -120,25 +127,24 @@
     <div class="arch-arrow">▼</div>
 
     <div class="arch-layer l-work">
-      <div class="al-head"><span class="al-num">⑤</span><span class="al-title">Background services — apps/worker</span></div>
-      <div class="al-desc">Deploy and scale independently of the request/response app tier, off a shared job queue. These are the exact jobs already listed in <a href="admin.html#status" style="color:var(--green-text);font-weight:600;">Admin → System status</a>.</div>
+      <div class="al-head"><span class="al-num">⑤</span><span class="al-title">Background &amp; specialized services</span></div>
+      <div class="al-desc">Split by job type into independent deployables — not one shared worker process. If webhook delivery crashes, SLA escalation keeps running for every customer; it doesn't take everyone down at once. Each job carries an idempotency key and dequeues with <span class="id-mono">FOR UPDATE SKIP LOCKED</span>-style locking so a redelivered message is a no-op, not a duplicate.</div>
       <div class="arch-nodes">
-        <span class="arch-node node-work">Job queue (Postgres-backed)</span>
-        <span class="arch-node node-work">SLA escalation</span>
-        <span class="arch-node node-work">Business rules engine</span>
-        <span class="arch-node node-work">AI agent worker</span>
-        <span class="arch-node node-work">Webhook delivery</span>
-        <span class="arch-node node-work">Report export scheduler</span>
+        <span class="arch-node node-work">worker-sla — SLA escalation</span>
+        <span class="arch-node node-work">worker-rules — business rules engine</span>
+        <span class="arch-node node-work">worker-webhooks — delivery + retries</span>
+        <span class="arch-node node-work">worker-reports — export scheduler</span>
+        <span class="arch-node node-work split">worker-ai-agent — separate service, different resource profile</span>
       </div>
     </div>
     <div class="arch-arrow">▼</div>
 
     <div class="arch-layer l-obs">
       <div class="al-head"><span class="al-num">⑥</span><span class="al-title">Monitoring</span></div>
-      <div class="al-desc">The same health registry behind Admin → System status feeds real dashboards and alerts in production.</div>
+      <div class="al-desc">The same health registry behind Admin → System status feeds real dashboards and alerts in production — now per worker, so a failure is attributed to one job type, not "background services" generically.</div>
       <div class="arch-nodes">
         <span class="arch-node node-obs">platform.services — health registry</span>
-        <span class="arch-node node-obs">Dashboards + alerts</span>
+        <span class="arch-node node-obs">Dashboards + alerts, per worker</span>
       </div>
     </div>
   </div>
@@ -149,56 +155,29 @@
       <thead><tr><th>Layer</th><th>Component</th><th>Purpose</th></tr></thead>
       <tbody>
         <tr><td style="color:var(--indigo-2);">Edge</td><td class="mono">*.trakolo.com, portal.trakolo.com</td><td>One wildcard cert and DNS record for every tenant subdomain; the sign-in chooser matches <span class="id-mono">login.html</span> in this mockup.</td></tr>
-        <tr><td style="color:var(--indigo-text);">App fleet</td><td class="mono">apps/web, apps/api</td><td>Stateless, horizontally scaled, no per-tenant pinning. <span class="id-mono">apps/api</span> stays a modular monolith.</td></tr>
-        <tr><td style="color:var(--violet-text);">Control plane</td><td class="mono">tenant registry, Redis</td><td>Resolves subdomain → tenant_id → DB host + bucket on every request; cached to avoid a DB hit per lookup.</td></tr>
+        <tr><td style="color:var(--indigo-text);">App fleet</td><td class="mono">apps/web, apps/api</td><td>Stateless, horizontally scaled, shared compute pool by default. <span class="id-mono">apps/api</span> stays a modular monolith; <span class="id-mono">compute_pool</span> is the per-tenant dedicated-compute escape hatch.</td></tr>
+        <tr><td style="color:var(--violet-text);">Control plane</td><td class="mono">tenant registry, Redis</td><td>Resolves subdomain → tenant_id → DB host + bucket + compute_pool on every request; cached to avoid a DB hit per lookup.</td></tr>
         <tr><td style="color:var(--amber-text);">Data tier</td><td class="mono">PgBouncer, Postgres, object storage</td><td>Shared pooled cluster with row-level tenant_id scoping for most plans; dedicated DB + bucket for Enterprise. Read replica isolates reporting.</td></tr>
-        <tr><td style="color:var(--green-text);">Background services</td><td class="mono">apps/worker</td><td>SLA escalation, business rules, AI agent, webhook delivery, report export — deploy and scale independently of the web tier.</td></tr>
-        <tr><td style="color:var(--ink-2);">Monitoring</td><td class="mono">platform.services, dashboards</td><td>Drives Admin → System status in the product and real dashboards/alerts in production — SLA breach rate, queue depth, replica lag, per-tenant error rate.</td></tr>
+        <tr><td style="color:var(--green-text);">Background services</td><td class="mono">worker-sla, worker-rules, worker-webhooks, worker-reports, worker-ai-agent</td><td>Split by job type — independent deploy, scale, and failure domain per worker, not one shared process for everything.</td></tr>
+        <tr><td style="color:var(--ink-2);">Monitoring</td><td class="mono">platform.services, dashboards</td><td>Drives Admin → System status in the product and real dashboards/alerts in production — SLA breach rate, per-worker queue depth, replica lag, per-tenant error rate.</td></tr>
       </tbody>
     </table>
   </div>
 
-  <div class="section-label" style="margin:26px 0 12px;">Two things this design depends on</div>
-  <div class="grid-2">
+  <div class="section-label" style="margin:26px 0 12px;">Things this design depends on</div>
+  <div class="grid-3">
     <div class="card">
       <div class="section-label" style="color:var(--indigo-text);">Route everything through the registry</div>
-      <div class="page-desc" style="margin-top:4px;">No service hardcodes which database or bucket a tenant lives in — every lookup goes through the control-plane registry. That's what makes "shared for most, dedicated for Enterprise" a config difference instead of two codebases.</div>
+      <div class="page-desc" style="margin-top:4px;">No service hardcodes which database, bucket, or compute pool a tenant lives in — every lookup goes through the control-plane registry. That's what makes "shared for most, dedicated for one" a config difference instead of two codebases.</div>
     </div>
     <div class="card" style="background:var(--coral-bg);border-color:#F0C4B2;">
       <div class="section-label" style="color:var(--coral-text);">Shared infrastructure shares fate</div>
       <div class="page-desc" style="margin-top:4px;color:var(--coral-text);">Tenants on the shared cluster share connection pool, disk I/O, and query load. Per-tenant rate limits and the reporting read replica exist specifically to stop one noisy tenant from becoming everyone else's incident.</div>
     </div>
-  </div>
-
-  <div class="section-label" style="margin:26px 0 12px;">Hosting architecture — Cloud edition</div>
-  <div class="page-desc" style="margin:-6px 0 12px;">Every layer in the diagram above maps onto managed cloud services rather than hand-run infrastructure — the goal is nothing to patch at 3am that a managed service already handles.</div>
-  <div class="panel">
-    <table class="layer-ref">
-      <thead><tr><th>Layer</th><th>Reference implementation</th><th>Why managed, not self-run</th></tr></thead>
-      <tbody>
-        <tr><td style="color:var(--indigo-2);">Edge</td><td class="mono">Route 53 · ACM wildcard cert · ALB / CloudFront</td><td>DNS, TLS renewal, and edge routing are undifferentiated — a lapsed cert or a DNS misconfig is a self-inflicted outage.</td></tr>
-        <tr><td style="color:var(--indigo-text);">App fleet</td><td class="mono">ECS Fargate (or EKS) · auto-scaling group</td><td>Stateless containers scale on CPU/request metrics without capacity planning by hand.</td></tr>
-        <tr><td style="color:var(--violet-text);">Control plane</td><td class="mono">ElastiCache (Redis) · app-owned registry table</td><td>Managed Redis handles failover; the registry itself is just rows in the data tier below.</td></tr>
-        <tr><td style="color:var(--amber-text);">Data tier</td><td class="mono">RDS Postgres (Multi-AZ) + read replica · S3</td><td>Automated backups, patching, and failover — the single biggest source of 3am pages if self-managed.</td></tr>
-        <tr><td style="color:var(--green-text);">Background services</td><td class="mono">ECS service (separate task def from web) · SQS-backed or Postgres-backed queue</td><td>Scales and deploys on its own schedule, independent of web traffic.</td></tr>
-        <tr><td style="color:var(--ink-2);">Monitoring</td><td class="mono">CloudWatch / Datadog · PagerDuty on-call routing</td><td>Same signals as Admin → System status, wired to actually page someone.</td></tr>
-        <tr><td style="color:var(--ink-2);">Secrets</td><td class="mono">Secrets Manager / Parameter Store</td><td>DB passwords and API keys never sit in a repo or a plain <span class="id-mono">.env</span> in production.</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="page-desc" style="margin-top:10px;">Named after AWS here for concreteness; the same shape maps onto Cloud SQL/Memorystore/GCS on GCP or Azure Database/Cache/Blob Storage on Azure without changing the architecture.</div>
-
-  <div class="section-label" style="margin:26px 0 12px;">Standalone / on-premise installation</div>
-  <div class="page-desc" style="margin:-6px 0 12px;">The perpetual-license edition (see <a href="site/pricing.html" style="color:var(--indigo-text);">Pricing</a> and <a href="admin.html#license" style="color:var(--indigo-text);">Admin → License &amp; billing</a>) runs as a single-host Docker Compose stack instead of the multi-tenant cloud topology above — one customer, one install, no shared infrastructure to reason about.</div>
-  <div class="card">
-    <div class="section-label">Reference stack — <span class="id-mono">install/</span></div>
-    <div class="row-line"><div><div class="rname">docker-compose.yml</div><div class="rdesc">Postgres, Redis, a one-shot migrate step that applies db/schema.sql, and the app — one command, one host</div></div><a href="install/docker-compose.yml" class="btn sm">View →</a></div>
-    <div class="row-line"><div><div class="rname">install.sh</div><div class="rdesc">Generates .env with a random DB password if missing, brings up the stack in dependency order, waits for health checks, applies the schema, starts the app</div></div><a href="install/install.sh" class="btn sm">View →</a></div>
-    <div class="row-line" style="border-bottom:none;"><div><div class="rname">.env.example</div><div class="rdesc">Database credentials, app port, and the license file path — copied to .env on first run</div></div><a href="install/.env.example" class="btn sm">View →</a></div>
-  </div>
-  <div class="card" style="margin-top:14px;">
-    <div class="section-label">License activation</div>
-    <div class="page-desc" style="margin-top:2px;">A workspace's <span class="id-mono">.trklic</span> file — a JSON payload signed with Trakolo's private key — is issued whenever seats, modules, or the expiry date change, and verified locally against the public key bundled with the install. Air-gapped networks activate offline: <span class="id-mono">License → Offline activation</span> generates a request code, exchanged for a response code on the customer portal from any machine with outbound access, then pasted back in. See <a href="site/docs.html#onprem-install" style="color:var(--indigo-text);">site/docs.html</a> for the full walkthrough.</div>
+    <div class="card" style="background:var(--green-bg);border-color:#B9DE9A;">
+      <div class="section-label" style="color:var(--green-text);">One worker, one failure domain</div>
+      <div class="page-desc" style="margin-top:4px;color:var(--green-text);">Splitting background jobs by type means a crash, a bad deploy, or a stuck queue in one worker is contained to that job — the lesson from the previous design, where one shared worker process going down stopped every background job for every customer at once.</div>
+    </div>
   </div>
 
 </div>

@@ -50,7 +50,7 @@
 
 <div class="wrap" style="max-width:960px;">
   <div class="page-head">
-    <div><div class="page-title">Site map</div><div class="page-desc">Every page in the mockup — 65 pages across 12 areas, as one flat list.</div></div>
+    <div><div class="page-title">Site map</div><div class="page-desc">Every page in the mockup — 66 pages across 12 areas, as one flat list.</div></div>
     <a href="index.html" class="btn">← Tile view</a>
   </div>
 
@@ -255,12 +255,13 @@
   </div>
 
   <div class="sm-section" id="sm-techdesign">
-    <div class="sm-label"><span class="name">Technical design · engineering reference</span><span class="rule"></span><span class="count">5 pages</span></div>
+    <div class="sm-label"><span class="name">Technical design · engineering reference</span><span class="rule"></span><span class="count">6 pages</span></div>
     <div class="panel">
       <table class="sm">
         <thead><tr><th>Page</th><th>What's on it</th></tr></thead>
         <tbody>
-          <tr><td><a href="technical-design.html">Technical design</a><div class="path">technical-design.html</div></td><td>Reference architecture — edge/routing, app fleet, control plane, hybrid data tier, background services, monitoring, cloud hosting &amp; standalone install</td></tr>
+          <tr><td><a href="technical-design.html">Application architecture</a><div class="path">technical-design.html</div></td><td>Reference architecture — edge/routing, app fleet, control plane, hybrid data tier, job-type-split background services, monitoring</td></tr>
+          <tr><td><a href="cloud-hosting-azure.html">Cloud hosting</a><div class="path">cloud-hosting-azure.html</div></td><td>Azure reference stack, layer-by-layer AWS-vs-Azure comparison, standalone/on-premise install</td></tr>
           <tr><td><a href="db/schema.sql">Database schema</a><div class="path">db/schema.sql</div></td><td>PostgreSQL schema for the full data model, organized by module (core, itsm, sam, dev, docs, platform)</td></tr>
           <tr><td><a href="er-diagram.html">Entity relationships</a><div class="path">er-diagram.html</div></td><td>All 108 foreign keys across the 53 tables, grouped by module and filterable, extracted from a live database</td></tr>
           <tr><td><a href="install/docker-compose.yml">docker-compose.yml</a><div class="path">install/docker-compose.yml</div></td><td>Standalone/on-premise reference stack — Postgres, Redis, a one-shot schema migration, the app</td></tr>
@@ -295,7 +296,7 @@ const AREA_COUNTS = [
   ['Platform','sm-platform',4,'var(--indigo)'],
   ['Portal','sm-portal',7,'var(--indigo-2)'],
   ['Admin','sm-admin',4,'var(--amber)'],
-  ['Technical design','sm-techdesign',5,'var(--violet)'],
+  ['Technical design','sm-techdesign',6,'var(--violet)'],
   ['This page','sitemap.html',1,'var(--border-strong)']
 ];
 const smTotal = AREA_COUNTS.reduce((n,a)=>n+a[2],0);

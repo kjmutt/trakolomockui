@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — cloud hosting (Azure)</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .arch-flow{display:flex;flex-direction:column;align-items:stretch;gap:0;}
+  .arch-layer{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px 22px;box-shadow:var(--shadow-sm);border-top:3px solid var(--border-strong);}
+  .arch-layer .al-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .arch-layer .al-num{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--ink-muted);}
+  .arch-layer .al-title{font-family:var(--font-display);font-size:15.5px;font-weight:700;}
+  .arch-layer .al-desc{font-size:12.5px;color:var(--ink-2);margin-bottom:12px;}
+  .arch-nodes{display:flex;flex-wrap:wrap;gap:8px;}
+  .arch-node{font-size:12px;font-weight:600;padding:7px 13px;border-radius:8px;border:1px solid transparent;}
+  .arch-node.split{border-style:dashed;border-color:currentColor;opacity:.9;}
+  .arch-arrow{display:flex;justify-content:center;padding:6px 0;color:var(--ink-muted);font-size:15px;}
+  .arch-layer.l-edge{border-top-color:var(--indigo-2);}
+  .arch-layer.l-app{border-top-color:var(--indigo);}
+  .arch-layer.l-ctrl{border-top-color:var(--violet);}
+  .arch-layer.l-data{border-top-color:var(--amber);}
+  .arch-layer.l-work{border-top-color:var(--green);}
+  .arch-layer.l-obs{border-top-color:var(--border-strong);}
+  .node-edge{background:var(--indigo-2);color:#fff;}
+  html[data-theme="dark"] .node-edge{color:#04222A;}
+  .node-app{background:var(--indigo-bg);color:var(--indigo-text);}
+  .node-ctrl{background:var(--violet-bg);color:var(--violet-text);}
+  .node-data{background:var(--amber-bg);color:var(--amber-text);}
+  .node-work{background:var(--green-bg);color:var(--green-text);}
+  .node-obs{background:var(--surface-2);color:var(--ink-2);border-color:var(--border);}
+
+  .layer-ref td:first-child{font-weight:700;white-space:nowrap;}
+  .layer-ref td.mono{font-family:var(--font-mono);font-size:12px;color:var(--ink-2);}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;}
+  @media (max-width:780px){.grid-2{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="docs.html">Docs</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+    <a href="technical-design.html" class="active">Technical</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="technical-design.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="4" height="3" rx=".5"/><rect x="10" y="2" width="4" height="3" rx=".5"/><rect x="6" y="11" width="4" height="3" rx=".5"/><path d="M4 5v3M12 5v3M4 8h8M8 8v3"/></svg>Application architecture</a>
+  <a class="active" href="cloud-hosting-azure.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4.5 12.5a3 3 0 010-6 4 4 0 017.5-1.5A3.2 3.2 0 0111.5 12.5h-7z"/></svg>Cloud hosting</a>
+</div>
+
+<div class="wrap" style="max-width:980px;">
+  <div class="page-head">
+    <div><div class="page-title">Cloud hosting</div><div class="page-desc">Where each layer of the <a href="technical-design.html" style="color:var(--indigo-text);">application architecture</a> actually runs — a managed-Azure reference stack, an AWS comparison for the layers that are cloud-agnostic, and the standalone on-premise install for the perpetual-license edition.</div></div>
+    <div style="display:flex;gap:8px;">
+      <a href="technical-design.html" class="btn">Application architecture →</a>
+      <a href="db/schema.sql" class="btn">View db/schema.sql →</a>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:22px;">
+    <div class="section-label">In one line</div>
+    <div class="page-desc" style="margin-top:2px;">Same six layers as the application architecture, mapped onto managed Azure services — Front Door at the edge, Container Apps for the fleet and the five job-type workers, Flexible Server for the hybrid data tier, Service Bus for background dispatch. Nothing about the app changes; only which cloud runs it.</div>
+  </div>
+
+  <div class="section-label" style="margin-bottom:12px;">Azure reference stack</div>
+  <div class="arch-flow">
+
+    <div class="arch-layer l-edge">
+      <div class="al-head"><span class="al-num">①</span><span class="al-title">Edge &amp; routing</span></div>
+      <div class="al-desc">Front Door terminates a wildcard managed TLS cert and load-balances to the app fleet — CDN, WAF, and global routing in one resource, where AWS splits the same job across ALB/CloudFront.</div>
+      <div class="arch-nodes">
+        <span class="arch-node node-edge">Azure DNS · *.trakolo.com</span>
+        <span class="arch-node node-edge">Front Door — managed TLS + WAF</span>
+        <span class="arch-node node-edge">portal.trakolo.com — sign-in</span>
+      </div>
+    </div>
+    <div class="arch-arrow">▼</div>
+
+    <div class="arch-layer l-app">
+      <div class="al-head"><span class="al-num">②</span><span class="al-title">App fleet</span></div>
+      <div class="al-desc">Static Web Apps serves the React SPA; Container Apps runs the .NET Core API as a modular monolith, scaling on HTTP load via KEDA. Shared compute pool for every tenant by default — <span class="id-mono">compute_pool</span> pins a rare contractually-demanding tenant to a dedicated Container Apps environment without a second codebase.</div>
+      <div class="arch-nodes">
+        <span class="arch-node node-app">Static Web Apps — apps/web (SPA)</span>
+        <span class="arch-node node-app">Container Apps — apps/api (itsm · sam · dev · docs)</span>
+        <span class="arch-node node-app split">compute_pool: shared (default) / dedicated (opt-in)</span>
+      </div>
+    </div>
+    <div class="arch-arrow">▼</div>
+
+    <div class="arch-layer l-ctrl">
+      <div class="al-head"><span class="al-num">③</span><span class="al-title">Control plane</span></div>
+      <div class="al-desc">Same Redis protocol as the AWS reference — the tenant-registry cache client code doesn't change between clouds.</div>
+      <div class="arch-nodes">
+        <span class="arch-node node-ctrl">Tenant registry (slug → db host, bucket, plan, compute_pool)</span>
+        <span class="arch-node node-ctrl">Azure Cache for Redis</span>
+      </div>
+    </div>
+    <div class="arch-arrow">▼</div>
+
+    <div class="arch-layer l-data">
+      <div class="al-head"><span class="al-num">④</span><span class="al-title">Data tier</span></div>
+      <div class="al-desc">Azure Database for PostgreSQL Flexible Server, zone-redundant HA, fronted by a PgBouncer sidecar — shared instance with row-level tenant_id scoping (see <a href="db/schema.sql" style="color:var(--amber-text);font-weight:600;">db/schema.sql</a>) for Free/Team/Business, a dedicated Flexible Server per Enterprise tenant, and a read replica isolating reporting from ticket-write traffic.</div>
+      <div class="arch-nodes">
+        <span class="arch-node node-data">PgBouncer sidecar</span>
+        <span class="arch-node node-data">Flexible Server — shared, zone-redundant HA</span>
+        <span class="arch-node node-data">Flexible Server — dedicated per Enterprise tenant</span>
+        <span class="arch-node node-data">Read replica — reporting</span>
+        <span class="arch-node node-data">Blob Storage — shared container + prefix, dedicated for Enterprise</span>
+      </div>
+    </div>
+    <div class="arch-arrow">▼</div>
+
+    <div class="arch-layer l-work">
+      <div class="al-head"><span class="al-num">⑤</span><span class="al-title">Background &amp; specialized services</span></div>
+      <div class="al-desc">Five independent Container Apps jobs, each with its own Service Bus queue — not one shared worker pulling off one queue. A crash or bad deploy in <span class="id-mono">worker-webhooks</span> never stops SLA escalation from running for every other customer; idempotency keys plus Service Bus session locks make a redelivered message a no-op instead of a duplicate.</div>
+      <div class="arch-nodes">
+        <span class="arch-node node-work">worker-sla — SLA escalation</span>
+        <span class="arch-node node-work">worker-rules — business rules engine</span>
+        <span class="arch-node node-work">worker-webhooks — delivery + retries</span>
+        <span class="arch-node node-work">worker-reports — export scheduler</span>
+        <span class="arch-node node-work split">worker-ai-agent — separate service, different resource profile</span>
+      </div>
+    </div>
+    <div class="arch-arrow">▼</div>
+
+    <div class="arch-layer l-obs">
+      <div class="al-head"><span class="al-num">⑥</span><span class="al-title">Monitoring &amp; secrets</span></div>
+      <div class="al-desc">Azure Monitor and Application Insights feed the same health signals as Admin → System status, per worker, routed to PagerDuty. Key Vault holds DB passwords, API keys, and the Trakolo private key used to sign <span class="id-mono">.trklic</span> license files — never a plain <span class="id-mono">.env</span> in production.</div>
+      <div class="arch-nodes">
+        <span class="arch-node node-obs">Azure Monitor + Application Insights</span>
+        <span class="arch-node node-obs">Alerts → PagerDuty, per worker</span>
+        <span class="arch-node node-obs">Key Vault — secrets</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin:26px 0 12px;">Layer-by-layer: AWS vs. Azure</div>
+  <div class="panel">
+    <table class="layer-ref">
+      <thead><tr><th>Layer</th><th>AWS reference</th><th>Azure equivalent</th><th>Why it's a drop-in swap</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--indigo-2);">Edge</td><td class="mono">Route 53, ACM, ALB/CloudFront</td><td class="mono">Azure DNS, Front Door (managed TLS + WAF)</td><td>Both resolve a subdomain, terminate TLS, and route to the app fleet — no app code touches this layer.</td></tr>
+        <tr><td style="color:var(--indigo-text);">App fleet</td><td class="mono">ECS Fargate / EKS</td><td class="mono">Container Apps (or AKS) + Static Web Apps</td><td>Container Apps auto-scales on HTTP/CPU load the same way Fargate does — the .NET Core API image doesn't change.</td></tr>
+        <tr><td style="color:var(--violet-text);">Control plane</td><td class="mono">ElastiCache</td><td class="mono">Azure Cache for Redis</td><td>Same Redis protocol — the tenant-registry cache client code is identical either way.</td></tr>
+        <tr><td style="color:var(--amber-text);">Data tier</td><td class="mono">RDS Postgres Multi-AZ + read replica, S3</td><td class="mono">Flexible Server (zone-redundant HA) + read replica, Blob Storage</td><td>Both are managed Postgres with automated failover and backups — <span class="id-mono">db/schema.sql</span> runs unmodified on either.</td></tr>
+        <tr><td style="color:var(--green-text);">Background services</td><td class="mono">5 separate ECS services (sla, rules, webhooks, reports, ai-agent), each SQS-backed or Postgres-backed</td><td class="mono">5 separate Container Apps jobs, each on its own Service Bus queue</td><td>Workers only need a queue to pull from — the job-processing code, including the idempotency-key check, is cloud-agnostic per worker.</td></tr>
+        <tr><td style="color:var(--ink-2);">Monitoring</td><td class="mono">CloudWatch / Datadog → PagerDuty</td><td class="mono">Azure Monitor + Application Insights → PagerDuty</td><td>Both ingest the same per-worker health signals already shown in Admin → System status.</td></tr>
+        <tr><td style="color:var(--ink-2);">Secrets</td><td class="mono">Secrets Manager</td><td class="mono">Azure Key Vault</td><td>DB passwords, API keys, and the license-signing key are read at boot from a managed vault either way — never committed, never in a plain <span class="id-mono">.env</span> in production.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="page-desc" style="margin-top:10px;">The only layer where the two clouds genuinely diverge in behavior is <b>Front Door vs. ALB/CloudFront</b> — Front Door bundles CDN, WAF, and global load balancing in one resource, where AWS splits that across two or three. Everything else is a like-for-like managed-service swap; the same shape maps onto Cloud SQL/Memorystore/GCS on GCP too.</div>
+
+  <div class="section-label" style="margin:26px 0 12px;">Standalone / on-premise installation</div>
+  <div class="page-desc" style="margin:-6px 0 12px;">The perpetual-license edition (see <a href="site/pricing.html" style="color:var(--indigo-text);">Pricing</a> and <a href="admin.html#license" style="color:var(--indigo-text);">Admin → License &amp; billing</a>) runs as a single-host Docker Compose stack instead of either cloud topology above — one customer, one install, no shared infrastructure to reason about.</div>
+  <div class="card">
+    <div class="section-label">Reference stack — <span class="id-mono">install/</span></div>
+    <div class="row-line"><div><div class="rname">docker-compose.yml</div><div class="rdesc">Postgres, Redis, a one-shot migrate step that applies db/schema.sql, and the app — one command, one host</div></div><a href="install/docker-compose.yml" class="btn sm">View →</a></div>
+    <div class="row-line"><div><div class="rname">install.sh</div><div class="rdesc">Generates .env with a random DB password if missing, brings up the stack in dependency order, waits for health checks, applies the schema, starts the app</div></div><a href="install/install.sh" class="btn sm">View →</a></div>
+    <div class="row-line" style="border-bottom:none;"><div><div class="rname">.env.example</div><div class="rdesc">Database credentials, app port, and the license file path — copied to .env on first run</div></div><a href="install/.env.example" class="btn sm">View →</a></div>
+  </div>
+  <div class="card" style="margin-top:14px;">
+    <div class="section-label">License activation</div>
+    <div class="page-desc" style="margin-top:2px;">A workspace's <span class="id-mono">.trklic</span> file — a JSON payload signed with Trakolo's private key — is issued whenever seats, modules, or the expiry date change, and verified locally against the public key bundled with the install. Air-gapped networks activate offline: <span class="id-mono">License → Offline activation</span> generates a request code, exchanged for a response code on the customer portal from any machine with outbound access, then pasted back in. See <a href="site/docs.html#onprem-install" style="color:var(--indigo-text);">site/docs.html</a> for the full walkthrough.</div>
+  </div>
+
+</div>
+<script src="app-chrome.js" defer></script>
+</body>
+</html>
