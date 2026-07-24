@@ -36,6 +36,25 @@
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;}
   .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px;}
   @media (max-width:780px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+
+  .diagram-svg{width:100%;height:auto;display:block;}
+  .diagram-svg .dedge{stroke:var(--ink-muted);stroke-width:1.6;}
+  .diagram-svg .dedge.dashed{stroke-dasharray:5 4;opacity:.8;}
+  .diagram-svg text.dtxt{font-family:var(--font-body);}
+  .diagram-svg .node-edge{fill:var(--indigo-2);stroke:var(--indigo-2);}
+  .diagram-svg .node-edge + text.dtxt{fill:#fff;}
+  .diagram-svg .node-app{fill:var(--indigo-bg);stroke:var(--indigo);}
+  .diagram-svg .node-app + text.dtxt{fill:var(--indigo-text);}
+  .diagram-svg .node-ctrl{fill:var(--violet-bg);stroke:var(--violet);}
+  .diagram-svg .node-ctrl + text.dtxt{fill:var(--violet-text);}
+  .diagram-svg .node-data{fill:var(--amber-bg);stroke:var(--amber);}
+  .diagram-svg .node-data + text.dtxt{fill:var(--amber-text);}
+  .diagram-svg .node-work{fill:var(--green-bg);stroke:var(--green);}
+  .diagram-svg .node-work + text.dtxt{fill:var(--green-text);}
+  .diagram-svg .node-obs{fill:var(--surface-2);stroke:var(--border-strong);}
+  .diagram-svg .node-obs + text.dtxt{fill:var(--ink-2);}
+  .diagram-svg rect.dnode{stroke-dasharray:4 3;}
+  .diagram-scroll{overflow-x:auto;padding:4px 2px 8px;}
 </style>
 </head>
 <body>
@@ -75,7 +94,63 @@
     <div class="page-desc" style="margin-top:2px;">One modular-monolith app fleet behind wildcard subdomains, a hybrid data tier — shared cluster for most tenants, dedicated database &amp; storage for Enterprise — and background services split by job type so one failure never takes down every job for every customer.</div>
   </div>
 
-  <div class="section-label" style="margin-bottom:12px;">Request &amp; data flow</div>
+  <div class="section-label" style="margin-bottom:12px;">Flow diagram</div>
+  <div class="card" style="margin-bottom:22px;padding:20px 22px 14px;">
+    <div class="diagram-scroll"><svg class="diagram-svg" viewBox="0 0 1288 618" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arrowhead" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-muted)"/>
+  </marker>
+</defs>
+<path class="dedge" d="M819.0,172.0 L819.0,260.0 L1080.0,260.0 L1080.0,418.0" fill="none"/>
+<path class="dedge" d="M119.0,418.0 L1080.0,418.0" fill="none"/>
+<path class="dedge" d="M119.0,418.0 L119.0,440.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge" d="M329.0,418.0 L329.0,440.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge" d="M539.0,418.0 L539.0,440.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge" d="M749.0,418.0 L749.0,440.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge" d="M959.0,418.0 L959.0,440.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge dashed" d="M539.0,418.0 L539.0,522.0 L749.0,522.0 L749.0,540.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge" d="M424.0,47.0 L424.0,47.0 L444.0,47.0 L444.0,47.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge" d="M634.0,47.0 L634.0,47.0 L654.0,47.0 L654.0,47.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge" d="M469.0,74.0 L469.0,96.0 L539.0,96.0 L539.0,118.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge" d="M749.0,74.0 L749.0,96.0 L609.0,96.0 L609.0,118.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge" d="M214.0,145.0 L214.0,145.0 L234.0,145.0 L234.0,145.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge" d="M539.0,172.0 L539.0,190.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge" d="M844.0,145.0 L844.0,145.0 L864.0,145.0 L864.0,145.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge" d="M1054.0,145.0 L1054.0,145.0 L1074.0,145.0 L1074.0,145.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge" d="M379.0,172.0 L379.0,260.0 L119.0,260.0 L119.0,340.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge" d="M214.0,367.0 L214.0,367.0 L234.0,367.0 L234.0,367.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge" d="M119.0,340.0 L119.0,316.0 L539.0,316.0 L539.0,340.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge" d="M119.0,340.0 L119.0,290.0 L959.0,290.0 L959.0,340.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge" d="M329.0,340.0 L329.0,306.0 L749.0,306.0 L749.0,340.0" fill="none" marker-end="url(#arrowhead)"/>
+<path class="dedge dashed" d="M119.0,394.0 L119.0,467.0 L329.0,467.0 L329.0,540.0" fill="none" marker-end="url(#arrowhead)"/>
+<rect class="node-edge" x="234.0" y="20.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="329.0" y="39.5" font-weight="700">Wildcard DNS</tspan><tspan x="329.0" y="54.5">*.trakolo.com</tspan></text>
+<rect class="node-edge" x="444.0" y="20.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="539.0" y="39.5" font-weight="700">Load balancer</tspan><tspan x="539.0" y="54.5">+ wildcard TLS</tspan></text>
+<rect class="node-edge" x="654.0" y="20.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="749.0" y="39.5" font-weight="700">portal.trakolo.com</tspan><tspan x="749.0" y="54.5">sign-in</tspan></text>
+<rect class="node-app" x="24.0" y="118.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="119.0" y="137.5" font-weight="700">apps/web</tspan><tspan x="119.0" y="152.5">(React SPA)</tspan></text>
+<rect class="node-app" x="234.0" y="118.0" width="610.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="539.0" y="137.5" font-weight="700">apps/api — modular monolith</tspan><tspan x="539.0" y="152.5">itsm · sam · dev · docs</tspan></text>
+<rect class="node-ctrl" x="864.0" y="118.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="959.0" y="137.5" font-weight="700">Tenant registry</tspan><tspan x="959.0" y="152.5">slug → db, bucket, plan</tspan></text>
+<rect class="node-ctrl" x="1074.0" y="118.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="1169.0" y="137.5" font-weight="700">Redis</tspan><tspan x="1169.0" y="152.5">tenant cache + sessions</tspan></text>
+<rect class="node-app dnode" x="424.0" y="190.0" width="230.0" height="34.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="539.0" y="199.5" font-weight="700">compute_pool</tspan><tspan x="539.0" y="214.5">shared / dedicated</tspan></text>
+<rect class="node-data" x="24.0" y="340.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="119.0" y="359.5" font-weight="700">PgBouncer</tspan><tspan x="119.0" y="374.5">connection pool</tspan></text>
+<rect class="node-data" x="234.0" y="340.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="329.0" y="359.5" font-weight="700">Shared Postgres</tspan><tspan x="329.0" y="374.5">Free · Team · Business</tspan></text>
+<rect class="node-data" x="444.0" y="340.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="539.0" y="359.5" font-weight="700">Dedicated Postgres</tspan><tspan x="539.0" y="374.5">per Enterprise tenant</tspan></text>
+<rect class="node-data" x="654.0" y="340.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="749.0" y="359.5" font-weight="700">Read replica</tspan><tspan x="749.0" y="374.5">reporting</tspan></text>
+<rect class="node-data" x="864.0" y="340.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="959.0" y="359.5" font-weight="700">Object storage</tspan><tspan x="959.0" y="374.5">shared + dedicated</tspan></text>
+<rect class="node-work" x="24.0" y="440.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="119.0" y="459.5" font-weight="700">worker-sla</tspan><tspan x="119.0" y="474.5">SLA escalation</tspan></text>
+<rect class="node-work" x="234.0" y="440.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="329.0" y="459.5" font-weight="700">worker-rules</tspan><tspan x="329.0" y="474.5">business rules</tspan></text>
+<rect class="node-work" x="444.0" y="440.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="539.0" y="459.5" font-weight="700">worker-webhooks</tspan><tspan x="539.0" y="474.5">delivery + retries</tspan></text>
+<rect class="node-work" x="654.0" y="440.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="749.0" y="459.5" font-weight="700">worker-reports</tspan><tspan x="749.0" y="474.5">export scheduler</tspan></text>
+<rect class="node-work dnode" x="864.0" y="440.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="959.0" y="459.5" font-weight="700">worker-ai-agent</tspan><tspan x="959.0" y="474.5">separate service</tspan></text>
+<rect class="node-obs" x="234.0" y="540.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="329.0" y="559.5" font-weight="700">platform.services</tspan><tspan x="329.0" y="574.5">health registry</tspan></text>
+<rect class="node-obs" x="654.0" y="540.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="749.0" y="559.5" font-weight="700">Dashboards</tspan><tspan x="749.0" y="574.5">+ alerts, per worker</tspan></text>
+</svg></div>
+    <div style="display:flex;justify-content:flex-end;padding:10px 2px 4px;">
+      <a href="diagrams/trakolo-architecture.drawio" class="btn sm">Download as .drawio →</a>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-bottom:12px;">Layer walkthrough</div>
   <div class="arch-flow">
 
     <div class="arch-layer l-edge">
