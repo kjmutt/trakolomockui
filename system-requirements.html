@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — system requirements</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .layer-ref td:first-child{font-weight:700;white-space:nowrap;}
+  .layer-ref td.mono{font-family:var(--font-mono);font-size:12px;color:var(--ink-2);}
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:8px;}
+  @media (max-width:900px){.grid-4{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:560px){.grid-4{grid-template-columns:1fr;}}
+  .tier-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;box-shadow:var(--shadow-sm);}
+  .tier-card .tname{font-family:var(--font-display);font-weight:700;font-size:14px;margin-bottom:2px;}
+  .tier-card .tusers{font-size:11.5px;color:var(--ink-muted);font-family:var(--font-mono);margin-bottom:10px;}
+  .tier-card .tspec{font-size:12.5px;color:var(--ink-2);display:flex;justify-content:space-between;padding:4px 0;border-top:1px solid var(--border);}
+  .tier-card .tspec:first-of-type{border-top:none;}
+  .tier-card .tspec b{color:var(--ink);font-weight:600;}
+  .src-list{list-style:none;margin:0;padding:0;}
+  .src-list li{padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .src-list li:last-child{border-bottom:none;}
+  .src-list a{color:var(--indigo-text);font-weight:600;text-decoration:none;}
+  .src-list a:hover{text-decoration:underline;}
+  .src-list .src-url{display:block;font-family:var(--font-mono);font-size:11px;color:var(--ink-muted);margin-top:2px;word-break:break-all;}
+  .verdate{font-size:11px;color:var(--ink-muted);font-family:var(--font-mono);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="docs.html">Docs</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+    <a href="technical-design.html" class="active">Technical</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="technical-design.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="4" height="3" rx=".5"/><rect x="10" y="2" width="4" height="3" rx=".5"/><rect x="6" y="11" width="4" height="3" rx=".5"/><path d="M4 5v3M12 5v3M4 8h8M8 8v3"/></svg>Application architecture</a>
+  <a href="cloud-hosting-azure.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4.5 12.5a3 3 0 010-6 4 4 0 017.5-1.5A3.2 3.2 0 0111.5 12.5h-7z"/></svg>Cloud hosting</a>
+  <a class="active" href="system-requirements.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="12" height="8" rx="1"/><path d="M5 13.5h6M8 10v3.5"/></svg>System requirements</a>
+</div>
+
+<div class="wrap" style="max-width:980px;">
+  <div class="page-head">
+    <div><div class="page-title">System requirements</div><div class="page-desc">Service versions and hardware sizing for the standalone/on-premise install (<span class="id-mono">install/docker-compose.yml</span>) — current as of <span class="verdate">July 2026</span>, re-check the source links before every release.</div></div>
+    <div style="display:flex;gap:8px;">
+      <a href="cloud-hosting-azure.html" class="btn">Cloud hosting →</a>
+      <a href="install/docker-compose.yml" class="btn">View docker-compose.yml →</a>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:22px;">
+    <div class="section-label">In one line</div>
+    <div class="page-desc" style="margin-top:2px;">Postgres 16 (pinned) is fine through 2028 but Postgres 18 is the current stable if starting fresh; Redis should move from the 7.x pin to 8.x; nginx's floating <span class="id-mono">alpine</span> tag needs no action. Hardware scales with concurrent users, not company size — Postgres is the resource-hungry piece.</div>
+  </div>
+
+  <div class="section-label" style="margin-bottom:12px;">Service versions</div>
+  <div class="panel" style="margin-bottom:22px;">
+    <table class="layer-ref">
+      <thead><tr><th>Service</th><th>Pinned today</th><th>Latest stable</th><th>Recommendation</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--amber-text);">db (Postgres)</td><td class="mono">postgres:16-alpine → 16.14</td><td class="mono">18.4</td><td>16 is supported through Nov 2028 — safe to keep. Starting fresh, pin <span class="id-mono">postgres:18-alpine</span> instead for 2 more years of runway. Postgres 19 is still beta (final ~Sep/Oct 2026) — skip it for now.</td></tr>
+        <tr><td style="color:var(--violet-text);">redis</td><td class="mono">redis:7-alpine (floats to latest 7.x)</td><td class="mono">8.6.2</td><td>Worth bumping. Redis 7.2 is already EOL (Feb 2026); 7.4/7.8 live on into 2026–2027 but 8.x is the current mainline. Move the pin to <span class="id-mono">redis:8-alpine</span>.</td></tr>
+        <tr><td style="color:var(--indigo-2);">app (nginx, placeholder)</td><td class="mono">nginx:alpine (floats to latest)</td><td class="mono">1.30.4</td><td>No action — the untagged <span class="id-mono">alpine</span> tag already tracks latest, and this container is replaced entirely once a real frontend/API image exists.</td></tr>
+        <tr><td style="color:var(--indigo-text);">api (future, not yet built)</td><td class="mono">—</td><td class="mono">.NET 10 LTS</td><td>Target this when the real .NET Core API described in <a href="technical-design.html" style="color:var(--indigo-text);">technical-design.html</a> is built — current LTS, supported through Nov 2028.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-label" style="margin-bottom:12px;">Hardware sizing — single-host on-prem install</div>
+  <div class="page-desc" style="margin:-6px 0 12px;">This is the perpetual-license edition — one host, one <span class="id-mono">docker compose up</span>, no Kubernetes — so sizing is per customer, not the 10,000-concurrent multi-tenant SaaS scale in <a href="cloud-hosting-azure.html" style="color:var(--indigo-text);">Cloud hosting</a>. Postgres is the RAM-hungry piece; disk should be SSD/NVMe specifically because ticket search and Dev-module diff/blob operations are I/O-heavy.</div>
+  <div class="grid-4">
+    <div class="tier-card">
+      <div class="tname">Starter</div>
+      <div class="tusers">up to ~25 concurrent users</div>
+      <div class="tspec"><span>CPU</span><b>2 vCPU</b></div>
+      <div class="tspec"><span>RAM</span><b>4 GB</b></div>
+      <div class="tspec"><span>Disk</span><b>40 GB SSD</b></div>
+    </div>
+    <div class="tier-card">
+      <div class="tname">Standard</div>
+      <div class="tusers">up to ~150 concurrent users</div>
+      <div class="tspec"><span>CPU</span><b>4 vCPU</b></div>
+      <div class="tspec"><span>RAM</span><b>8–16 GB</b></div>
+      <div class="tspec"><span>Disk</span><b>100 GB SSD</b></div>
+    </div>
+    <div class="tier-card">
+      <div class="tname">Growth</div>
+      <div class="tusers">up to ~500 concurrent users</div>
+      <div class="tspec"><span>CPU</span><b>8 vCPU</b></div>
+      <div class="tspec"><span>RAM</span><b>32 GB</b></div>
+      <div class="tspec"><span>Disk</span><b>250 GB+ NVMe</b></div>
+    </div>
+    <div class="tier-card">
+      <div class="tname">Large on-prem</div>
+      <div class="tusers">500+ concurrent users</div>
+      <div class="tspec"><span>CPU</span><b>16+ vCPU</b></div>
+      <div class="tspec"><span>RAM</span><b>64 GB+</b></div>
+      <div class="tspec"><span>Disk</span><b>500 GB+ NVMe</b></div>
+    </div>
+  </div>
+  <div class="page-desc" style="margin-top:10px;">Past ~500 concurrent users, move <span class="id-mono">db</span> onto its own VM/host rather than co-locating everything in the same Compose stack, even though Compose supports it.</div>
+
+  <div class="section-label" style="margin:26px 0 12px;">Sources</div>
+  <div class="panel">
+    <ul class="src-list" style="padding:4px 20px;">
+      <li><a href="https://www.postgresql.org/about/news/postgresql-184-1710-1614-1518-and-1423-released-3297/" target="_blank" rel="noopener">PostgreSQL 18.4, 17.10, 16.14, 15.18, and 14.23 Released!</a><span class="src-url">postgresql.org/about/news/postgresql-184-1710-1614-1518-and-1423-released-3297</span></li>
+      <li><a href="https://www.postgresql.org/support/versioning/" target="_blank" rel="noopener">PostgreSQL: Versioning Policy</a><span class="src-url">postgresql.org/support/versioning</span></li>
+      <li><a href="https://endoflife.ai/postgresql/16" target="_blank" rel="noopener">PostgreSQL 16 End of Life Date — supported until November 9, 2028</a><span class="src-url">endoflife.ai/postgresql/16</span></li>
+      <li><a href="https://endoflife.date/redis" target="_blank" rel="noopener">Redis — endoflife.date</a><span class="src-url">endoflife.date/redis</span></li>
+      <li><a href="https://redis.io/blog/whats-new-in-two-april-2026-edition/" target="_blank" rel="noopener">What's new in two – April 2026 edition (Redis)</a><span class="src-url">redis.io/blog/whats-new-in-two-april-2026-edition</span></li>
+      <li><a href="https://nginx.org/2026.html" target="_blank" rel="noopener">nginx news: 2026</a><span class="src-url">nginx.org/2026.html</span></li>
+      <li><a href="https://www.theregister.com/2025/11/12/net_10_c_14_visual/" target="_blank" rel="noopener">Microsoft ships .NET 10 LTS and Visual Studio 2026</a><span class="src-url">theregister.com/2025/11/12/net_10_c_14_visual</span></li>
+      <li><a href="https://dotnet.microsoft.com/en-us/platform/support/policy" target="_blank" rel="noopener">The official .NET support policy</a><span class="src-url">dotnet.microsoft.com/en-us/platform/support/policy</span></li>
+    </ul>
+  </div>
+
+</div>
+<script src="app-chrome.js" defer></script>
+</body>
+</html>
