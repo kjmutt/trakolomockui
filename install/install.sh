@@ -37,7 +37,7 @@ log "Trakolo is up at ${APP_BASE_URL:-http://localhost:${APP_PORT:-8080}}"
 echo
 echo "Next steps:"
 echo "  1. Copy your issued license file to ${LICENSE_FILE:-./license/workspace.trklic}"
-echo "     (see technical-design.html > Standalone / on-premise installation for how license files work)"
+echo "     (see cloud-hosting-azure.html > Standalone / on-premise installation for how license files work)"
 echo "  2. Sign in with the initial admin account created on first boot"
 echo "  3. docker compose logs -f app   — tail logs"
 echo "  4. docker compose down          — stop everything (data persists in named volumes)"

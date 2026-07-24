@@ -5,10 +5,13 @@
 # exists; everything else (db, redis, migrate, network topology) carries over
 # unchanged, matching the "app fleet talks to a pooled Postgres + Redis"
 # shape described in ../technical-design.html.
+#
+# Image versions and hardware sizing are tracked in ../system-requirements.html —
+# re-check there before bumping postgres/redis major versions.
 
 services:
   db:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-trakolo}
@@ -24,7 +27,7 @@ services:
     networks: [trakolo]
 
   redis:
-    image: redis:7-alpine
+    image: redis:8-alpine
     restart: unless-stopped
     volumes:
       - trakolo_redis_data:/data
@@ -37,7 +40,7 @@ services:
 
   # One-shot: applies db/schema.sql, then exits. install.sh waits for it.
   migrate:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     depends_on:
       db:
         condition: service_healthy
