@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — REST API reference</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  .layer-ref td:first-child{font-weight:700;white-space:nowrap;}
+  .layer-ref td.mono{font-family:var(--font-mono);font-size:12px;color:var(--ink-2);}
+  .ep-table{border-collapse:collapse;width:100%;}
+  .ep-table th,.ep-table td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--border);font-size:12.5px;vertical-align:top;}
+  .ep-table th{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted);background:var(--surface-2);font-weight:600;}
+  .ep-table tr:last-child td{border-bottom:none;}
+  .method{font-family:var(--font-mono);font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap;}
+  .method.get{background:var(--indigo-bg);color:var(--indigo-text);}
+  .method.post{background:var(--green-bg);color:var(--green-text);}
+  .method.patch{background:var(--amber-bg);color:var(--amber-text);}
+  .method.delete{background:var(--coral-bg);color:var(--coral-text);}
+  .ep-path{font-family:var(--font-mono);font-size:12px;}
+  .code-block{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;font-family:var(--font-mono);font-size:11.5px;line-height:1.6;overflow-x:auto;white-space:pre;color:var(--ink-2);}
+  .code-block .k{color:var(--violet-text);}
+  .code-block .s{color:var(--green-text);}
+  .code-block .n{color:var(--amber-text);}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;}
+  @media (max-width:780px){.grid-2{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="docs.html">Docs</a>
+    <a href="admin.html">Admin</a>
+    <a href="portal-admin-login.html">Portal admin</a>
+    <a href="technical-design.html" class="active">Technical</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="technical-design.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="4" height="3" rx=".5"/><rect x="10" y="2" width="4" height="3" rx=".5"/><rect x="6" y="11" width="4" height="3" rx=".5"/><path d="M4 5v3M12 5v3M4 8h8M8 8v3"/></svg>Application architecture</a>
+  <a href="cloud-hosting-azure.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4.5 12.5a3 3 0 010-6 4 4 0 017.5-1.5A3.2 3.2 0 0111.5 12.5h-7z"/></svg>Cloud hosting</a>
+  <a href="system-requirements.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="12" height="8" rx="1"/><path d="M5 13.5h6M8 10v3.5"/></svg>System requirements</a>
+  <a href="how-it-works.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6"/><path d="M8 5.5v3.2M8 11v.1"/></svg>How it works</a>
+  <a href="release-engineering.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="4.5" cy="4" r="1.8"/><circle cx="4.5" cy="12" r="1.8"/><circle cx="11.5" cy="8" r="1.8"/><path d="M4.5 5.8V10.2M6 4.5c3 0 3.5 1.5 3.8 2.2M6 11.5c3 0 3.5-1.5 3.8-2.2"/></svg>Release &amp; DR</a>
+  <a class="active" href="api-reference.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M5 4L2 8l3 4M11 4l3 4-3 4M9.5 3l-3 10"/></svg>API reference</a>
+  <a href="deployment-options.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2l5.5 3.2v5.6L8 14 2.5 10.8V5.2z"/><path d="M8 8l5.5-3.2M8 8v6M8 8L2.5 4.8"/></svg>Deployment options</a>
+</div>
+
+<div class="wrap" style="max-width:980px;">
+  <div class="page-head">
+    <div><div class="page-title">REST API reference</div><div class="page-desc">Every call to <span class="id-mono">apps/api</span> — from the React SPA or a third-party integration — goes through the API Gateway described in <a href="technical-design.html" style="color:var(--indigo-text);">Application architecture</a>. This page documents that surface: base URL, auth, versioning, rate limits, and the endpoints themselves.</div></div>
+    <div style="display:flex;gap:8px;">
+      <a href="technical-design.html" class="btn">Application architecture →</a>
+      <a href="openapi/trakolo-v1.yaml" class="btn">Download openapi.yaml →</a>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:22px;">
+    <div class="section-label">In one line</div>
+    <div class="page-desc" style="margin-top:2px;">One versioned REST API (<span class="id-mono">/api/v1</span>) behind the gateway, OAuth2 bearer tokens for the SPA and API keys for integrations, cursor-based pagination, RFC 7807 error bodies, and per-tenant rate limits enforced at the gateway — not scattered per module.</div>
+  </div>
+
+  <div class="section-label" style="margin-bottom:12px;">Conventions</div>
+  <div class="panel" style="margin-bottom:22px;">
+    <table class="layer-ref">
+      <tbody>
+        <tr><td style="color:var(--indigo-text);">Base URL</td><td class="mono">https://{tenant}.trakolo.com/api/v1</td></tr>
+        <tr><td style="color:var(--violet-text);">Auth — user sessions</td><td>OAuth2 bearer token, issued at sign-in (<span class="id-mono">login.html</span>), validated at the gateway before the request reaches <span class="id-mono">apps/api</span></td></tr>
+        <tr><td style="color:var(--violet-text);">Auth — integrations</td><td><span class="id-mono">Authorization: ApiKey &lt;key&gt;</span>, issued from Admin → Integrations, scoped to specific modules</td></tr>
+        <tr><td style="color:var(--amber-text);">Versioning</td><td><span class="id-mono">/api/v1</span> today. Changes are additive only (new fields, new endpoints); a breaking change ships as <span class="id-mono">/api/v2</span> with v1 kept live through its deprecation window — same rule as the canary/rollback discipline in <a href="release-engineering.html" style="color:var(--amber-text);font-weight:600;">Release &amp; DR</a>.</td></tr>
+        <tr><td style="color:var(--green-text);">Rate limits</td><td>Enforced per tenant at the gateway, scaled by plan tier — exceeding it returns <span class="id-mono">429</span> with a <span class="id-mono">Retry-After</span> header, not a silently dropped request.</td></tr>
+        <tr><td style="color:var(--ink-2);">Pagination</td><td>Cursor-based: <span class="id-mono">?cursor=&lt;opaque&gt;&amp;limit=50</span> (max 200), response includes <span class="id-mono">next_cursor</span></td></tr>
+        <tr><td style="color:var(--coral-text);">Errors</td><td>RFC 7807 <span class="id-mono">application/problem+json</span> — <span class="id-mono">{type, title, status, detail, instance}</span>, never a bare string</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-label" style="margin-bottom:12px;">Endpoints — itsm</div>
+  <div class="panel" style="margin-bottom:22px;">
+    <table class="ep-table">
+      <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><span class="method get">GET</span></td><td class="ep-path">/tickets</td><td>List tickets, filterable by status/priority/category_id/assignee</td></tr>
+        <tr><td><span class="method post">POST</span></td><td class="ep-path">/tickets</td><td>Create a ticket</td></tr>
+        <tr><td><span class="method get">GET</span></td><td class="ep-path">/tickets/{id}</td><td>Get a single ticket</td></tr>
+        <tr><td><span class="method patch">PATCH</span></td><td class="ep-path">/tickets/{id}</td><td>Update status, assignee, category, priority</td></tr>
+        <tr><td><span class="method get">GET</span></td><td class="ep-path">/tickets/{id}/activity</td><td>Activity feed — comments, status changes, AI agent actions</td></tr>
+        <tr><td><span class="method post">POST</span></td><td class="ep-path">/tickets/{id}/attachments</td><td>Upload an attachment</td></tr>
+        <tr><td><span class="method get">GET</span></td><td class="ep-path">/ticket-categories</td><td>Tree of ticket categories — see <a href="er-diagram.html" style="color:var(--indigo-text);">Entity relationships</a></td></tr>
+        <tr><td><span class="method get">GET</span></td><td class="ep-path">/kb-articles</td><td>List/search knowledge-base articles</td></tr>
+        <tr><td><span class="method post">POST</span></td><td class="ep-path">/kb-articles</td><td>Create a KB article</td></tr>
+        <tr><td><span class="method get">GET</span></td><td class="ep-path">/service-catalog-items</td><td>List catalog items available to request</td></tr>
+        <tr><td><span class="method post">POST</span></td><td class="ep-path">/catalog-requests</td><td>Submit a service catalog request</td></tr>
+        <tr><td><span class="method get">GET</span></td><td class="ep-path">/change-requests</td><td>List change requests</td></tr>
+        <tr><td><span class="method post">POST</span></td><td class="ep-path">/change-requests/{id}/approvals</td><td>Record an approval decision</td></tr>
+        <tr><td><span class="method get">GET</span></td><td class="ep-path">/problems</td><td>List problem records and their linked incidents</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:22px;">
+    <div>
+      <div class="section-label" style="margin-bottom:12px;">Endpoints — sam</div>
+      <div class="panel">
+        <table class="ep-table">
+          <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="method get">GET</span></td><td class="ep-path">/assets</td><td>List assets</td></tr>
+            <tr><td><span class="method patch">PATCH</span></td><td class="ep-path">/assets/{id}</td><td>Update an asset</td></tr>
+            <tr><td><span class="method post">POST</span></td><td class="ep-path">/assets/{id}/assignments</td><td>Assign to a user</td></tr>
+            <tr><td><span class="method get">GET</span></td><td class="ep-path">/license-renewals</td><td>Upcoming/overdue renewals</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="section-label" style="margin-bottom:12px;">Endpoints — dev</div>
+      <div class="panel">
+        <table class="ep-table">
+          <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="method get">GET</span></td><td class="ep-path">/projects</td><td>List projects</td></tr>
+            <tr><td><span class="method get">GET</span></td><td class="ep-path">/backlog-items</td><td>List backlog items, filter by sprint/epic</td></tr>
+            <tr><td><span class="method patch">PATCH</span></td><td class="ep-path">/backlog-items/{id}</td><td>Update — including linking a change_request_id</td></tr>
+            <tr><td><span class="method post">POST</span></td><td class="ep-path">/deployments</td><td>Record a deployment against a change request</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-bottom:12px;">Endpoints — docs</div>
+  <div class="panel" style="margin-bottom:22px;">
+    <table class="ep-table">
+      <thead><tr><th>Method</th><th>Path</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><span class="method get">GET</span></td><td class="ep-path">/folders</td><td>List folders (self-referencing tree, see <a href="er-diagram.html" style="color:var(--indigo-text);">Entity relationships</a>)</td></tr>
+        <tr><td><span class="method post">POST</span></td><td class="ep-path">/documents</td><td>Upload a document to a folder</td></tr>
+        <tr><td><span class="method get">GET</span></td><td class="ep-path">/wiki-spaces</td><td>List wiki spaces</td></tr>
+        <tr><td><span class="method get">GET</span></td><td class="ep-path">/wiki-pages</td><td>List wiki pages (nested, self-referencing)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-label" style="margin-bottom:12px;">Example — GET /tickets/{id}</div>
+  <div class="card" style="margin-bottom:22px;">
+    <div class="code-block">GET /api/v1/tickets/8f2a1c9e-...
+Authorization: Bearer eyJhbGciOi...
+
+<span class="k">{</span>
+  <span class="s">"id"</span>: <span class="s">"8f2a1c9e-4b1a-4e9d-9c3a-1a2b3c4d5e6f"</span>,
+  <span class="s">"ticket_number"</span>: <span class="s">"TS-4833"</span>,
+  <span class="s">"subject"</span>: <span class="s">"VPN drops every ~20 minutes"</span>,
+  <span class="s">"category"</span>: <span class="k">{</span> <span class="s">"id"</span>: <span class="s">"..."</span>, <span class="s">"name"</span>: <span class="s">"Network"</span>, <span class="s">"parent"</span>: <span class="s">"Hardware"</span> <span class="k">}</span>,
+  <span class="s">"priority"</span>: <span class="s">"high"</span>,
+  <span class="s">"status"</span>: <span class="s">"in_progress"</span>,
+  <span class="s">"assignee"</span>: <span class="k">{</span> <span class="s">"id"</span>: <span class="s">"..."</span>, <span class="s">"name"</span>: <span class="s">"Priya K."</span> <span class="k">}</span>,
+  <span class="s">"sla_due_at"</span>: <span class="s">"2026-07-28T18:00:00Z"</span>,
+  <span class="s">"created_at"</span>: <span class="s">"2026-07-28T09:14:02Z"</span>
+<span class="k">}</span></div>
+  </div>
+
+  <div class="page-desc">Field names mirror <a href="db/schema.sql" style="color:var(--indigo-text);">db/schema.sql</a> directly — <span class="id-mono">category_id</span> is expanded to a nested <span class="id-mono">category</span> object in responses, but the underlying column and the hierarchical <span class="id-mono">itsm.ticket_categories</span> table are exactly what <a href="er-diagram.html" style="color:var(--indigo-text);">Entity relationships</a> documents.</div>
+
+</div>
+<script src="app-chrome.js" defer></script>
+</body>
+</html>

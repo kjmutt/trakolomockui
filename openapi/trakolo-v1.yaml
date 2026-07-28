@@ -1,0 +1,229 @@
+openapi: 3.0.3
+info:
+  title: Trakolo REST API
+  version: "1.0"
+  description: >
+    Reference OpenAPI spec for Trakolo's REST API — the surface behind the
+    API Gateway described in technical-design.html. Field names mirror
+    db/schema.sql directly. This is a representative subset (itsm.tickets
+    and its category tree), not the full endpoint set catalogued in
+    api-reference.html.
+servers:
+  - url: https://{tenant}.trakolo.com/api/v1
+    variables:
+      tenant:
+        default: acme
+security:
+  - bearerAuth: []
+  - apiKeyAuth: []
+paths:
+  /tickets:
+    get:
+      summary: List tickets
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [open, in_progress, awaiting_customer, escalated, resolved, closed, merged]
+        - name: category_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 200
+      responses:
+        "200":
+          description: Paginated list of tickets
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Ticket"
+                  next_cursor:
+                    type: string
+                    nullable: true
+    post:
+      summary: Create a ticket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketCreate"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ticket"
+  /tickets/{id}:
+    get:
+      summary: Get a single ticket
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Ticket
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ticket"
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+    patch:
+      summary: Update a ticket
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketUpdate"
+      responses:
+        "200":
+          description: Updated ticket
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ticket"
+  /ticket-categories:
+    get:
+      summary: Tree of ticket categories (unlimited depth, self-referencing)
+      responses:
+        "200":
+          description: Flat list with parent_category_id — the client builds the tree
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TicketCategory"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: OAuth2 bearer token issued at sign-in, used by the SPA
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: "ApiKey <key> — issued from Admin -> Integrations, scoped per module"
+  schemas:
+    TicketCategory:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        parent_category_id:
+          type: string
+          format: uuid
+          nullable: true
+        name:
+          type: string
+        sort_order:
+          type: integer
+    Ticket:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        ticket_number:
+          type: string
+          example: TS-4833
+        subject:
+          type: string
+        category_id:
+          type: string
+          format: uuid
+          nullable: true
+        priority:
+          type: string
+          enum: [low, normal, high, urgent]
+        status:
+          type: string
+          enum: [open, in_progress, awaiting_customer, escalated, resolved, closed, merged]
+        assignee_user_id:
+          type: string
+          format: uuid
+          nullable: true
+        sla_due_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+    TicketCreate:
+      type: object
+      required: [subject]
+      properties:
+        subject:
+          type: string
+        category_id:
+          type: string
+          format: uuid
+        priority:
+          type: string
+          enum: [low, normal, high, urgent]
+    TicketUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [open, in_progress, awaiting_customer, escalated, resolved, closed, merged]
+        assignee_user_id:
+          type: string
+          format: uuid
+        category_id:
+          type: string
+          format: uuid
+        priority:
+          type: string
+          enum: [low, normal, high, urgent]
+    Problem:
+      type: object
+      description: RFC 7807 problem+json
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
