@@ -1,5 +1,13 @@
 -- ============================================================================
--- Trakolo — per-tenant database schema (PostgreSQL 14+)
+-- Trakolo — per-tenant database schema (PostgreSQL 18+)
+--
+-- Requires 18 specifically for the native uuidv7() used on high-insert
+-- tables (tickets, ticket_activity, ticket_attachments, notifications,
+-- audit_log) — time-ordered ids avoid the B-tree bloat random UUIDv4 causes
+-- on tables that only ever grow. Every other table still uses
+-- gen_random_uuid() (UUIDv4): fine for low-insert-rate reference data, and
+-- there's no reason to pay the (tiny) extra complexity where it doesn't
+-- matter. install/docker-compose.yml already pins postgres:18-alpine.
 --
 -- Database-per-tenant model: every cloud tenant gets its own dedicated
 -- Postgres database running exactly this file, and an on-premise/standalone
@@ -100,12 +108,14 @@ CREATE TABLE core.role_permissions (
   permission_id uuid NOT NULL REFERENCES core.permissions(id) ON DELETE CASCADE,
   PRIMARY KEY (role_id, permission_id)
 );
+CREATE INDEX idx_role_permissions_permission_id ON core.role_permissions(permission_id);
 
 CREATE TABLE core.user_roles (
   user_id  uuid NOT NULL REFERENCES core.users(id) ON DELETE CASCADE,
   role_id  uuid NOT NULL REFERENCES core.roles(id) ON DELETE CASCADE,
   PRIMARY KEY (user_id, role_id)
 );
+CREATE INDEX idx_user_roles_role_id ON core.user_roles(role_id);
 
 -- Support groups (e.g. "IT Ops", "Infrastructure", "Security")
 CREATE TABLE core.teams (
@@ -118,6 +128,7 @@ CREATE TABLE core.team_members (
   user_id  uuid NOT NULL REFERENCES core.users(id) ON DELETE CASCADE,
   PRIMARY KEY (team_id, user_id)
 );
+CREATE INDEX idx_team_members_user_id ON core.team_members(user_id);
 
 -- Approval groups (used by change requests, access requests, catalog items)
 CREATE TABLE core.approval_groups (
@@ -130,9 +141,10 @@ CREATE TABLE core.approval_group_members (
   user_id            uuid NOT NULL REFERENCES core.users(id) ON DELETE CASCADE,
   PRIMARY KEY (approval_group_id, user_id)
 );
+CREATE INDEX idx_approval_group_members_user_id ON core.approval_group_members(user_id);
 
 CREATE TABLE core.notifications (
-  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id          uuid PRIMARY KEY DEFAULT uuidv7(),        -- time-ordered: this table is high-insert, never random-accessed by id
   user_id     uuid NOT NULL REFERENCES core.users(id) ON DELETE CASCADE,
   type        text NOT NULL,               -- 'sla_breach', 'approval_pending', 'oncall_assigned', ...
   title       text NOT NULL,
@@ -152,6 +164,7 @@ CREATE TABLE core.api_keys (
   revoked_at  timestamptz,
   created_at  timestamptz NOT NULL DEFAULT now()
 );
+CREATE INDEX idx_api_keys_created_by ON core.api_keys(created_by);
 
 CREATE TABLE core.integrations (
   id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -170,7 +183,7 @@ CREATE TABLE core.feature_flags (
 
 -- Every admin action and privileged change — see Admin > Audit log.
 CREATE TABLE core.audit_log (
-  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id           uuid PRIMARY KEY DEFAULT uuidv7(),        -- time-ordered: append-only, ever-growing, never random-accessed by id
   actor_user_id uuid REFERENCES core.users(id),
   action       text NOT NULL,              -- 'role.updated', 'business_rule.created', ...
   target_type  text NOT NULL,
@@ -178,7 +191,21 @@ CREATE TABLE core.audit_log (
   metadata     jsonb NOT NULL DEFAULT '{}',
   created_at   timestamptz NOT NULL DEFAULT now()
 );
+CREATE INDEX idx_audit_log_actor_user_id ON core.audit_log(actor_user_id);
 CREATE INDEX idx_audit_log_time ON core.audit_log(created_at DESC);
+
+-- Framework-agnostic migration tracking. This file is "0001_initial";
+-- future schema changes ship as numbered files (0002_*.sql, ...) that check
+-- for their own version here before applying and INSERT it after — so
+-- re-running a migration runner against an already-migrated tenant database
+-- is a no-op instead of an "already exists" error. Which tool wraps this
+-- convention (Flyway, sqlx, node-pg-migrate, a hand-rolled script) is an
+-- app-stack decision; this table only needs to exist, not be owned by one.
+CREATE TABLE core.schema_migrations (
+  version     text PRIMARY KEY,
+  applied_at  timestamptz NOT NULL DEFAULT now()
+);
+INSERT INTO core.schema_migrations (version) VALUES ('0001_initial');
 
 
 -- ============================================================================
@@ -203,7 +230,7 @@ CREATE TABLE itsm.ticket_categories (
 CREATE INDEX idx_ticket_categories_parent ON itsm.ticket_categories(parent_category_id);
 
 CREATE TABLE itsm.tickets (
-  id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id                 uuid PRIMARY KEY DEFAULT uuidv7(),  -- time-ordered: this is the highest-insert-rate table in the schema
   ticket_number      text NOT NULL,        -- display id, e.g. 'TS-4833'
   subject            text NOT NULL,
   category_id        uuid REFERENCES itsm.ticket_categories(id),
@@ -221,6 +248,8 @@ CREATE TABLE itsm.tickets (
   updated_at         timestamptz NOT NULL DEFAULT now(),
   UNIQUE (ticket_number)
 );
+CREATE INDEX idx_tickets_merged_into_id ON itsm.tickets(merged_into_id);
+CREATE INDEX idx_tickets_requester_contact_id ON itsm.tickets(requester_contact_id);
 CREATE INDEX idx_tickets_status ON itsm.tickets(status);
 CREATE INDEX idx_tickets_assignee ON itsm.tickets(assignee_user_id);
 CREATE INDEX idx_tickets_category ON itsm.tickets(category_id);
@@ -231,7 +260,7 @@ CREATE TRIGGER trg_tickets_updated BEFORE UPDATE ON itsm.tickets
 CREATE TYPE itsm.actor_type AS ENUM ('user', 'contact', 'ai_agent', 'system');
 
 CREATE TABLE itsm.ticket_activity (
-  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id           uuid PRIMARY KEY DEFAULT uuidv7(),        -- time-ordered: every comment/status change on every ticket lands here
   ticket_id    uuid NOT NULL REFERENCES itsm.tickets(id) ON DELETE CASCADE,
   actor_type   itsm.actor_type NOT NULL,
   actor_user_id uuid REFERENCES core.users(id),
@@ -239,10 +268,11 @@ CREATE TABLE itsm.ticket_activity (
   body         text NOT NULL,
   created_at   timestamptz NOT NULL DEFAULT now()
 );
+CREATE INDEX idx_ticket_activity_actor_user_id ON itsm.ticket_activity(actor_user_id);
 CREATE INDEX idx_ticket_activity_ticket ON itsm.ticket_activity(ticket_id, created_at);
 
 CREATE TABLE itsm.ticket_attachments (
-  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id            uuid PRIMARY KEY DEFAULT uuidv7(),       -- time-ordered: append-only alongside ticket_activity
   ticket_id     uuid NOT NULL REFERENCES itsm.tickets(id) ON DELETE CASCADE,
   filename      text NOT NULL,
   content_type  text,
@@ -251,6 +281,7 @@ CREATE TABLE itsm.ticket_attachments (
   uploaded_by   uuid REFERENCES core.users(id),
   created_at    timestamptz NOT NULL DEFAULT now()
 );
+CREATE INDEX idx_ticket_attachments_uploaded_by ON itsm.ticket_attachments(uploaded_by);
 CREATE INDEX idx_ticket_attachments_ticket ON itsm.ticket_attachments(ticket_id);
 
 -- Generic cross-module links (ticket <-> ticket, ticket <-> dev card, ticket
@@ -281,11 +312,13 @@ CREATE TABLE itsm.problems (
   closed_at      timestamptz,
   UNIQUE (problem_number)
 );
+CREATE INDEX idx_problems_owner_user_id ON itsm.problems(owner_user_id);
 CREATE TABLE itsm.problem_incidents (
   problem_id  uuid NOT NULL REFERENCES itsm.problems(id) ON DELETE CASCADE,
   ticket_id   uuid NOT NULL REFERENCES itsm.tickets(id) ON DELETE CASCADE,
   PRIMARY KEY (problem_id, ticket_id)
 );
+CREATE INDEX idx_problem_incidents_ticket_id ON itsm.problem_incidents(ticket_id);
 
 CREATE TYPE itsm.change_status AS ENUM ('draft', 'pending_approval', 'approved', 'rejected', 'deployed', 'rolled_back');
 CREATE TYPE itsm.change_risk AS ENUM ('low', 'medium', 'high');
@@ -305,8 +338,14 @@ CREATE TABLE itsm.change_requests (
   deployed_at            timestamptz,
   rollback_plan          text,
   created_at             timestamptz NOT NULL DEFAULT now(),
+  updated_at             timestamptz NOT NULL DEFAULT now(),
   UNIQUE (cr_number)
 );
+CREATE TRIGGER trg_change_requests_updated BEFORE UPDATE ON itsm.change_requests
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+CREATE INDEX idx_change_requests_source_ticket_id ON itsm.change_requests(source_ticket_id);
+CREATE INDEX idx_change_requests_requested_by_user_id ON itsm.change_requests(requested_by_user_id);
+CREATE INDEX idx_change_requests_backlog_item_id ON itsm.change_requests(backlog_item_id);
 CREATE INDEX idx_change_requests_status ON itsm.change_requests(status);
 
 CREATE TYPE itsm.approval_decision AS ENUM ('pending', 'approved', 'rejected');
@@ -320,6 +359,9 @@ CREATE TABLE itsm.change_approvals (
   comment            text,
   decided_at         timestamptz
 );
+CREATE INDEX idx_change_approvals_approval_group_id ON itsm.change_approvals(approval_group_id);
+CREATE INDEX idx_change_approvals_change_request_id ON itsm.change_approvals(change_request_id);
+CREATE INDEX idx_change_approvals_approver_user_id ON itsm.change_approvals(approver_user_id);
 
 CREATE TABLE itsm.sla_policies (
   id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -368,6 +410,9 @@ CREATE TABLE itsm.catalog_requests (
   status              itsm.ticket_status NOT NULL DEFAULT 'open',
   created_at          timestamptz NOT NULL DEFAULT now()
 );
+CREATE INDEX idx_catalog_requests_requested_by_contact_id ON itsm.catalog_requests(requested_by_contact_id);
+CREATE INDEX idx_catalog_requests_ticket_id ON itsm.catalog_requests(ticket_id);
+CREATE INDEX idx_catalog_requests_catalog_item_id ON itsm.catalog_requests(catalog_item_id);
 
 CREATE TABLE itsm.kb_categories (
   id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -404,6 +449,7 @@ CREATE TABLE itsm.oncall_rotations (
   starts_at    timestamptz NOT NULL,
   ends_at      timestamptz NOT NULL
 );
+CREATE INDEX idx_oncall_rotations_user_id ON itsm.oncall_rotations(user_id);
 CREATE INDEX idx_oncall_rotations_window ON itsm.oncall_rotations(schedule_id, starts_at, ends_at);
 
 
@@ -432,6 +478,7 @@ CREATE TABLE sam.assets (
   updated_at     timestamptz NOT NULL DEFAULT now(),
   UNIQUE (asset_tag)
 );
+CREATE INDEX idx_assets_owner_user_id ON sam.assets(owner_user_id);
 CREATE INDEX idx_assets_type ON sam.assets(type);
 CREATE INDEX idx_assets_renews_at ON sam.assets(renews_at) WHERE status = 'active';
 CREATE TRIGGER trg_assets_updated BEFORE UPDATE ON sam.assets
@@ -444,6 +491,7 @@ CREATE TABLE sam.asset_assignments (
   assigned_at     timestamptz NOT NULL DEFAULT now(),
   unassigned_at   timestamptz
 );
+CREATE INDEX idx_asset_assignments_assigned_to_user_id ON sam.asset_assignments(assigned_to_user_id);
 CREATE INDEX idx_asset_assignments_asset ON sam.asset_assignments(asset_id);
 
 CREATE TYPE sam.renewal_status AS ENUM ('upcoming', 'renewed', 'reclaimed', 'lapsed');
@@ -456,6 +504,7 @@ CREATE TABLE sam.license_renewals (
   status        sam.renewal_status NOT NULL DEFAULT 'upcoming',
   reminder_sent_at timestamptz
 );
+CREATE INDEX idx_license_renewals_asset_id ON sam.license_renewals(asset_id);
 CREATE INDEX idx_license_renewals_due ON sam.license_renewals(renews_at) WHERE status = 'upcoming';
 
 CREATE TYPE sam.scan_type AS ENUM ('agent', 'network');
@@ -489,11 +538,13 @@ CREATE TABLE dev.scrum_teams (
   project_id  uuid NOT NULL REFERENCES dev.projects(id) ON DELETE CASCADE,
   name        text NOT NULL
 );
+CREATE INDEX idx_scrum_teams_project_id ON dev.scrum_teams(project_id);
 CREATE TABLE dev.team_memberships (
   scrum_team_id  uuid NOT NULL REFERENCES dev.scrum_teams(id) ON DELETE CASCADE,
   user_id        uuid NOT NULL REFERENCES core.users(id) ON DELETE CASCADE,
   PRIMARY KEY (scrum_team_id, user_id)
 );
+CREATE INDEX idx_team_memberships_user_id ON dev.team_memberships(user_id);
 
 CREATE TABLE dev.epics (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -502,6 +553,7 @@ CREATE TABLE dev.epics (
   quarter     text,                       -- 'Q3 2026'
   status      text NOT NULL DEFAULT 'planned'
 );
+CREATE INDEX idx_epics_project_id ON dev.epics(project_id);
 
 CREATE TABLE dev.sprints (
   id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -511,6 +563,7 @@ CREATE TABLE dev.sprints (
   ends_on         date NOT NULL,
   capacity_points int
 );
+CREATE INDEX idx_sprints_project_id ON dev.sprints(project_id);
 
 CREATE TYPE dev.card_priority AS ENUM ('low', 'p3', 'p2', 'p1');
 CREATE TYPE dev.card_status AS ENUM ('backlog', 'in_progress', 'in_review', 'done');
@@ -537,6 +590,12 @@ CREATE TABLE dev.backlog_items (
   updated_at       timestamptz NOT NULL DEFAULT now(),
   UNIQUE (card_number)
 );
+CREATE INDEX idx_backlog_items_owner_user_id ON dev.backlog_items(owner_user_id);
+CREATE INDEX idx_backlog_items_project_id ON dev.backlog_items(project_id);
+CREATE INDEX idx_backlog_items_change_request_id ON dev.backlog_items(change_request_id);
+CREATE INDEX idx_backlog_items_problem_id ON dev.backlog_items(problem_id);
+CREATE INDEX idx_backlog_items_incident_ticket_id ON dev.backlog_items(incident_ticket_id);
+CREATE INDEX idx_backlog_items_epic_id ON dev.backlog_items(epic_id);
 CREATE INDEX idx_backlog_items_sprint ON dev.backlog_items(sprint_id);
 CREATE INDEX idx_backlog_items_status ON dev.backlog_items(status);
 CREATE TRIGGER trg_backlog_items_updated BEFORE UPDATE ON dev.backlog_items
@@ -557,6 +616,7 @@ CREATE TABLE dev.deployments (
   deployed_at        timestamptz NOT NULL DEFAULT now(),
   rolled_back_at     timestamptz
 );
+CREATE INDEX idx_deployments_deployed_by_user_id ON dev.deployments(deployed_by_user_id);
 CREATE INDEX idx_deployments_change_request ON dev.deployments(change_request_id);
 
 
@@ -570,6 +630,7 @@ CREATE TABLE docs.folders (
   parent_folder_id uuid REFERENCES docs.folders(id),
   name             text NOT NULL
 );
+CREATE INDEX idx_folders_parent_folder_id ON docs.folders(parent_folder_id);
 
 CREATE TABLE docs.documents (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -581,6 +642,7 @@ CREATE TABLE docs.documents (
   uploaded_by   uuid REFERENCES core.users(id),
   created_at    timestamptz NOT NULL DEFAULT now()
 );
+CREATE INDEX idx_documents_uploaded_by ON docs.documents(uploaded_by);
 CREATE INDEX idx_documents_folder ON docs.documents(folder_id);
 
 CREATE TABLE docs.document_versions (
@@ -592,6 +654,7 @@ CREATE TABLE docs.document_versions (
   created_at     timestamptz NOT NULL DEFAULT now(),
   UNIQUE (document_id, version_number)
 );
+CREATE INDEX idx_document_versions_uploaded_by ON docs.document_versions(uploaded_by);
 
 CREATE TABLE docs.wiki_spaces (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -610,6 +673,9 @@ CREATE TABLE docs.wiki_pages (
   created_at      timestamptz NOT NULL DEFAULT now(),
   updated_at      timestamptz NOT NULL DEFAULT now()
 );
+CREATE INDEX idx_wiki_pages_updated_by ON docs.wiki_pages(updated_by);
+CREATE INDEX idx_wiki_pages_created_by ON docs.wiki_pages(created_by);
+CREATE INDEX idx_wiki_pages_parent_page_id ON docs.wiki_pages(parent_page_id);
 CREATE INDEX idx_wiki_pages_space ON docs.wiki_pages(space_id);
 CREATE TRIGGER trg_wiki_pages_updated BEFORE UPDATE ON docs.wiki_pages
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
@@ -623,6 +689,7 @@ CREATE TABLE docs.wiki_page_history (
   edited_at      timestamptz NOT NULL DEFAULT now(),
   UNIQUE (wiki_page_id, version_number)
 );
+CREATE INDEX idx_wiki_page_history_edited_by ON docs.wiki_page_history(edited_by);
 
 CREATE TABLE docs.wiki_comments (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -631,6 +698,7 @@ CREATE TABLE docs.wiki_comments (
   body           text NOT NULL,
   created_at     timestamptz NOT NULL DEFAULT now()
 );
+CREATE INDEX idx_wiki_comments_author_user_id ON docs.wiki_comments(author_user_id);
 CREATE INDEX idx_wiki_comments_page ON docs.wiki_comments(wiki_page_id);
 
 
@@ -644,3 +712,32 @@ CREATE INDEX idx_wiki_comments_page ON docs.wiki_comments(wiki_page_id);
 -- ============================================================================
 INSERT INTO core.workspace (tenant_id, name, slug, deployment_model) VALUES
   ('a1111111-1111-4111-8111-111111111111', 'Acme Corp', 'acme', 'cloud');
+
+
+-- ============================================================================
+-- Least-privilege application role. Run once per database, after every table
+-- above exists. trakolo_app_role itself is NOLOGIN — it's a permissions
+-- bundle, not something anyone connects as directly. Provisioning creates a
+-- separate per-database LOGIN role (its password issued by a secrets
+-- manager, never written here or committed to version control) and grants
+-- it this role, e.g.: GRANT trakolo_app_role TO trakolo_app_acme;
+-- Rotating that login role's password, or swapping which login role serves
+-- a tenant, never means re-granting table privileges.
+--
+-- No CREATE/DROP/ALTER of any kind — the app cannot alter its own schema,
+-- only read and write rows. Schema changes are a migration-runner concern
+-- (see core.schema_migrations above), run as a separate, more privileged
+-- role that the running application never uses.
+-- ============================================================================
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'trakolo_app_role') THEN
+    CREATE ROLE trakolo_app_role NOLOGIN;
+  END IF;
+END
+$$;
+
+GRANT USAGE ON SCHEMA core, itsm, sam, dev, docs TO trakolo_app_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA core, itsm, sam, dev, docs TO trakolo_app_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA core, itsm, sam, dev, docs
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO trakolo_app_role;

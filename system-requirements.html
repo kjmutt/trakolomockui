@@ -73,7 +73,7 @@
 
   <div class="card" style="margin-bottom:22px;">
     <div class="section-label">In one line</div>
-    <div class="page-desc" style="margin-top:2px;">Postgres 16 (pinned) is fine through 2028 but Postgres 18 is the current stable if starting fresh; Redis should move from the 7.x pin to 8.x; nginx's floating <span class="id-mono">alpine</span> tag needs no action. Hardware scales with concurrent users, not company size — Postgres is the resource-hungry piece.</div>
+    <div class="page-desc" style="margin-top:2px;">Postgres 18 is required, not optional — <a href="db/schema.sql" style="color:var(--indigo-text);">db/schema.sql</a> and <a href="db/schema-master.sql" style="color:var(--indigo-text);">db/schema-master.sql</a> use the native <span class="id-mono">uuidv7()</span> added in 18 on every high-insert table; Redis should move from the 7.x pin to 8.x; nginx's floating <span class="id-mono">alpine</span> tag needs no action. Hardware scales with concurrent users, not company size — Postgres is the resource-hungry piece.</div>
   </div>
 
   <div class="section-label" style="margin-bottom:12px;">Service versions</div>
@@ -81,7 +81,7 @@
     <table class="layer-ref">
       <thead><tr><th>Service</th><th>Pinned today</th><th>Latest stable</th><th>Recommendation</th></tr></thead>
       <tbody>
-        <tr><td style="color:var(--amber-text);">db (Postgres)</td><td class="mono">postgres:16-alpine → 16.14</td><td class="mono">18.4</td><td>16 is supported through Nov 2028 — safe to keep. Starting fresh, pin <span class="id-mono">postgres:18-alpine</span> instead for 2 more years of runway. Postgres 19 is still beta (final ~Sep/Oct 2026) — skip it for now.</td></tr>
+        <tr><td style="color:var(--amber-text);">db (Postgres)</td><td class="mono">postgres:18-alpine → 18.4</td><td class="mono">18.4</td><td>Not a "when convenient" upgrade — the schema's <span class="id-mono">uuidv7()</span> calls only exist from 18 onward, so this pin is a hard requirement, not a recommendation. Postgres 19 is still beta (final ~Sep/Oct 2026) — skip it for now.</td></tr>
         <tr><td style="color:var(--violet-text);">redis</td><td class="mono">redis:7-alpine (floats to latest 7.x)</td><td class="mono">8.6.2</td><td>Worth bumping. Redis 7.2 is already EOL (Feb 2026); 7.4/7.8 live on into 2026–2027 but 8.x is the current mainline. Move the pin to <span class="id-mono">redis:8-alpine</span>.</td></tr>
         <tr><td style="color:var(--indigo-2);">app (nginx, placeholder)</td><td class="mono">nginx:alpine (floats to latest)</td><td class="mono">1.30.4</td><td>No action — the untagged <span class="id-mono">alpine</span> tag already tracks latest, and this container is replaced entirely once a real frontend/API image exists.</td></tr>
         <tr><td style="color:var(--indigo-text);">api (future, not yet built)</td><td class="mono">—</td><td class="mono">.NET 10 LTS</td><td>Target this when the real .NET Core API described in <a href="technical-design.html" style="color:var(--indigo-text);">technical-design.html</a> is built — current LTS, supported through Nov 2028.</td></tr>

@@ -1,5 +1,10 @@
 -- ============================================================================
--- trakolo-master — the platform control-plane database (PostgreSQL 14+)
+-- trakolo-master — the platform control-plane database (PostgreSQL 18+)
+--
+-- Requires 18 specifically for the native uuidv7() used on the append-only
+-- audit tables (subscription_history, error_logs, staff_audit_log) — see
+-- db/schema.sql's header for why. Everything else still uses
+-- gen_random_uuid() (UUIDv4).
 --
 -- One database, owned by Trakolo, never by a tenant. It holds the tenant
 -- registry (core.tenants) and every table behind the Platform Admin console
@@ -73,6 +78,14 @@ CREATE TABLE core.tenants (
 CREATE TRIGGER trg_tenants_updated BEFORE UPDATE ON core.tenants
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
+-- Framework-agnostic migration tracking — see db/schema.sql's copy of this
+-- table for the full rationale; identical convention on both databases.
+CREATE TABLE core.schema_migrations (
+  version     text PRIMARY KEY,
+  applied_at  timestamptz NOT NULL DEFAULT now()
+);
+INSERT INTO core.schema_migrations (version) VALUES ('0001_initial');
+
 
 -- ============================================================================
 -- SCHEMA: platform — Trakolo-staff-only: editions, licensing, entitlements,
@@ -115,6 +128,7 @@ CREATE TABLE platform.plan_features (
   value       text,                        -- numeric limit or label, e.g. '5', 'Unlimited'; null for plain booleans
   PRIMARY KEY (plan_id, feature_id)
 );
+CREATE INDEX idx_plan_features_feature_id ON platform.plan_features(feature_id);
 
 CREATE TYPE platform.subscription_status AS ENUM ('trialing', 'active', 'past_due', 'expired', 'canceled');
 CREATE TYPE platform.contract_type AS ENUM ('monthly', 'yearly', 'perpetual');
@@ -136,6 +150,7 @@ CREATE TABLE platform.subscriptions (
   updated_at           timestamptz NOT NULL DEFAULT now(),
   UNIQUE (tenant_id)                       -- one active subscription per tenant
 );
+CREATE INDEX idx_subscriptions_plan_id ON platform.subscriptions(plan_id);
 CREATE TRIGGER trg_subscriptions_updated BEFORE UPDATE ON platform.subscriptions
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
@@ -144,7 +159,7 @@ CREATE TRIGGER trg_subscriptions_updated BEFORE UPDATE ON platform.subscriptions
 CREATE TYPE platform.subscription_action AS ENUM ('generated', 'renewed', 'upgraded', 'downgraded', 'cancelled');
 
 CREATE TABLE platform.subscription_history (
-  id                         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id                         uuid PRIMARY KEY DEFAULT uuidv7(),  -- time-ordered: append-only audit trail
   subscription_id            uuid NOT NULL REFERENCES platform.subscriptions(id) ON DELETE CASCADE,
   action                     platform.subscription_action NOT NULL,
   previous_plan_id           uuid REFERENCES platform.plans(id),
@@ -158,6 +173,8 @@ CREATE TABLE platform.subscription_history (
   note                       text,
   created_at                 timestamptz NOT NULL DEFAULT now()
 );
+CREATE INDEX idx_subscription_history_previous_plan_id ON platform.subscription_history(previous_plan_id);
+CREATE INDEX idx_subscription_history_new_plan_id ON platform.subscription_history(new_plan_id);
 CREATE INDEX idx_subscription_history_subscription ON platform.subscription_history(subscription_id, created_at DESC);
 
 -- Per-tenant, per-feature overrides on top of the plan (e.g. a trial add-on).
@@ -182,7 +199,7 @@ CREATE TABLE platform.services (
 CREATE TYPE platform.log_type AS ENUM ('info', 'warning', 'error');
 
 CREATE TABLE platform.error_logs (
-  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id            uuid PRIMARY KEY DEFAULT uuidv7(),  -- time-ordered: append-only, ever-growing
   tenant_id     uuid REFERENCES core.tenants(id) ON DELETE CASCADE,   -- null = platform-wide
   service_name  text NOT NULL,
   api_method    text,
@@ -196,16 +213,18 @@ CREATE INDEX idx_error_logs_tenant_time ON platform.error_logs(tenant_id, logged
 -- Outbound mail accounts used for SSP system email (signup, password reset —
 -- not the tenant's own ticket-ingestion mailboxes, see core.integrations).
 CREATE TABLE platform.ssp_email_settings (
-  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name                text NOT NULL,
-  provider            text NOT NULL DEFAULT 'smtp' CHECK (provider IN ('smtp', 'outlook', 'gmail')),
-  from_address        citext NOT NULL,
-  client_id           text,
-  client_secret_hash  text,               -- never store the raw secret
-  smtp_host           text,
-  smtp_port           int,
-  is_active           boolean NOT NULL DEFAULT true,
-  created_at          timestamptz NOT NULL DEFAULT now()
+  id                       uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name                     text NOT NULL,
+  provider                 text NOT NULL DEFAULT 'smtp' CHECK (provider IN ('smtp', 'outlook', 'gmail')),
+  from_address             citext NOT NULL,
+  client_id                text,
+  client_secret_encrypted  bytea,       -- envelope-encrypted (e.g. pgcrypto pgp_sym_encrypt with a KMS-held key), never plaintext.
+                                        -- NOT a hash: this has to be decrypted to authenticate outbound to the mail provider,
+                                        -- unlike a password, so a one-way hash can't work here.
+  smtp_host                text,
+  smtp_port                int,
+  is_active                boolean NOT NULL DEFAULT true,
+  created_at               timestamptz NOT NULL DEFAULT now()
 );
 
 -- System email templates the SSP sends on account-lifecycle events.
@@ -234,11 +253,12 @@ CREATE TABLE platform.callback_requests (
   status         platform.callback_status NOT NULL DEFAULT 'new',
   created_at     timestamptz NOT NULL DEFAULT now()
 );
+CREATE INDEX idx_callback_requests_tenant_id ON platform.callback_requests(tenant_id);
 
 -- Every privileged action a Trakolo staff member takes in the platform
 -- console — separate from core.audit_log, which is per-tenant.
 CREATE TABLE platform.staff_audit_log (
-  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id          uuid PRIMARY KEY DEFAULT uuidv7(),  -- time-ordered: append-only, ever-growing
   staff_email citext NOT NULL,
   action      text NOT NULL,        -- 'subscription.renewed', 'plan_feature.toggled', ...
   target_type text NOT NULL,
@@ -269,6 +289,7 @@ CREATE TABLE platform.leads (
   logged_by_email     citext,
   created_at          timestamptz NOT NULL DEFAULT now()
 );
+CREATE INDEX idx_leads_converted_tenant_id ON platform.leads(converted_tenant_id);
 CREATE INDEX idx_leads_status ON platform.leads(status);
 
 -- Who Trakolo staff actually call at each account — sales/success-facing,
@@ -301,6 +322,7 @@ CREATE TABLE platform.campaigns (
   sent_at         timestamptz,
   created_at      timestamptz NOT NULL DEFAULT now()
 );
+CREATE INDEX idx_campaigns_segment_plan_id ON platform.campaigns(segment_plan_id);
 
 CREATE TABLE platform.campaign_recipients (
   campaign_id  uuid NOT NULL REFERENCES platform.campaigns(id) ON DELETE CASCADE,
@@ -308,6 +330,7 @@ CREATE TABLE platform.campaign_recipients (
   opened_at    timestamptz,
   PRIMARY KEY (campaign_id, tenant_id)
 );
+CREATE INDEX idx_campaign_recipients_tenant_id ON platform.campaign_recipients(tenant_id);
 
 
 -- ============================================================================
@@ -338,3 +361,24 @@ FROM core.tenants t, platform.plans p WHERE t.slug = 'acme' AND p.name = 'Team';
 INSERT INTO platform.subscriptions (tenant_id, plan_id, status, contract_type, total_license_count, generated_date, contract_from_date, contract_to_date, drop_dead_date, license_key, generated_by_email)
 SELECT t.id, p.id, 'active', 'perpetual', 46, '2025-01-01', '2025-01-01', '2099-01-01', '2099-01-01', 'TRK-TRAKOLO-2025-INTERNAL', 'platform-ops@trakolo.com'
 FROM core.tenants t, platform.plans p WHERE t.slug = 'trakolo' AND p.name = 'Enterprise';
+
+
+-- ============================================================================
+-- Least-privilege application role — see db/schema.sql's copy of this
+-- section for the full rationale (NOLOGIN bundle, per-environment LOGIN
+-- role granted it out-of-band, no DDL rights at all). Only the Platform
+-- Admin backend ever connects to this database as trakolo_master_role;
+-- no tenant, and no per-tenant application code, ever does.
+-- ============================================================================
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'trakolo_master_role') THEN
+    CREATE ROLE trakolo_master_role NOLOGIN;
+  END IF;
+END
+$$;
+
+GRANT USAGE ON SCHEMA core, platform TO trakolo_master_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA core, platform TO trakolo_master_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA core, platform
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO trakolo_master_role;
