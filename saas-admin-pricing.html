@@ -12,13 +12,21 @@
   .cat-head .name{font-family:var(--font-display);font-size:16px;font-weight:700;color:#fff;}
   .matrix{width:100%;border-collapse:collapse;}
   .matrix th{text-align:center;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:#7C948A;font-family:var(--font-mono);font-weight:500;padding:12px 10px;border-bottom:1px solid #26362F;background:#151F1B;}
-  .matrix th:first-child{text-align:left;width:280px;}
+  .matrix th:first-child{text-align:left;width:300px;}
   .matrix td{padding:10px;border-bottom:1px solid #1E2B25;text-align:center;vertical-align:middle;}
   .matrix tbody tr:last-child td{border-bottom:none;}
   .matrix td:first-child{text-align:left;}
   .feat-name{width:100%;padding:8px 10px;border-radius:7px;border:1px solid #2B3B33;background:#0E1613;color:#EAF2ED;font-size:12.5px;}
-  .feat-value{width:60px;padding:7px 8px;border-radius:7px;border:1px solid #2B3B33;background:#0E1613;color:#EAF2ED;font-size:12px;text-align:center;}
+  .feat-value{width:120px;padding:7px 8px;border-radius:7px;border:1px solid #2B3B33;background:#0E1613;color:#EAF2ED;font-size:12px;text-align:center;}
   .matrix .pub-col{background:rgba(93,202,165,.05);}
+  .source-note{font-size:12.5px;color:#8FA79C;margin-bottom:20px;max-width:720px;line-height:1.6;}
+  .source-note b{color:#5DCAA5;}
+  .edition-price-row{display:flex;gap:12px;margin-bottom:24px;}
+  .edition-price-card{flex:1;background:#151F1B;border:1px solid #26362F;border-radius:12px;padding:14px 16px;}
+  .edition-price-card .en{font-family:var(--font-display);font-weight:700;color:#fff;font-size:14px;}
+  .edition-price-card .ep{font-family:var(--font-display);font-size:20px;font-weight:700;color:#5DCAA5;margin-top:6px;}
+  .edition-price-card .ep span{font-size:11px;color:#7C948A;font-weight:400;}
+  .loading{padding:40px;text-align:center;color:#7C948A;}
 </style>
 </head>
 <body class="platform-body">
@@ -49,96 +57,123 @@
   <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px;">
     <div>
       <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;">Pricing &amp; editions</div>
-      <div style="font-size:13px;color:#8FA79C;margin-top:4px;max-width:640px;">The feature catalog behind every edition. This is the source of truth the Upgrade modal reads from — toggle a cell to grant or withhold a feature per edition, or add a new row entirely.</div>
+      <div style="font-size:13px;color:#8FA79C;margin-top:4px;max-width:680px;">The single source of truth for every edition and feature — <a href="https://trakolo.com/pricing.html" style="color:#5DCAA5;" target="_blank" rel="noopener">trakolo.com/pricing.html</a> reads this same file to render its plan cards and comparison table. Toggle a cell to grant or withhold a feature per edition, or add a new row entirely.</div>
     </div>
   </div>
 
-  <div class="cat-head">
-    <span class="name">Essentials</span>
-    <button class="btn primary sm" style="background:#1D9E75;border-color:#1D9E75;" onclick="addFeatureRow()">+ Add feature</button>
-  </div>
+  <div id="pricing-root"><div class="loading">Loading pricing-config.json…</div></div>
 
-  <div class="plat-card">
-    <table class="matrix">
-      <thead><tr><th>Feature</th><th>Free</th><th>Team</th><th>Business</th><th>Enterprise</th><th class="pub-col">Published</th></tr></thead>
-      <tbody id="matrix-body">
-        <tr>
-          <td><input class="feat-name" value="REST API" readonly><input class="feat-value" value="1" style="margin-top:6px;" title="requests/sec limit"></td>
-          <td><div class="switch on"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td>
-          <td class="pub-col"><div class="switch on"></div></td>
-        </tr>
-        <tr>
-          <td><input class="feat-name" value="Custom domain" readonly></td>
-          <td><div class="switch"></div></td><td><div class="switch"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td>
-          <td class="pub-col"><div class="switch on"></div></td>
-        </tr>
-        <tr>
-          <td><input class="feat-name" value="Multi-factor authentication" readonly></td>
-          <td><div class="switch on"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td>
-          <td class="pub-col"><div class="switch on"></div></td>
-        </tr>
-        <tr>
-          <td><input class="feat-name" value="Active Directory integration" readonly></td>
-          <td><div class="switch"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td><td><div class="switch"></div></td>
-          <td class="pub-col"><div class="switch on"></div></td>
-        </tr>
-        <tr>
-          <td><input class="feat-name" value="Workflows" readonly></td>
-          <td><div class="switch on"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td>
-          <td class="pub-col"><div class="switch on"></div></td>
-        </tr>
-        <tr>
-          <td><input class="feat-name" value="Single sign-on" readonly></td>
-          <td><div class="switch"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td><td><div class="switch"></div></td>
-          <td class="pub-col"><div class="switch on"></div></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="cat-head">
-    <span class="name">Support &amp; limits</span>
-  </div>
-  <div class="plat-card">
-    <table class="matrix">
-      <thead><tr><th>Feature</th><th>Free</th><th>Team</th><th>Business</th><th>Enterprise</th><th class="pub-col">Published</th></tr></thead>
-      <tbody>
-        <tr>
-          <td><input class="feat-name" value="Seats included" readonly></td>
-          <td><input class="feat-value" value="5"></td><td><input class="feat-value" value="50"></td><td><input class="feat-value" value="250"></td><td><input class="feat-value" value="∞"></td>
-          <td class="pub-col"><div class="switch on"></div></td>
-        </tr>
-        <tr>
-          <td><input class="feat-name" value="AI Agent — Service desk" readonly></td>
-          <td><div class="switch"></div></td><td><div class="switch"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td>
-          <td class="pub-col"><div class="switch on"></div></td>
-        </tr>
-        <tr>
-          <td><input class="feat-name" value="Priority support (4h SLA)" readonly></td>
-          <td><div class="switch"></div></td><td><div class="switch"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td>
-          <td class="pub-col"><div class="switch on"></div></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="save-bar-static" style="margin-top:20px;display:flex;justify-content:flex-end;gap:10px;">
-    <button class="btn sm" style="background:transparent;border-color:#37473F;color:#8FA79C;" onclick="location.reload()">Discard</button>
-    <button class="btn sm primary" style="background:#1D9E75;border-color:#1D9E75;" onclick="alert('Pricing matrix saved. Live on the marketing site and Upgrade modal immediately.')">Save changes</button>
+  <div style="margin-top:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+    <div class="source-note" style="margin-bottom:0;">This mockup has no backend — <b>Save</b> downloads the edited <span class="id-mono">pricing-config.json</span>; commit it back to the repo to actually publish the change to trakolo.com and Entitlements.</div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn sm" style="background:transparent;border-color:#37473F;color:#8FA79C;" onclick="location.reload()">Discard</button>
+      <button class="btn sm primary" style="background:#1D9E75;border-color:#1D9E75;" onclick="saveConfig()">Save changes</button>
+    </div>
   </div>
 </div>
 
 <script>
-document.querySelectorAll('.matrix .switch').forEach(s => s.addEventListener('click', () => s.classList.toggle('on')));
-function addFeatureRow(){
-  const tbody = document.getElementById('matrix-body');
+let CONFIG = null;
+
+fetch('pricing-config.json')
+  .then(r => r.json())
+  .then(data => { CONFIG = data; render(); })
+  .catch(err => {
+    document.getElementById('pricing-root').innerHTML = '<div class="loading">Couldn\'t load pricing-config.json: ' + err + '</div>';
+  });
+
+function esc(s){ const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function render(){
+  const root = document.getElementById('pricing-root');
+  let html = '<div class="edition-price-row">';
+  CONFIG.editions.forEach(ed => {
+    const price = ed.priceLabel ? ed.priceLabel : ('£' + (ed.priceMonthly === 0 ? '0' : ed.priceMonthly.toFixed(2)));
+    html += '<div class="edition-price-card"><div class="en">' + esc(ed.name) + '</div><div class="ep">' + esc(price) + (ed.priceLabel ? '' : '<span> ' + esc(ed.priceUnit || '') + '</span>') + '</div></div>';
+  });
+  html += '</div>';
+
+  CONFIG.categories.forEach((cat, ci) => {
+    html += '<div class="cat-head"><span class="name">' + esc(cat.label) + '</span>' +
+      (ci === 0 ? '<button class="btn primary sm" style="background:#1D9E75;border-color:#1D9E75;" onclick="addFeatureRow(\'' + cat.key + '\')">+ Add feature</button>' : '') +
+      '</div>';
+    html += '<div class="plat-card"><table class="matrix" data-category="' + cat.key + '">';
+    html += '<thead><tr><th>Feature</th>' + CONFIG.editions.map(e => '<th>' + esc(e.name) + '</th>').join('') + '<th class="pub-col">Published</th></tr></thead>';
+    html += '<tbody>';
+    cat.features.forEach(f => { html += featureRow(f); });
+    html += '</tbody></table></div>';
+  });
+
+  root.innerHTML = html;
+  wireInteractions();
+}
+
+function featureRow(f){
+  let row = '<tr data-key="' + f.key + '" data-type="' + f.type + '">';
+  row += '<td><input class="feat-name" value="' + esc(f.label) + '"></td>';
+  CONFIG.editions.forEach(ed => {
+    const v = f.values[ed.key];
+    if(f.type === 'boolean'){
+      row += '<td><div class="switch ' + (v ? 'on' : '') + '" data-edition="' + ed.key + '"></div></td>';
+    } else {
+      row += '<td><input class="feat-value" data-edition="' + ed.key + '" value="' + esc(v == null ? '' : v) + '"></td>';
+    }
+  });
+  row += '<td class="pub-col"><div class="switch ' + (f.published === false ? '' : 'on') + '" data-published="1"></div></td>';
+  row += '</tr>';
+  return row;
+}
+
+function wireInteractions(){
+  document.querySelectorAll('.matrix .switch').forEach(s => {
+    if(!s.dataset.wired){ s.addEventListener('click', () => s.classList.toggle('on')); s.dataset.wired = '1'; }
+  });
+}
+
+function addFeatureRow(categoryKey){
+  const table = document.querySelector('.matrix[data-category="' + categoryKey + '"] tbody');
+  const cat = CONFIG.categories.find(c => c.key === categoryKey);
+  const newFeature = { key: 'new_feature_' + Date.now(), label: '', type: 'boolean', values: {} };
+  CONFIG.editions.forEach(ed => newFeature.values[ed.key] = false);
+  cat.features.push(newFeature);
   const tr = document.createElement('tr');
-  tr.innerHTML = '<td><input class="feat-name" value="" placeholder="New feature name"></td>' +
-    '<td><div class="switch"></div></td><td><div class="switch"></div></td><td><div class="switch"></div></td><td><div class="switch"></div></td>' +
-    '<td class="pub-col"><div class="switch on"></div></td>';
-  tbody.appendChild(tr);
-  tr.querySelectorAll('.switch').forEach(s => s.addEventListener('click', () => s.classList.toggle('on')));
+  tr.innerHTML = featureRow(newFeature).replace(/^<tr[^>]*>/, '').replace(/<\/tr>$/, '');
+  tr.dataset.key = newFeature.key;
+  tr.dataset.type = newFeature.type;
+  table.appendChild(tr);
+  wireInteractions();
   tr.querySelector('.feat-name').focus();
+}
+
+function saveConfig(){
+  // Read the DOM back into CONFIG
+  document.querySelectorAll('.matrix').forEach(table => {
+    const catKey = table.dataset.category;
+    const cat = CONFIG.categories.find(c => c.key === catKey);
+    const rows = [...table.querySelectorAll('tbody tr')];
+    cat.features = rows.map(tr => {
+      const key = tr.dataset.key;
+      const type = tr.dataset.type;
+      const label = tr.querySelector('.feat-name').value;
+      const values = {};
+      CONFIG.editions.forEach(ed => {
+        if(type === 'boolean'){
+          values[ed.key] = tr.querySelector('.switch[data-edition="' + ed.key + '"]').classList.contains('on');
+        } else {
+          values[ed.key] = tr.querySelector('.feat-value[data-edition="' + ed.key + '"]').value;
+        }
+      });
+      const published = tr.querySelector('.switch[data-published]').classList.contains('on');
+      return { key, label, type, values, published };
+    });
+  });
+
+  const blob = new Blob([JSON.stringify(CONFIG, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'pricing-config.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
 }
 </script>
 <script src="platform-chrome.js" defer></script>

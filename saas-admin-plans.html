@@ -55,7 +55,7 @@
 <div class="plat-wrap">
   <div style="margin-bottom:22px;">
     <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;">Customer plans &amp; entitlements</div>
-    <div style="font-size:13px;color:#8FA79C;margin-top:4px;max-width:720px;">What each customer bought, and which features their workspace can see. Toggling here changes what that tenant's admins get on their next page load — every change is written to the platform audit log. On-premise customers are governed by their license file, not these switches.</div>
+    <div style="font-size:13px;color:#8FA79C;margin-top:4px;max-width:720px;">What each customer bought, and which features their workspace can see. Toggling here changes what that tenant's admins get on their next page load — every change is written to the platform audit log. On-premise customers are governed by their license file, not these switches. Feature names here match the <a href="saas-admin-pricing.html" style="color:#5DCAA5;">Pricing</a> configuration — an edition's baseline comes from there, this page only handles per-tenant overrides on top of it.</div>
   </div>
 
   <div class="cust-card">
@@ -75,11 +75,11 @@
         <div class="ent-col-label">Feature flags</div>
         <div class="ent-row"><div><div class="ent-name">AI Agent — Service desk</div><div class="ent-note">Paid add-on · 1 license active</div></div><div class="switch on"></div></div>
         <div class="ent-row"><div><div class="ent-name">AI Agent — Coding</div><div class="ent-note">Paid add-on · not purchased</div></div><div class="switch"></div></div>
-        <div class="ent-row"><div><div class="ent-name">REST API &amp; bulk upload</div></div><div class="switch on"></div></div>
-        <div class="ent-row"><div><div class="ent-name">Data migration wizard</div></div><div class="switch on"></div></div>
-        <div class="ent-row"><div><div class="ent-name">Service catalog &amp; knowledge base</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">REST API &amp; bulk import/export</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Data migration wizard (Jira, ServiceNow, CSV…)</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Knowledge base &amp; service catalog</div></div><div class="switch on"></div></div>
         <div class="ent-row"><div><div class="ent-name">Problem management &amp; on-call</div></div><div class="switch on"></div></div>
-        <div class="ent-row"><div><div class="ent-name">Asset discovery</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Asset discovery (agent + network scan)</div></div><div class="switch on"></div></div>
         <div class="ent-row"><div><div class="ent-name">Live chat</div></div><div class="switch on"></div></div>
         <div class="ent-row"><div><div class="ent-name">Sandbox workspace</div><div class="ent-note">Not purchased</div></div><div class="switch"></div></div>
       </div>
@@ -103,12 +103,12 @@
         <div class="ent-col-label">Feature flags</div>
         <div class="ent-row"><div><div class="ent-name">AI Agent — Service desk</div><div class="ent-note">Included in Enterprise · 4 licenses active</div></div><div class="switch on"></div></div>
         <div class="ent-row"><div><div class="ent-name">AI Agent — Coding</div><div class="ent-note">Included in Enterprise · 2 licenses active</div></div><div class="switch on"></div></div>
-        <div class="ent-row"><div><div class="ent-name">REST API &amp; bulk upload</div></div><div class="switch on"></div></div>
-        <div class="ent-row"><div><div class="ent-name">Data migration wizard</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">REST API &amp; bulk import/export</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Data migration wizard (Jira, ServiceNow, CSV…)</div></div><div class="switch on"></div></div>
         <div class="ent-row"><div><div class="ent-name">SSO &amp; SCIM</div></div><div class="switch on"></div></div>
-        <div class="ent-row"><div><div class="ent-name">Service catalog &amp; knowledge base</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Knowledge base &amp; service catalog</div></div><div class="switch on"></div></div>
         <div class="ent-row"><div><div class="ent-name">Problem management &amp; on-call</div></div><div class="switch on"></div></div>
-        <div class="ent-row"><div><div class="ent-name">Asset discovery</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Asset discovery (agent + network scan)</div></div><div class="switch on"></div></div>
       </div>
     </div>
   </div>
@@ -130,7 +130,7 @@
         <div class="ent-col-label">Feature flags — issue a new license to change</div>
         <div class="ent-row"><div><div class="ent-name">AI Agent — Service desk</div><div class="ent-note">Not in their license</div></div><div class="switch locked"></div></div>
         <div class="ent-row"><div><div class="ent-name">AI Agent — Coding</div><div class="ent-note">Not in their license</div></div><div class="switch locked"></div></div>
-        <div class="ent-row"><div><div class="ent-name">REST API &amp; bulk upload</div></div><span class="lic-badge">In license</span></div>
+        <div class="ent-row"><div><div class="ent-name">REST API &amp; bulk import/export</div></div><span class="lic-badge">In license</span></div>
         <div class="ent-row"><div><div class="ent-name">Support &amp; upgrades plan</div><div class="ent-note">Renews Jan 2027</div></div><span class="lic-badge">Active</span></div>
         <div class="ent-row"><div><div class="ent-name">Issue replacement license</div><div class="ent-note">Seats, modules, or support-date change</div></div><button class="btn sm" style="background:#1B2E27;border-color:#2E4A3E;color:#5DCAA5;">Generate .trklic</button></div>
       </div>
@@ -154,9 +154,9 @@
         <div class="ent-col-label">Feature flags</div>
         <div class="ent-row"><div><div class="ent-name">AI Agent — Service desk</div><div class="ent-note">Not purchased</div></div><div class="switch"></div></div>
         <div class="ent-row"><div><div class="ent-name">AI Agent — Coding</div><div class="ent-note">Not purchased</div></div><div class="switch"></div></div>
-        <div class="ent-row"><div><div class="ent-name">REST API &amp; bulk upload</div></div><div class="switch"></div></div>
-        <div class="ent-row"><div><div class="ent-name">Data migration wizard</div><div class="ent-note">Free on every plan — helps them move in</div></div><div class="switch on"></div></div>
-        <div class="ent-row"><div><div class="ent-name">Service catalog &amp; knowledge base</div><div class="ent-note">Team plan and above</div></div><div class="switch"></div></div>
+        <div class="ent-row"><div><div class="ent-name">REST API &amp; bulk import/export</div></div><div class="switch"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Data migration wizard (Jira, ServiceNow, CSV…)</div><div class="ent-note">Free on every plan — helps them move in</div></div><div class="switch on"></div></div>
+        <div class="ent-row"><div><div class="ent-name">Knowledge base &amp; service catalog</div><div class="ent-note">Team plan and above</div></div><div class="switch"></div></div>
         <div class="ent-row"><div><div class="ent-name">Live chat</div><div class="ent-note">Team plan and above</div></div><div class="switch"></div></div>
       </div>
     </div>

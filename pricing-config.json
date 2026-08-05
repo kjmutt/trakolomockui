@@ -1,0 +1,111 @@
+{
+  "editions": [
+    {
+      "key": "free", "name": "Free",
+      "description": "For small teams getting started with tickets.",
+      "priceMonthly": 0, "priceUnit": "/month", "wasPriceMonthly": null,
+      "badge": null, "badgeStyle": null, "featured": false,
+      "cta": { "label": "Start free", "href": "https://portal.trakolo.com/login", "style": "ghost" },
+      "highlights": ["Up to 10 users", "Up to 50 Self-Service Portal users", "Unlimited tickets", "Basic kanban board", "Email support", "1 GB database storage", "2 GB file & document storage"]
+    },
+    {
+      "key": "team", "name": "Team",
+      "description": "For growing IT and dev teams that need it all.",
+      "priceMonthly": 6.30, "priceUnit": "/user/month", "wasPriceMonthly": 9.00,
+      "badge": "Most popular · 30% off", "badgeStyle": "primary", "featured": true,
+      "cta": { "label": "Start free trial", "href": "https://portal.trakolo.com/login", "style": "primary" },
+      "highlights": ["Everything in Free", "Up to 1,000 Self-Service Portal users", "Software asset management", "SLA timers & escalations", "Sprint boards & Git integration", "Custom dashboards", "REST API & bulk data access", "AI Agent licenses (add-on, per agent)", "20 GB database storage", "100 GB file & document storage"]
+    },
+    {
+      "key": "business", "name": "Business",
+      "description": "For multi-department IT operations.",
+      "priceMonthly": 12.60, "priceUnit": "/user/month", "wasPriceMonthly": 18.00,
+      "badge": "30% off", "badgeStyle": "muted", "featured": false,
+      "cta": { "label": "Start free trial", "href": "https://portal.trakolo.com/login", "style": "ghost" },
+      "highlights": ["Everything in Team", "Up to 10,000 Self-Service Portal users", "Audit-ready compliance exports", "Role-based permissions", "Priority support", "2 AI Agent licenses included", "100 GB database storage", "500 GB file & document storage"]
+    },
+    {
+      "key": "enterprise", "name": "Enterprise",
+      "description": "For large orgs with security & compliance needs.",
+      "priceMonthly": null, "priceLabel": "Custom", "priceUnit": null, "wasPriceMonthly": null,
+      "badge": null, "badgeStyle": null, "featured": false,
+      "cta": { "label": "Contact sales", "href": "contact.html", "style": "ghost" },
+      "highlights": ["Everything in Business", "Unlimited Self-Service Portal users", "SSO & SCIM provisioning", "Dedicated onboarding", "Custom contract & SLA", "Custom AI Agent license count", "500 GB database storage, expandable", "2 TB file & document storage, expandable"]
+    }
+  ],
+
+  "deployment": [
+    {
+      "key": "cloud", "name": "Cloud (SaaS)",
+      "description": "Hosted and managed by us. Subscription billing, monthly or annual.",
+      "bullets": ["No infrastructure to manage", "Automatic updates & patching", "Billed per user, per month", "Get started in minutes"],
+      "cta": { "label": "Start free →", "href": "https://portal.trakolo.com/login", "style": "primary" }
+    },
+    {
+      "key": "onprem", "name": "Standalone / On-premise",
+      "description": "A perpetual license installed into your own environment — your servers, your cloud tenant, or an air-gapped network.",
+      "bullets": ["One-time perpetual license fee, from £4,200", "Optional annual support & upgrades plan (18% of license)", "Full data residency — nothing leaves your environment", "Ideal for regulated industries and government"],
+      "cta": { "label": "Talk to sales", "href": "contact.html", "style": "ghost" }
+    }
+  ],
+
+  "categories": [
+    {
+      "key": "limits", "label": "Users & limits",
+      "features": [
+        { "key": "users", "label": "Users (agents, dev & admins)", "type": "text", "values": { "free": "Up to 10", "team": "Unlimited", "business": "Unlimited", "enterprise": "Unlimited" } },
+        { "key": "ssp_users", "label": "Self-Service Portal (SSP) users", "type": "text", "values": { "free": "Up to 50", "team": "Up to 1,000", "business": "Up to 10,000", "enterprise": "Unlimited" } },
+        { "key": "db_storage", "label": "Database storage", "type": "text", "values": { "free": "1 GB", "team": "20 GB", "business": "100 GB", "enterprise": "500 GB, expandable" } },
+        { "key": "file_storage", "label": "File & document storage", "type": "text", "values": { "free": "2 GB", "team": "100 GB", "business": "500 GB", "enterprise": "2 TB, expandable" } }
+      ]
+    },
+    {
+      "key": "ai", "label": "AI & automation",
+      "features": [
+        { "key": "ai_agent_servicedesk", "label": "AI Agent — Service desk", "type": "text", "values": { "free": "—", "team": "Add-on, per agent", "business": "1 included, add more", "enterprise": "Custom" } },
+        { "key": "ai_agent_coding", "label": "AI Agent — Coding", "type": "text", "values": { "free": "—", "team": "Add-on, per agent", "business": "1 included, add more", "enterprise": "Custom" } },
+        { "key": "ai_triage", "label": "AI triage & auto-resolution", "type": "text", "values": { "free": "—", "team": "Add-on", "business": "✓", "enterprise": "✓" } },
+        { "key": "ai_copilot", "label": "AI Copilot (agent, admin & self-service portal)", "type": "text", "values": { "free": "—", "team": "Add-on", "business": "✓", "enterprise": "✓" } }
+      ]
+    },
+    {
+      "key": "core", "label": "Core service management",
+      "features": [
+        { "key": "ticketing", "label": "Ticketing & SLAs", "type": "boolean", "values": { "free": true, "team": true, "business": true, "enterprise": true } },
+        { "key": "asset_mgmt", "label": "Asset management", "type": "boolean", "values": { "free": false, "team": true, "business": true, "enterprise": true } },
+        { "key": "dev_boards", "label": "Dev boards & Git integration", "type": "boolean", "values": { "free": false, "team": true, "business": true, "enterprise": true } },
+        { "key": "rest_api", "label": "REST API & bulk import/export", "type": "boolean", "values": { "free": false, "team": true, "business": true, "enterprise": true } },
+        { "key": "channels", "label": "Ticket channels (email, phone, chat, Slack)", "type": "text", "values": { "free": "Portal + email", "team": "✓", "business": "✓", "enterprise": "✓" } },
+        { "key": "hr_self_service", "label": "Employee self-service HR (payslips, leave, offer letter)", "type": "boolean", "values": { "free": false, "team": false, "business": true, "enterprise": true } },
+        { "key": "change_mgmt", "label": "Change management (CRs, CAB approval, scheduling)", "type": "boolean", "values": { "free": false, "team": true, "business": true, "enterprise": true } },
+        { "key": "business_rules", "label": "Business rules automation", "type": "boolean", "values": { "free": false, "team": true, "business": true, "enterprise": true } },
+        { "key": "data_migration", "label": "Data migration wizard (Jira, ServiceNow, CSV…)", "type": "boolean", "values": { "free": true, "team": true, "business": true, "enterprise": true } },
+        { "key": "kb_catalog", "label": "Knowledge base & service catalog", "type": "boolean", "values": { "free": false, "team": true, "business": true, "enterprise": true } },
+        { "key": "doc_library", "label": "Document library (files, video, audio, images)", "type": "boolean", "values": { "free": false, "team": true, "business": true, "enterprise": true } },
+        { "key": "wiki", "label": "Confluence-style wiki spaces", "type": "boolean", "values": { "free": false, "team": false, "business": true, "enterprise": true } },
+        { "key": "problem_mgmt", "label": "Problem management & on-call", "type": "boolean", "values": { "free": false, "team": true, "business": true, "enterprise": true } },
+        { "key": "team_workload", "label": "Team workload (drag-to-assign & pairing)", "type": "boolean", "values": { "free": false, "team": true, "business": true, "enterprise": true } },
+        { "key": "asset_discovery", "label": "Asset discovery (agent + network scan)", "type": "boolean", "values": { "free": false, "team": false, "business": true, "enterprise": true } },
+        { "key": "gantt", "label": "Gantt charts, epics & roadmap", "type": "boolean", "values": { "free": false, "team": false, "business": true, "enterprise": true } },
+        { "key": "themes", "label": "Dark mode, themes & 8 languages", "type": "boolean", "values": { "free": true, "team": true, "business": true, "enterprise": true } }
+      ]
+    },
+    {
+      "key": "admin", "label": "Admin, compliance & security",
+      "features": [
+        { "key": "granular_controls", "label": "Granular per-feature controls", "type": "boolean", "values": { "free": false, "team": false, "business": true, "enterprise": true } },
+        { "key": "audit_reporting", "label": "Audit-ready reporting", "type": "boolean", "values": { "free": false, "team": false, "business": true, "enterprise": true } },
+        { "key": "custom_roles", "label": "Custom roles & permission matrix", "type": "boolean", "values": { "free": false, "team": false, "business": true, "enterprise": true } },
+        { "key": "api_keys", "label": "Workspace API keys", "type": "boolean", "values": { "free": false, "team": false, "business": true, "enterprise": true } },
+        { "key": "sso_scim", "label": "SSO & SCIM", "type": "boolean", "values": { "free": false, "team": false, "business": false, "enterprise": true } },
+        { "key": "onprem_option", "label": "Standalone / on-premise option", "type": "boolean", "values": { "free": false, "team": false, "business": false, "enterprise": true } }
+      ]
+    },
+    {
+      "key": "support", "label": "Support",
+      "features": [
+        { "key": "support_level", "label": "Support", "type": "text", "values": { "free": "Email", "team": "Email & chat", "business": "Priority", "enterprise": "Dedicated" } }
+      ]
+    }
+  ]
+}
