@@ -138,7 +138,7 @@
 <rect class="node-edge" x="654.0" y="20.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="749.0" y="39.5" font-weight="700">portal.trakolo.com</tspan><tspan x="749.0" y="54.5">sign-in</tspan></text>
 <rect class="node-ctrl" x="234.0" y="140.0" width="610.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="539.0" y="159.5" font-weight="700">API Gateway</tspan><tspan x="539.0" y="174.5">routing · auth (OAuth2/API key) · rate limits · versioning v1 · dev portal</tspan></text>
 <rect class="node-app" x="24.0" y="260.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="119.0" y="279.5" font-weight="700">apps/web</tspan><tspan x="119.0" y="294.5">React 18 (SPA)</tspan></text>
-<rect class="node-app" x="234.0" y="260.0" width="610.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="539.0" y="279.5" font-weight="700">apps/api — ASP.NET Core 8</tspan><tspan x="539.0" y="294.5">modular monolith: itsm · sam · dev · docs</tspan></text>
+<rect class="node-app" x="234.0" y="260.0" width="610.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="539.0" y="279.5" font-weight="700">apps/api — ASP.NET Core 10</tspan><tspan x="539.0" y="294.5">modular monolith: itsm · sam · dev · docs</tspan></text>
 <rect class="node-ctrl" x="864.0" y="260.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="959.0" y="279.5" font-weight="700">trakolo-master</tspan><tspan x="959.0" y="294.5">slug → db_host, db_name</tspan></text>
 <rect class="node-ctrl" x="1074.0" y="260.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="1169.0" y="279.5" font-weight="700">Redis</tspan><tspan x="1169.0" y="294.5">tenant cache + sessions</tspan></text>
 <rect class="node-app dnode" x="294.0" y="338.0" width="230.0" height="34.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="409.0" y="347.5" font-weight="700">compute_tier</tspan><tspan x="409.0" y="362.5">shared / dedicated</tspan></text>
@@ -192,10 +192,10 @@
       <div class="al-desc">Shared compute pool for every tenant by default, including Enterprise — no per-tenant pinning, any instance serves any tenant's request once resolved. A <span class="id-mono">compute_tier</span> field on the tenant registry is the escape hatch: it can pin one contractually-demanding tenant to a dedicated pool without a second codebase. Each module (itsm/sam/dev/docs) is a project inside the ASP.NET Core solution with its own xUnit test project — one deployable, independently testable modules.</div>
       <div class="arch-nodes">
         <span class="arch-node node-app">apps/web — React 18 (SPA)</span>
-        <span class="arch-node node-app">apps/api — ASP.NET Core 8: itsm</span>
-        <span class="arch-node node-app">apps/api — ASP.NET Core 8: sam</span>
-        <span class="arch-node node-app">apps/api — ASP.NET Core 8: dev</span>
-        <span class="arch-node node-app">apps/api — ASP.NET Core 8: docs</span>
+        <span class="arch-node node-app">apps/api — ASP.NET Core 10: itsm</span>
+        <span class="arch-node node-app">apps/api — ASP.NET Core 10: sam</span>
+        <span class="arch-node node-app">apps/api — ASP.NET Core 10: dev</span>
+        <span class="arch-node node-app">apps/api — ASP.NET Core 10: docs</span>
         <span class="arch-node node-app split">compute_tier: shared (default) / dedicated (opt-in)</span>
         <span class="arch-node node-app split">xUnit — itsm.Tests · sam.Tests · dev.Tests · docs.Tests</span>
       </div>
@@ -255,7 +255,7 @@
       <tbody>
         <tr><td style="color:var(--indigo-2);">Edge</td><td class="mono">*.trakolo.com, portal.trakolo.com</td><td>One wildcard cert and DNS record for every tenant subdomain; the sign-in chooser matches <span class="id-mono">login.html</span> in this mockup.</td></tr>
         <tr><td style="color:var(--violet-text);">API Gateway</td><td class="mono">routing, auth, rate limits, versioning, dev portal</td><td>Every call to <span class="id-mono">apps/api</span> — from the SPA or a third-party integration — passes through here. See <a href="api-reference.html" style="color:var(--violet-text);font-weight:600;">API reference</a>.</td></tr>
-        <tr><td style="color:var(--indigo-text);">App fleet</td><td class="mono">apps/web (React 18), apps/api (ASP.NET Core 8)</td><td>Stateless, horizontally scaled, shared compute pool by default. <span class="id-mono">apps/api</span> stays a modular monolith with a per-module xUnit test project; <span class="id-mono">compute_tier</span> is the per-tenant dedicated-compute escape hatch.</td></tr>
+        <tr><td style="color:var(--indigo-text);">App fleet</td><td class="mono">apps/web (React 18), apps/api (ASP.NET Core 10)</td><td>Stateless, horizontally scaled, shared compute pool by default. <span class="id-mono">apps/api</span> stays a modular monolith with a per-module xUnit test project; <span class="id-mono">compute_tier</span> is the per-tenant dedicated-compute escape hatch.</td></tr>
         <tr><td style="color:var(--violet-text);">Control plane</td><td class="mono">trakolo-master (core.tenants), Redis</td><td>Resolves subdomain → db_host + db_name + bucket on every request; cached to avoid a DB hit per lookup. trakolo-master also backs the entire Platform Admin console — see <a href="db/schema-master.sql" style="color:var(--violet-text);font-weight:600;">db/schema-master.sql</a>.</td></tr>
         <tr><td style="color:var(--amber-text);">Data tier</td><td class="mono">PgBouncer, Postgres, object storage</td><td>One dedicated database per tenant (see <a href="db/schema.sql" style="color:var(--amber-text);font-weight:600;">db/schema.sql</a>), pooled onto shared clusters by default with an opt-in dedicated cluster per tenant. Read replica isolates reporting.</td></tr>
         <tr><td style="color:var(--green-text);">Background services</td><td class="mono">worker-sla, worker-rules, worker-webhooks, worker-reports, worker-ai-agent</td><td>Split by job type — independent deploy, scale, and failure domain per worker, not one shared process for everything.</td></tr>
@@ -318,6 +318,51 @@
   <div class="card" style="margin-bottom:22px;background:var(--coral-bg);border-color:#F0C4B2;">
     <div class="section-label" style="color:var(--coral-text);">Planning number — write this down and test it early</div>
     <div class="page-desc" style="margin-top:4px;color:var(--coral-text);">Budget <b>a few hundred tenants per Postgres cluster</b>, with the binding constraint being <b>50–100 concurrently active tenants</b>. Load-test that ceiling well before there are that many paying customers, because the failure mode is a cliff rather than a slope: everything is healthy, then connection exhaustion hits and <i>every</i> tenant on the cluster fails at once. Schema-per-tenant would largely dissolve this problem by letting connections be shared — the pooling cost is the deliberate price of choosing a boundary the database enforces itself.</div>
+  </div>
+
+  <div class="section-label" style="margin:26px 0 12px;">Platform capabilities the diagram above doesn't show</div>
+  <div class="page-desc" style="margin:-6px 0 12px;">Four cross-cutting concerns that don't belong to any one module, and that get built badly — three or four incompatible times over — if they aren't named as platform capabilities up front.</div>
+
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div class="card">
+      <div class="section-label" style="color:var(--green-text);">Transactional outbox</div>
+      <div class="page-desc" style="margin-top:4px;">Background workers being idempotent solves redelivery, but not the dual-write problem underneath it: commit a ticket to Postgres, then publish <span class="id-mono">TicketCreated</span> to Service Bus, and any crash between the two leaves the database updated and the message gone. No amount of consumer-side idempotency recovers an event that was never sent.<br><br>Write the event to an <span class="id-mono">outbox</span> table <i>inside the same transaction</i> as the business data, then let a dispatcher poll and publish it. The commit is atomic, so the event either exists with the data or neither does. Consumers still need idempotency for the at-least-once redelivery this produces — the two mechanisms solve different halves.</div>
+    </div>
+    <div class="card">
+      <div class="section-label" style="color:var(--violet-text);">One workflow engine, not four</div>
+      <div class="page-desc" style="margin-top:4px;">SLA timers, business rules, change approvals, access requests, catalogue fulfilment, and document sign-off all need the same primitives: conditions, assignment, timers, escalation, human tasks, retry, and an execution history you can audit.<br><br>Today <span class="id-mono">itsm.sla_policies</span> and <span class="id-mono">itsm.business_rules</span> are separate mechanisms with separate workers, and <span class="id-mono">itsm.change_approvals</span> is a third path. That's three implementations of "wait for a condition, then act" which will drift. A shared workflow module — definition, version, instance, step, human task, timer, transition, history — lets a service request and an asset disposal run the same engine. Build a constrained state machine first; an external BPMN engine can go behind the same interface later if it earns its complexity.</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div class="card">
+      <div class="section-label" style="color:var(--amber-text);">Search is undefined and needed everywhere</div>
+      <div class="page-desc" style="margin-top:4px;">Knowledge articles, wiki pages, documents, tickets, assets, and the command palette all need retrieval, and nothing in the current design says how. Start with PostgreSQL full-text search — it is genuinely sufficient at single-tenant volumes and removes a whole component from the on-premise stack. Move to OpenSearch only when relevance tuning or cross-module ranking demands it, behind an <span class="id-mono">ISearchProvider</span> so the switch isn't a rewrite.<br><br>Indexing belongs in its own worker fed by the same outbox events, not inline with the write path — a slow index must never fail a ticket save.</div>
+    </div>
+    <div class="card">
+      <div class="section-label" style="color:var(--indigo-text);">AI reads through permissions, never around them</div>
+      <div class="page-desc" style="margin-top:4px;">The AI agent must not query operational tables directly. Retrieval runs through the same authorisation context as a human request, so a copilot can only surface what that user could already open, and actions execute as ordinary application commands rather than direct writes. Anything else turns the assistant into a permission bypass with a friendly interface — and in a tenant database holding another company's incidents, that is the single worst failure mode available.</div>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin:26px 0 12px;">One image, three deployment profiles</div>
+  <div class="page-desc" style="margin:-6px 0 12px;">The same container images, the same migrations, and the same release version serve cloud and on-premise. Deployment differences are configuration and infrastructure adapters, never a second codebase — which is what keeps the instance-per-tenant tier in the table above nearly free to support.</div>
+  <div class="panel" style="margin-bottom:22px;">
+    <table class="layer-ref">
+      <thead><tr><th>Capability</th><th>Interface</th><th>Cloud</th><th>On-premise</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--amber-text);">Object storage</td><td class="mono">IObjectStorage</td><td class="mono">Azure Blob Storage</td><td class="mono">MinIO / any S3-compatible</td></tr>
+        <tr><td style="color:var(--green-text);">Messaging</td><td class="mono">IMessageBus</td><td class="mono">Azure Service Bus</td><td class="mono">RabbitMQ</td></tr>
+        <tr><td style="color:var(--violet-text);">Secrets</td><td class="mono">ISecretProvider</td><td class="mono">Azure Key Vault</td><td class="mono">Docker/K8s secrets, or Vault</td></tr>
+        <tr><td style="color:var(--indigo-text);">Search</td><td class="mono">ISearchProvider</td><td class="mono">OpenSearch at scale</td><td class="mono">PostgreSQL full-text search</td></tr>
+        <tr><td style="color:var(--indigo-2);">Identity</td><td class="mono">IIdentityProvider</td><td class="mono">Entra ID / any OIDC</td><td class="mono">Customer OIDC / SAML / LDAP</td></tr>
+        <tr><td style="color:var(--ink-2);">Telemetry</td><td class="mono">OpenTelemetry (no wrapper needed)</td><td class="mono">Azure Monitor</td><td class="mono">Prometheus / Grafana</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card" style="margin-bottom:22px;background:var(--coral-bg);border-color:#F0C4B2;">
+    <div class="section-label" style="color:var(--coral-text);">The adapter boundary has to hold at the semantic level</div>
+    <div class="page-desc" style="margin-top:4px;color:var(--coral-text);">An interface that leaks its cloud implementation isn't portable. Service Bus session locks and RabbitMQ consumer acknowledgements are not the same delivery model, so <span class="id-mono">IMessageBus</span> must expose the guarantee both can honour — at-least-once with an idempotency key — rather than the richer semantics of whichever one gets built first. The same applies to <span class="id-mono">expand-and-contract</span> migrations: on-premise customers upgrade on their own schedule, so every migration must leave the <i>previous</i> application version able to run against the new schema. Add structures, ship code tolerant of both shapes, backfill, and only drop the old columns a release later.</div>
   </div>
 
   <div class="section-label" style="margin:26px 0 12px;">Things this design depends on</div>
