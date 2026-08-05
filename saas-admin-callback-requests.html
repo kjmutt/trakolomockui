@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — callback requests</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .plat-wrap{max-width:1180px;margin:0 auto;padding:32px 40px 60px;}
+  .plat-card{background:#151F1B;border:1px solid #26362F;border-radius:14px;}
+  .plat-card table{width:100%;border-collapse:collapse;}
+  .plat-card th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:#7C948A;font-family:var(--font-mono);font-weight:500;padding:12px 14px;border-bottom:1px solid #26362F;background:#151F1B;}
+  .plat-card td{padding:12px 14px;border-bottom:1px solid #26362F;font-size:13px;color:#D6E4DE;}
+  .plat-card tbody tr:last-child td{border-bottom:none;}
+  .plat-card tbody tr:hover{background:#1B2620;}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .toolbar input[type=text]{width:280px;padding:8px 12px;border-radius:8px;border:1px solid #2B3B33;background:#151F1B;color:#EAF2ED;font-size:13px;}
+  .status-pill{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;}
+  .status-pill.new{background:rgba(93,169,224,.14);color:#5DA9E0;}
+  .status-pill.contacted{background:rgba(221,162,52,.14);color:#DDA234;}
+  .status-pill.closed{background:rgba(93,202,165,.14);color:#5DCAA5;}
+</style>
+</head>
+<body class="platform-body">
+<div class="platform-header">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#1B2E27" stroke="#5DCAA5" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#5DCAA5" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5"/><circle cx="100" cy="100" r="16" fill="#5DCAA5"/><circle cx="150" cy="50" r="21" fill="#5DCAA5"/></svg>
+    <span class="brand-name">Trakolo</span>
+    <span class="plat-tag">Platform</span>
+  </a>
+  <div class="top-right"><a href="saas-admin-login.html">Sign out</a></div>
+</div>
+<div class="plat-tabstrip">
+  <a href="saas-admin-console.html">Home</a>
+  <a href="saas-admin-errorlog.html">Error log</a>
+  <a href="saas-admin-pricing.html">Pricing</a>
+  <a href="saas-admin-plans.html">Entitlements</a>
+  <a href="saas-admin-email-settings.html">Email settings</a>
+  <a href="saas-admin-email-templates.html">Email templates</a>
+  <a href="saas-admin-callback-requests.html" class="active">Callback requests</a>
+  <a href="saas-admin-services.html">Services</a>
+  <a href="saas-admin-billing.html">Billing &amp; payments</a>
+</div>
+
+<div class="plat-wrap">
+  <div class="toolbar">
+    <div>
+      <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;">Callback requests</div>
+      <div style="font-size:13px;color:#8FA79C;margin-top:4px;">Leads from the "Request a callback" form on the marketing site and SSP sign-in screen.</div>
+    </div>
+    <input type="text" id="cb-search" placeholder="Search name, mobile, email…" oninput="filterCb()">
+  </div>
+
+  <div class="plat-card" style="overflow-x:auto;">
+    <table id="cb-table">
+      <thead><tr><th>ID</th><th>Name</th><th>Mobile number</th><th>Mail ID</th><th>Available at</th><th>Status</th><th>Created at</th></tr></thead>
+      <tbody id="cb-body">
+        <tr><td>7</td><td>Girish</td><td class="id-mono">6565859858</td><td>Girish@gmail.com</td><td class="id-mono">24/05/2026 04:19 AM</td><td><span class="status-pill new">New</span></td><td class="id-mono">21/05/2026</td></tr>
+        <tr><td>6</td><td>Ragul</td><td class="id-mono">6363628262</td><td>Ragul@gmail.com</td><td class="id-mono">—</td><td><span class="status-pill new">New</span></td><td class="id-mono">21/05/2026</td></tr>
+        <tr><td>5</td><td>pramod</td><td class="id-mono">6361655555</td><td>pramod@ig.co</td><td class="id-mono">—</td><td><span class="status-pill contacted">Contacted</span></td><td class="id-mono">21/05/2026</td></tr>
+        <tr><td>4</td><td>Shamanthsss</td><td class="id-mono">6361960877</td><td>Shamanth081@gmail.com</td><td class="id-mono">30/05/2026 12:00 PM</td><td><span class="status-pill closed">Closed</span></td><td class="id-mono">21/05/2026</td></tr>
+        <tr><td>3</td><td>Shamanth</td><td class="id-mono">6361960877</td><td>Shamanth081@gmail.com</td><td class="id-mono">30/05/2026 12:00 PM</td><td><span class="status-pill contacted">Contacted</span></td><td class="id-mono">21/05/2026</td></tr>
+        <tr><td>2</td><td>Shamanth</td><td class="id-mono">6361960877</td><td>Shamanth081@gmail.com</td><td class="id-mono">30/05/2026 12:00 PM</td><td><span class="status-pill closed">Closed</span></td><td class="id-mono">21/05/2026</td></tr>
+        <tr><td>1</td><td>Shammi</td><td class="id-mono">9591463504</td><td>—</td><td class="id-mono">31/05/2026 06:35 AM</td><td><span class="status-pill new">New</span></td><td class="id-mono">21/05/2026</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function filterCb(){
+  const q = document.getElementById('cb-search').value.toLowerCase();
+  document.querySelectorAll('#cb-body tr').forEach(r => { r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none'; });
+}
+</script>
+<script src="platform-chrome.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — SSP email settings</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .plat-wrap{max-width:1180px;margin:0 auto;padding:32px 40px 60px;}
+  .cfg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+  .cfg-card{background:#151F1B;border:1px solid #26362F;border-radius:12px;padding:16px 18px;}
+  .cfg-card .name{font-family:var(--font-display);font-size:14.5px;font-weight:700;color:#fff;}
+  .cfg-card .meta{font-size:12px;color:#8FA79C;margin-top:6px;font-family:var(--font-mono);line-height:1.6;}
+  .cfg-card .row-actions{display:flex;gap:8px;margin-top:12px;}
+  .icon-btn{background:#1B2620;border:1px solid #2B3B33;color:#D6E4DE;border-radius:7px;padding:6px 10px;cursor:pointer;font-size:12px;}
+  .icon-btn:hover{background:#26362F;}
+  .icon-btn.danger{color:#E8795A;}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .toolbar input[type=text]{width:280px;padding:8px 12px;border-radius:8px;border:1px solid #2B3B33;background:#151F1B;color:#EAF2ED;font-size:13px;}
+</style>
+</head>
+<body class="platform-body">
+<div class="platform-header">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#1B2E27" stroke="#5DCAA5" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#5DCAA5" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5"/><circle cx="100" cy="100" r="16" fill="#5DCAA5"/><circle cx="150" cy="50" r="21" fill="#5DCAA5"/></svg>
+    <span class="brand-name">Trakolo</span>
+    <span class="plat-tag">Platform</span>
+  </a>
+  <div class="top-right"><a href="saas-admin-login.html">Sign out</a></div>
+</div>
+<div class="plat-tabstrip">
+  <a href="saas-admin-console.html">Home</a>
+  <a href="saas-admin-errorlog.html">Error log</a>
+  <a href="saas-admin-pricing.html">Pricing</a>
+  <a href="saas-admin-plans.html">Entitlements</a>
+  <a href="saas-admin-email-settings.html" class="active">Email settings</a>
+  <a href="saas-admin-email-templates.html">Email templates</a>
+  <a href="saas-admin-callback-requests.html">Callback requests</a>
+  <a href="saas-admin-services.html">Services</a>
+  <a href="saas-admin-billing.html">Billing &amp; payments</a>
+</div>
+
+<div class="plat-wrap">
+  <div class="toolbar">
+    <div>
+      <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;">SSP email settings</div>
+      <div style="font-size:13px;color:#8FA79C;margin-top:4px;max-width:600px;">The mail accounts that send system email for the Self-Service Portal — sign-up, account creation, and password reset. Not the tenant's own ticket-ingestion mailboxes (those live under each tenant's Admin &gt; Integrations).</div>
+    </div>
+    <button class="btn primary" style="background:#1D9E75;border-color:#1D9E75;white-space:nowrap;" onclick="openModal()">+ Add new</button>
+  </div>
+
+  <div class="cfg-grid" id="cfg-grid">
+    <div class="cfg-card">
+      <div class="name">Testing</div>
+      <div class="meta">Provider: Outlook<br>research@simplysys.com.onmicrosoft.com<br>Incoming: off · Outgoing: on</div>
+      <div class="row-actions"><button class="icon-btn" onclick="alert('Edit — demo only')">✎ Edit</button><button class="icon-btn danger" onclick="this.closest('.cfg-card').remove()">🗑 Delete</button></div>
+    </div>
+    <div class="cfg-card">
+      <div class="name">Trakolo Gmail (fallback)</div>
+      <div class="meta">Provider: Gmail / Web-Mail<br>noreply@trakolo.com<br>Incoming: off · Outgoing: on</div>
+      <div class="row-actions"><button class="icon-btn" onclick="alert('Edit — demo only')">✎ Edit</button><button class="icon-btn danger" onclick="this.closest('.cfg-card').remove()">🗑 Delete</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="plat-modal-scrim" id="settings-modal-scrim" onclick="if(event.target===this) closeModal()">
+  <div class="plat-modal">
+    <div class="plat-modal-head"><span class="title">Add email setting</span><button class="plat-modal-close" onclick="closeModal()">✕</button></div>
+    <label>Mail service</label>
+    <select id="es-provider">
+      <option>Outlook</option>
+      <option>Gmail / Web-Mail</option>
+      <option>SMTP</option>
+    </select>
+    <label>Title</label>
+    <input id="es-title" type="text" placeholder="e.g. Production SSP mailer">
+    <label>Client ID</label>
+    <input type="text" placeholder="OAuth client ID">
+    <label>Mail ID</label>
+    <input type="text" placeholder="from-address@yourdomain.com">
+    <label>Client secret</label>
+    <input type="password" placeholder="••••••••">
+    <div style="display:flex;gap:18px;margin-top:14px;font-size:12.5px;color:#D6E4DE;">
+      <label style="display:flex;align-items:center;gap:6px;margin:0;"><input type="checkbox" style="width:auto;"> Incoming mail</label>
+      <label style="display:flex;align-items:center;gap:6px;margin:0;"><input type="checkbox" checked style="width:auto;"> Outgoing mail</label>
+    </div>
+    <div class="plat-btn-row">
+      <button class="btn primary" style="flex:1;background:#1D9E75;border-color:#1D9E75;" onclick="saveSetting()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openModal(){ document.getElementById('settings-modal-scrim').classList.add('open'); }
+function closeModal(){ document.getElementById('settings-modal-scrim').classList.remove('open'); }
+function saveSetting(){
+  const title = document.getElementById('es-title').value.trim() || 'Untitled';
+  const provider = document.getElementById('es-provider').value;
+  const card = document.createElement('div');
+  card.className = 'cfg-card';
+  card.innerHTML = '<div class="name">' + title + '</div><div class="meta">Provider: ' + provider + '<br>Outgoing: on</div>' +
+    '<div class="row-actions"><button class="icon-btn" onclick="alert(\'Edit — demo only\')">✎ Edit</button><button class="icon-btn danger" onclick="this.closest(\'.cfg-card\').remove()">🗑 Delete</button></div>';
+  document.getElementById('cfg-grid').appendChild(card);
+  closeModal();
+}
+</script>
+<script src="platform-chrome.js" defer></script>
+</body>
+</html>

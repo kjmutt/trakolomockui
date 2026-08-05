@@ -5,15 +5,25 @@
 <title>Trakolo — platform console</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-  .plat-wrap{max-width:1080px;margin:0 auto;padding:32px 40px 60px;}
+  .plat-wrap{max-width:1180px;margin:0 auto;padding:32px 40px 60px;}
   .plat-card{background:#151F1B;border:1px solid #26362F;border-radius:14px;}
   .plat-card table{width:100%;border-collapse:collapse;}
-  .plat-card th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:#7C948A;font-family:var(--font-mono);font-weight:500;padding:12px 18px;border-bottom:1px solid #26362F;background:#151F1B;}
-  .plat-card td{padding:14px 18px;border-bottom:1px solid #26362F;font-size:13px;color:#D6E4DE;}
+  .plat-card th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:#7C948A;font-family:var(--font-mono);font-weight:500;padding:12px 14px;border-bottom:1px solid #26362F;background:#151F1B;}
+  .plat-card td{padding:13px 14px;border-bottom:1px solid #26362F;font-size:13px;color:#D6E4DE;vertical-align:middle;}
   .plat-card tbody tr:hover{background:#1B2620;}
   .plat-mcard{background:#151F1B;border:1px solid #26362F;border-radius:12px;padding:16px 18px;}
   .plat-mcard .mlabel{font-size:11px;color:#7C948A;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.5px;}
   .plat-mcard .mval{font-family:var(--font-display);font-size:23px;font-weight:700;margin-top:6px;color:#fff;}
+  .org-toggle{background:none;border:none;color:#7C948A;cursor:pointer;font-size:13px;padding:2px 4px;}
+  .org-toggle:hover{color:#fff;}
+  .detail-row td{background:#101815;padding:14px 14px 16px 40px;border-bottom:1px solid #26362F;}
+  .detail-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 20px;}
+  .detail-grid .dlabel{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#7C948A;font-family:var(--font-mono);}
+  .detail-grid .dval{font-size:12.5px;color:#D6E4DE;margin-top:2px;}
+  .action-row{display:flex;gap:6px;flex-wrap:wrap;}
+  .edition-pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:#1B2E27;color:#5DCAA5;border:1px solid #2E4A3E;white-space:nowrap;}
+  .edition-pill.free{background:#26362F;color:#8FA79C;border-color:#37473F;}
+  .edition-pill.enterprise{background:#2A2338;color:#B9A8ED;border-color:#453A61;}
 </style>
 </head>
 <body class="platform-body">
@@ -25,20 +35,25 @@
   </a>
   <div class="top-right"><a href="saas-admin-login.html">Sign out</a></div>
 </div>
-<div style="display:flex;gap:22px;padding:0 40px;background:#0E1613;border-bottom:1px solid #223028;">
-  <a href="saas-admin-console.html" style="font-size:13px;color:#fff;text-decoration:none;padding:11px 0;border-bottom:2px solid #5DCAA5;font-weight:500;">Tenant workspaces</a>
-  <a href="saas-admin-services.html" style="font-size:13px;color:#8FA79C;text-decoration:none;padding:11px 0;border-bottom:2px solid transparent;">Services</a>
-  <a href="saas-admin-plans.html" style="font-size:13px;color:#8FA79C;text-decoration:none;padding:11px 0;border-bottom:2px solid transparent;">Plans &amp; entitlements</a>
-  <a href="saas-admin-billing.html" style="font-size:13px;color:#8FA79C;text-decoration:none;padding:11px 0;border-bottom:2px solid transparent;">Billing &amp; payments</a>
+<div class="plat-tabstrip">
+  <a href="saas-admin-console.html" class="active">Home</a>
+  <a href="saas-admin-errorlog.html">Error log</a>
+  <a href="saas-admin-pricing.html">Pricing</a>
+  <a href="saas-admin-plans.html">Entitlements</a>
+  <a href="saas-admin-email-settings.html">Email settings</a>
+  <a href="saas-admin-email-templates.html">Email templates</a>
+  <a href="saas-admin-callback-requests.html">Callback requests</a>
+  <a href="saas-admin-services.html">Services</a>
+  <a href="saas-admin-billing.html">Billing &amp; payments</a>
 </div>
 
 <div class="plat-wrap">
   <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:22px;">
     <div>
-      <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;">Tenant workspaces</div>
+      <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;">Tenant licenses</div>
       <div style="font-size:13px;color:#8FA79C;margin-top:4px;">Every org running on Trakolo cloud. DB-per-tenant, isolated at the infra layer.</div>
     </div>
-    <button class="btn primary" style="background:#1D9E75;border-color:#1D9E75;">+ New tenant</button>
+    <button class="btn primary" style="background:#1D9E75;border-color:#1D9E75;" onclick="openModal('generate-modal')">+ Generate License</button>
   </div>
 
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px;">
@@ -47,64 +62,304 @@
     <div class="plat-mcard"><div class="mlabel">On-prem installs</div><div class="mval">14</div></div>
     <div class="plat-mcard"><div class="mlabel">Platform uptime</div><div class="mval">99.97%</div></div>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:22px;">
-    <div class="plat-mcard"><div class="mlabel">Database storage consumed</div><div class="mval">779 GB</div><div style="font-size:11.5px;color:#7C948A;margin-top:4px;">Across all Cloud tenants · on-prem installs excluded</div></div>
-    <div class="plat-mcard"><div class="mlabel">Files &amp; documents storage consumed</div><div class="mval">2.72 TB</div><div style="font-size:11.5px;color:#7C948A;margin-top:4px;">Document library + attachments, Cloud tenants only</div></div>
-  </div>
 
   <div class="plat-card" style="overflow-x:auto;">
-    <table>
-      <thead><tr><th>Org</th><th>Plan</th><th>Billing</th><th>Seats</th><th>Region</th><th>DB size</th><th>Files &amp; docs</th><th>Health</th><th>Deployment</th><th></th></tr></thead>
+    <table id="lic-table">
+      <thead><tr><th></th><th>Company</th><th>Edition</th><th>Generated</th><th>Contract from</th><th>Contract to</th><th>Drop dead</th><th>Subscription</th><th>Licenses</th><th>Actions</th></tr></thead>
       <tbody>
-        <tr>
-          <td><b style="color:#fff;">Org1 — Acme Corp</b></td><td>Team</td>
-          <td>Monthly · <a href="saas-admin-billing.html" style="color:#5DCAA5;text-decoration:none;">$529.20/mo</a></td>
-          <td>84</td><td>us-east</td>
-          <td>4.8 GB <span style="color:#7C948A;">/ 20 GB</span></td>
-          <td>62 GB <span style="color:#7C948A;">/ 100 GB</span></td>
-          <td><span class="tenant-health"><span class="hdot" style="background:#5DCAA5;"></span>Healthy</span></td>
-          <td>Cloud</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
+
+        <tr class="org-row" data-org="Acme Corp" data-edition="Team" data-cost="63.00" data-users="84" data-contract-to="2027-03-01" data-contract-type="Monthly">
+          <td><button class="org-toggle" onclick="toggleDetail(this)">▸</button></td>
+          <td><b style="color:#fff;">Acme Corp</b></td>
+          <td><span class="edition-pill">Team</span></td>
+          <td class="id-mono" style="color:#8FA79C;">01/03/2026</td>
+          <td class="id-mono" style="color:#8FA79C;">01/03/2026</td>
+          <td class="id-mono" style="color:#8FA79C;">01/03/2027</td>
+          <td class="id-mono" style="color:#8FA79C;">15/03/2027</td>
+          <td>Monthly</td>
+          <td>84</td>
+          <td>
+            <div class="action-row">
+              <a class="plat-action-link" href="admin.html">View</a>
+              <a class="plat-action-link renew" href="#" onclick="openRenew(this);return false;">Renew</a>
+              <a class="plat-action-link upgrade" href="#" onclick="openUpgrade(this);return false;">Upgrade</a>
+              <a class="plat-action-link errlog" href="saas-admin-errorlog.html?org=Acme%20Corp">Error log</a>
+            </div>
+          </td>
         </tr>
-        <tr>
-          <td><b style="color:#fff;">Org2 — Northwind Traders</b></td><td>Enterprise</td>
-          <td>Annual · <a href="saas-admin-billing.html" style="color:#E8795A;text-decoration:none;">payment failed</a></td>
-          <td>412</td><td>eu-west</td>
-          <td>84 GB <span style="color:#7C948A;">/ 500 GB</span></td>
-          <td>340 GB <span style="color:#7C948A;">/ 2 TB</span></td>
-          <td><span class="tenant-health"><span class="hdot" style="background:#5DCAA5;"></span>Healthy</span></td>
-          <td>Cloud</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
+        <tr class="detail-row" style="display:none;"><td colspan="10">
+          <div class="detail-grid">
+            <div><div class="dlabel">Region</div><div class="dval">us-east · Cloud</div></div>
+            <div><div class="dlabel">Database size</div><div class="dval">4.8 GB / 20 GB</div></div>
+            <div><div class="dlabel">Files &amp; docs</div><div class="dval">62 GB / 100 GB</div></div>
+            <div><div class="dlabel">Health</div><div class="dval"><span class="tenant-health"><span class="hdot" style="background:#5DCAA5;"></span>Healthy</span></div></div>
+            <div><div class="dlabel">Billing</div><div class="dval">$529.20/mo · <a href="saas-admin-billing.html" style="color:#5DCAA5;">paid</a></div></div>
+            <div><div class="dlabel">License key</div><div class="dval id-mono">TRK-ACME-2026-Y84</div></div>
+            <div><div class="dlabel">Generated by</div><div class="dval">t.reyes@trakolo.com</div></div>
+            <div><div class="dlabel">Customer since</div><div class="dval">Mar 2026</div></div>
+          </div>
+        </td></tr>
+
+        <tr class="org-row" data-org="Northwind Traders" data-edition="Enterprise" data-cost="0" data-users="412" data-contract-to="2026-11-01" data-contract-type="Yearly">
+          <td><button class="org-toggle" onclick="toggleDetail(this)">▸</button></td>
+          <td><b style="color:#fff;">Northwind Traders</b></td>
+          <td><span class="edition-pill enterprise">Enterprise</span></td>
+          <td class="id-mono" style="color:#8FA79C;">01/11/2025</td>
+          <td class="id-mono" style="color:#8FA79C;">01/11/2025</td>
+          <td class="id-mono" style="color:#8FA79C;">01/11/2026</td>
+          <td class="id-mono" style="color:#8FA79C;">15/11/2026</td>
+          <td>Yearly</td>
+          <td>412</td>
+          <td>
+            <div class="action-row">
+              <a class="plat-action-link" href="admin.html">View</a>
+              <a class="plat-action-link renew" href="#" onclick="openRenew(this);return false;">Renew</a>
+              <a class="plat-action-link upgrade" href="#" onclick="openUpgrade(this);return false;">Upgrade</a>
+              <a class="plat-action-link errlog" href="saas-admin-errorlog.html?org=Northwind%20Traders">Error log</a>
+            </div>
+          </td>
         </tr>
-        <tr>
-          <td><b style="color:#fff;">Org3 — Globex Industries</b></td><td>Enterprise</td>
-          <td>Perpetual <span style="color:#7C948A;">+ support</span></td>
-          <td>1,204</td><td>on-prem</td>
-          <td>210 GB <span style="color:#7C948A;">(self-hosted)</span></td>
-          <td>512 GB <span style="color:#7C948A;">(self-hosted)</span></td>
-          <td><span class="tenant-health"><span class="hdot" style="background:#DDA234;"></span>Degraded — sync delayed</span></td>
-          <td>On-premise</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
+        <tr class="detail-row" style="display:none;"><td colspan="10">
+          <div class="detail-grid">
+            <div><div class="dlabel">Region</div><div class="dval">eu-west · Cloud</div></div>
+            <div><div class="dlabel">Database size</div><div class="dval">84 GB / 500 GB</div></div>
+            <div><div class="dlabel">Files &amp; docs</div><div class="dval">340 GB / 2 TB</div></div>
+            <div><div class="dlabel">Health</div><div class="dval"><span class="tenant-health"><span class="hdot" style="background:#5DCAA5;"></span>Healthy</span></div></div>
+            <div><div class="dlabel">Billing</div><div class="dval"><a href="saas-admin-billing.html" style="color:#E8795A;">payment failed</a></div></div>
+            <div><div class="dlabel">License key</div><div class="dval id-mono">TRK-NWTR-2025-Y412</div></div>
+            <div><div class="dlabel">Generated by</div><div class="dval">t.reyes@trakolo.com</div></div>
+            <div><div class="dlabel">Customer since</div><div class="dval">Nov 2025</div></div>
+          </div>
+        </td></tr>
+
+        <tr class="org-row" data-org="Globex Industries" data-edition="Enterprise" data-cost="0" data-users="1204" data-contract-to="2029-01-06" data-contract-type="Perpetual">
+          <td><button class="org-toggle" onclick="toggleDetail(this)">▸</button></td>
+          <td><b style="color:#fff;">Globex Industries</b></td>
+          <td><span class="edition-pill enterprise">Enterprise</span></td>
+          <td class="id-mono" style="color:#8FA79C;">06/01/2025</td>
+          <td class="id-mono" style="color:#8FA79C;">06/01/2025</td>
+          <td class="id-mono" style="color:#8FA79C;">06/01/2029</td>
+          <td class="id-mono" style="color:#8FA79C;">08/02/2029</td>
+          <td>Perpetual</td>
+          <td>1,204</td>
+          <td>
+            <div class="action-row">
+              <a class="plat-action-link" href="admin.html">View</a>
+              <a class="plat-action-link renew" href="#" onclick="openRenew(this);return false;">Renew</a>
+              <a class="plat-action-link upgrade" href="#" onclick="openUpgrade(this);return false;">Upgrade</a>
+              <a class="plat-action-link errlog" href="saas-admin-errorlog.html?org=Globex%20Industries">Error log</a>
+            </div>
+          </td>
         </tr>
-        <tr>
-          <td><b style="color:#fff;">Initech</b></td><td>Starter</td>
-          <td style="color:#7C948A;">— (Free)</td>
-          <td>18</td><td>us-east</td>
-          <td>0.4 GB <span style="color:#7C948A;">/ 1 GB</span></td>
-          <td>1.1 GB <span style="color:#7C948A;">/ 2 GB</span></td>
-          <td><span class="tenant-health"><span class="hdot" style="background:#5DCAA5;"></span>Healthy</span></td>
-          <td>Cloud</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
+        <tr class="detail-row" style="display:none;"><td colspan="10">
+          <div class="detail-grid">
+            <div><div class="dlabel">Region</div><div class="dval">on-prem · self-hosted</div></div>
+            <div><div class="dlabel">Database size</div><div class="dval">210 GB (self-hosted)</div></div>
+            <div><div class="dlabel">Files &amp; docs</div><div class="dval">512 GB (self-hosted)</div></div>
+            <div><div class="dlabel">Health</div><div class="dval"><span class="tenant-health"><span class="hdot" style="background:#DDA234;"></span>Degraded — sync delayed</span></div></div>
+            <div><div class="dlabel">Billing</div><div class="dval">Perpetual + support</div></div>
+            <div><div class="dlabel">License key</div><div class="dval id-mono">TRK-GLBX-2025-P1204</div></div>
+            <div><div class="dlabel">Generated by</div><div class="dval">m.osei@trakolo.com</div></div>
+            <div><div class="dlabel">Customer since</div><div class="dval">Jan 2025</div></div>
+          </div>
+        </td></tr>
+
+        <tr class="org-row" data-org="Initech" data-edition="Free" data-cost="0" data-users="18" data-contract-to="2027-06-21" data-contract-type="Yearly">
+          <td><button class="org-toggle" onclick="toggleDetail(this)">▸</button></td>
+          <td><b style="color:#fff;">Initech</b></td>
+          <td><span class="edition-pill free">Free</span></td>
+          <td class="id-mono" style="color:#8FA79C;">21/06/2026</td>
+          <td class="id-mono" style="color:#8FA79C;">21/06/2026</td>
+          <td class="id-mono" style="color:#8FA79C;">21/06/2027</td>
+          <td class="id-mono" style="color:#8FA79C;">05/07/2027</td>
+          <td>Yearly</td>
+          <td>18</td>
+          <td>
+            <div class="action-row">
+              <a class="plat-action-link" href="admin.html">View</a>
+              <a class="plat-action-link renew" href="#" onclick="openRenew(this);return false;">Renew</a>
+              <a class="plat-action-link upgrade" href="#" onclick="openUpgrade(this);return false;">Upgrade</a>
+              <a class="plat-action-link errlog" href="saas-admin-errorlog.html?org=Initech">Error log</a>
+            </div>
+          </td>
         </tr>
-        <tr>
-          <td><b style="color:#fff;">Umbrella Group</b></td><td>Enterprise</td>
-          <td>Perpetual <span style="color:#DDA234;">· renewal in 6d</span></td>
-          <td>2,880</td><td>ap-south</td>
-          <td>480 GB <span style="color:#7C948A;">(self-hosted)</span></td>
-          <td>1.8 TB <span style="color:#7C948A;">(self-hosted)</span></td>
-          <td><span class="tenant-health"><span class="hdot" style="background:#D85A30;"></span>License expiring in 6 days</span></td>
-          <td>On-premise</td><td><a href="admin.html" style="color:#5DCAA5;font-size:12.5px;text-decoration:none;">View as admin →</a></td>
+        <tr class="detail-row" style="display:none;"><td colspan="10">
+          <div class="detail-grid">
+            <div><div class="dlabel">Region</div><div class="dval">us-east · Cloud</div></div>
+            <div><div class="dlabel">Database size</div><div class="dval">0.4 GB / 1 GB</div></div>
+            <div><div class="dlabel">Files &amp; docs</div><div class="dval">1.1 GB / 2 GB</div></div>
+            <div><div class="dlabel">Health</div><div class="dval"><span class="tenant-health"><span class="hdot" style="background:#5DCAA5;"></span>Healthy</span></div></div>
+            <div><div class="dlabel">Billing</div><div class="dval" style="color:#7C948A;">— (Free)</div></div>
+            <div><div class="dlabel">License key</div><div class="dval id-mono">TRK-INTC-2026-Y18</div></div>
+            <div><div class="dlabel">Generated by</div><div class="dval">t.reyes@trakolo.com</div></div>
+            <div><div class="dlabel">Customer since</div><div class="dval">Jun 2026</div></div>
+          </div>
+        </td></tr>
+
+        <tr class="org-row" data-org="Umbrella Group" data-edition="Enterprise" data-cost="0" data-users="2880" data-contract-to="2026-08-11" data-contract-type="Perpetual">
+          <td><button class="org-toggle" onclick="toggleDetail(this)">▸</button></td>
+          <td><b style="color:#fff;">Umbrella Group</b></td>
+          <td><span class="edition-pill enterprise">Enterprise</span></td>
+          <td class="id-mono" style="color:#8FA79C;">11/08/2023</td>
+          <td class="id-mono" style="color:#8FA79C;">11/08/2023</td>
+          <td class="id-mono" style="color:#DDA234;">11/08/2026</td>
+          <td class="id-mono" style="color:#DDA234;">25/08/2026</td>
+          <td>Perpetual</td>
+          <td>2,880</td>
+          <td>
+            <div class="action-row">
+              <a class="plat-action-link" href="admin.html">View</a>
+              <a class="plat-action-link renew" href="#" onclick="openRenew(this);return false;">Renew</a>
+              <a class="plat-action-link upgrade" href="#" onclick="openUpgrade(this);return false;">Upgrade</a>
+              <a class="plat-action-link errlog" href="saas-admin-errorlog.html?org=Umbrella%20Group">Error log</a>
+            </div>
+          </td>
         </tr>
+        <tr class="detail-row" style="display:none;"><td colspan="10">
+          <div class="detail-grid">
+            <div><div class="dlabel">Region</div><div class="dval">ap-south · on-prem</div></div>
+            <div><div class="dlabel">Database size</div><div class="dval">480 GB (self-hosted)</div></div>
+            <div><div class="dlabel">Files &amp; docs</div><div class="dval">1.8 TB (self-hosted)</div></div>
+            <div><div class="dlabel">Health</div><div class="dval"><span class="tenant-health"><span class="hdot" style="background:#D85A30;"></span>License expiring in 6 days</span></div></div>
+            <div><div class="dlabel">Billing</div><div class="dval">Perpetual <span style="color:#DDA234;">· renewal in 6d</span></div></div>
+            <div><div class="dlabel">License key</div><div class="dval id-mono">TRK-UMBR-2023-P2880</div></div>
+            <div><div class="dlabel">Generated by</div><div class="dval">m.osei@trakolo.com</div></div>
+            <div><div class="dlabel">Customer since</div><div class="dval">Aug 2023</div></div>
+          </div>
+        </td></tr>
+
       </tbody>
     </table>
   </div>
 </div>
+
+<!-- Renew modal -->
+<div class="plat-modal-scrim" id="renew-modal-scrim" onclick="if(event.target===this) closeModal('renew-modal-scrim')">
+  <div class="plat-modal">
+    <div class="plat-modal-head"><span class="title">Renew</span><button class="plat-modal-close" onclick="closeModal('renew-modal-scrim')">✕</button></div>
+    <label>License subscription type</label>
+    <select id="renew-type">
+      <option>Monthly</option>
+      <option selected>Yearly</option>
+    </select>
+    <div class="info-box" id="renew-info"></div>
+    <div class="cost-row">£ <span id="renew-cost">100</span> <span style="font-weight:400;color:#8FA79C;font-size:12px;">yearly cost</span></div>
+    <div class="plat-btn-row">
+      <button class="btn primary" style="flex:1;background:#1D9E75;border-color:#1D9E75;" onclick="doRenew()">Renew ↻</button>
+    </div>
+  </div>
+</div>
+
+<!-- Upgrade modal -->
+<div class="plat-modal-scrim" id="upgrade-modal-scrim" onclick="if(event.target===this) closeModal('upgrade-modal-scrim')">
+  <div class="plat-modal">
+    <div class="plat-modal-head"><span class="title">Upgrade</span><button class="plat-modal-close" onclick="closeModal('upgrade-modal-scrim')">✕</button></div>
+    <label>Select an edition</label>
+    <select id="upgrade-edition" onchange="recalcUpgrade()">
+      <option>Free</option>
+      <option>Team</option>
+      <option>Business</option>
+      <option selected>Enterprise</option>
+    </select>
+    <label>No of total users</label>
+    <div class="stepper">
+      <button onclick="stepUsers(-1)">−</button>
+      <input id="upgrade-users" type="text" value="50" oninput="recalcUpgrade()">
+      <button onclick="stepUsers(1)">+</button>
+    </div>
+    <div class="cost-row">£ <span id="upgrade-cost">400</span> <span style="font-weight:400;color:#8FA79C;font-size:12px;">yearly cost</span></div>
+    <div class="plat-btn-row">
+      <button class="btn primary" style="flex:1;background:#1D9E75;border-color:#1D9E75;" onclick="doUpgrade()">Upgrade ⇄</button>
+    </div>
+  </div>
+</div>
+
+<!-- Generate license modal -->
+<div class="plat-modal-scrim" id="generate-modal-scrim" onclick="if(event.target===this) closeModal('generate-modal-scrim')">
+  <div class="plat-modal" id="generate-modal">
+    <div class="plat-modal-head"><span class="title">Generate license</span><button class="plat-modal-close" onclick="closeModal('generate-modal-scrim')">✕</button></div>
+    <label>Company name</label>
+    <input id="gen-name" type="text" placeholder="e.g. Stark Industries">
+    <label>Edition</label>
+    <select id="gen-edition"><option>Free</option><option selected>Team</option><option>Business</option><option>Enterprise</option></select>
+    <label>Subscription type</label>
+    <select id="gen-type"><option>Monthly</option><option selected>Yearly</option><option>Perpetual</option></select>
+    <label>Total license count</label>
+    <input id="gen-users" type="text" value="10">
+    <div class="plat-btn-row">
+      <button class="btn primary" style="flex:1;background:#1D9E75;border-color:#1D9E75;" onclick="doGenerate()">Generate license</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const YEARLY_PRICE = {Free:0, Team:63, Business:140, Enterprise:8};   // Enterprise shown as per-seat quote reference (£8/seat/yr) for demo math only
+let activeRow = null;
+
+function openModal(id){ document.getElementById(id+'-scrim').classList.add('open'); }
+function closeModal(scrimId){ document.getElementById(scrimId).classList.remove('open'); }
+
+function toggleDetail(btn){
+  const row = btn.closest('tr').nextElementSibling;
+  const open = row.style.display !== 'none';
+  row.style.display = open ? 'none' : 'table-row';
+  btn.textContent = open ? '▸' : '▾';
+}
+
+function fmtDate(d){ const dd=String(d.getDate()).padStart(2,'0'), mm=String(d.getMonth()+1).padStart(2,'0'); return dd+'/'+mm+'/'+d.getFullYear(); }
+
+function openRenew(link){
+  activeRow = link.closest('.org-row');
+  document.getElementById('renew-type').value = activeRow.dataset.contractType === 'Monthly' ? 'Monthly' : 'Yearly';
+  recalcRenew();
+  document.getElementById('renew-modal-scrim').classList.add('open');
+}
+function recalcRenew(){
+  const type = document.getElementById('renew-type').value;
+  const from = new Date(activeRow.dataset.contractTo);
+  const to = new Date(from);
+  if(type === 'Monthly') to.setMonth(to.getMonth()+1); else to.setFullYear(to.getFullYear()+1);
+  document.getElementById('renew-info').innerHTML = '<span>If you click Renew,<br>Contract From Date will be changed to <b>'+fmtDate(from)+'</b><br>Contract To Date will be changed to <b>'+fmtDate(to)+'</b></span>';
+  const users = Number(activeRow.dataset.users);
+  const perSeat = YEARLY_PRICE[activeRow.dataset.edition] || 0;
+  document.getElementById('renew-cost').textContent = (type === 'Monthly' ? Math.round(perSeat*users/12) : perSeat*users).toLocaleString();
+}
+document.getElementById('renew-type').addEventListener('change', recalcRenew);
+function doRenew(){
+  closeModal('renew-modal-scrim');
+  alert('Renewed ' + activeRow.dataset.org + '. New contract dates applied — logged to the platform staff audit log.');
+}
+
+function openUpgrade(link){
+  activeRow = link.closest('.org-row');
+  document.getElementById('upgrade-edition').value = activeRow.dataset.edition;
+  document.getElementById('upgrade-users').value = activeRow.dataset.users;
+  recalcUpgrade();
+  document.getElementById('upgrade-modal-scrim').classList.add('open');
+}
+function stepUsers(delta){
+  const el = document.getElementById('upgrade-users');
+  el.value = Math.max(1, Number(el.value||0) + delta*10);
+  recalcUpgrade();
+}
+function recalcUpgrade(){
+  const edition = document.getElementById('upgrade-edition').value;
+  const users = Number(document.getElementById('upgrade-users').value || 0);
+  document.getElementById('upgrade-cost').textContent = ((YEARLY_PRICE[edition]||0) * users).toLocaleString();
+}
+function doUpgrade(){
+  const edition = document.getElementById('upgrade-edition').value;
+  closeModal('upgrade-modal-scrim');
+  alert('Upgraded ' + activeRow.dataset.org + ' to ' + edition + '. Tenant picks this up on next page load — logged to the platform staff audit log.');
+}
+
+function doGenerate(){
+  const name = document.getElementById('gen-name').value.trim();
+  if(!name){ alert('Enter a company name.'); return; }
+  closeModal('generate-modal-scrim');
+  alert('License generated for ' + name + '. A provisioning job has been queued.');
+}
+</script>
 <script src="platform-chrome.js" defer></script>
 </body>
 </html>

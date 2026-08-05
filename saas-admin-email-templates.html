@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — SSP email templates</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .plat-wrap{max-width:1180px;margin:0 auto;padding:32px 40px 60px;}
+  .cfg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
+  .cfg-card{background:#151F1B;border:1px solid #26362F;border-radius:12px;padding:16px 18px;}
+  .cfg-card .name{font-family:var(--font-display);font-size:14.5px;font-weight:700;color:#fff;}
+  .cfg-card .meta{font-size:12px;color:#8FA79C;margin-top:6px;}
+  .cfg-card .meta b{color:#B9D8CB;font-weight:500;}
+  .cfg-card .row-actions{display:flex;gap:8px;margin-top:12px;}
+  .icon-btn{background:#1B2620;border:1px solid #2B3B33;color:#D6E4DE;border-radius:7px;padding:6px 10px;cursor:pointer;font-size:12px;}
+  .icon-btn:hover{background:#26362F;}
+  .icon-btn.danger{color:#E8795A;}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+  .plat-modal.wide{width:min(640px,92vw);}
+  .plat-modal textarea{width:100%;min-height:160px;padding:10px 12px;border-radius:8px;border:1px solid #2B3B33;background:#0E1613;color:#EAF2ED;font-family:var(--font-body);font-size:13px;resize:vertical;}
+  .field-chip{display:inline-block;font-family:var(--font-mono);font-size:11px;background:#1B2E27;color:#5DCAA5;border:1px solid #2E4A3E;border-radius:5px;padding:2px 7px;margin:2px 4px 0 0;}
+</style>
+</head>
+<body class="platform-body">
+<div class="platform-header">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#1B2E27" stroke="#5DCAA5" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#5DCAA5" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5"/><circle cx="100" cy="100" r="16" fill="#5DCAA5"/><circle cx="150" cy="50" r="21" fill="#5DCAA5"/></svg>
+    <span class="brand-name">Trakolo</span>
+    <span class="plat-tag">Platform</span>
+  </a>
+  <div class="top-right"><a href="saas-admin-login.html">Sign out</a></div>
+</div>
+<div class="plat-tabstrip">
+  <a href="saas-admin-console.html">Home</a>
+  <a href="saas-admin-errorlog.html">Error log</a>
+  <a href="saas-admin-pricing.html">Pricing</a>
+  <a href="saas-admin-plans.html">Entitlements</a>
+  <a href="saas-admin-email-settings.html">Email settings</a>
+  <a href="saas-admin-email-templates.html" class="active">Email templates</a>
+  <a href="saas-admin-callback-requests.html">Callback requests</a>
+  <a href="saas-admin-services.html">Services</a>
+  <a href="saas-admin-billing.html">Billing &amp; payments</a>
+</div>
+
+<div class="plat-wrap">
+  <div class="toolbar">
+    <div>
+      <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;">SSP email templates</div>
+      <div style="font-size:13px;color:#8FA79C;margin-top:4px;max-width:600px;">System email the Self-Service Portal sends on account-lifecycle events. Sent through whichever mailbox is active under Email settings.</div>
+    </div>
+    <button class="btn primary" style="background:#1D9E75;border-color:#1D9E75;white-space:nowrap;" onclick="openTemplate('', '', '')">+ Add new</button>
+  </div>
+
+  <div class="cfg-grid" id="cfg-grid">
+    <div class="cfg-card">
+      <div class="name">Sign Up Template</div>
+      <div class="meta">Subject: <b>New Account Creation</b></div>
+      <div class="row-actions"><button class="icon-btn" onclick="openTemplate('Sign Up Template','New Account Creation','Hi {{FirstName}},\n\nWelcome to the Trakolo Self-Service Portal. Confirm your account to get started.\n\n{{ConfirmLink}}')">✎ Edit</button><button class="icon-btn danger" onclick="this.closest('.cfg-card').remove()">🗑 Delete</button></div>
+    </div>
+    <div class="cfg-card">
+      <div class="name">AccountCreated</div>
+      <div class="meta">Subject: <b>New Account Creation</b></div>
+      <div class="row-actions"><button class="icon-btn" onclick="openTemplate('AccountCreated','New Account Creation','Hi {{FirstName}},\n\nYour account is ready. Sign in at {{PortalUrl}}.')">✎ Edit</button><button class="icon-btn danger" onclick="this.closest('.cfg-card').remove()">🗑 Delete</button></div>
+    </div>
+    <div class="cfg-card">
+      <div class="name">Forget Password</div>
+      <div class="meta">Subject: <b>{{UserName}} has successfully raised a ticket for a password reset</b></div>
+      <div class="row-actions"><button class="icon-btn" onclick="openTemplate('Forget Password','{{UserName}} has successfully raised a ticket for a password reset','Hi {{FirstName}},\n\nWe received a password reset request. If this was you, use the link below — it expires in 30 minutes.\n\n{{ResetLink}}')">✎ Edit</button><button class="icon-btn danger" onclick="this.closest('.cfg-card').remove()">🗑 Delete</button></div>
+    </div>
+    <div class="cfg-card">
+      <div class="name">Reset Password</div>
+      <div class="meta">Subject: <b>{{UserName}} — Reset Password</b></div>
+      <div class="row-actions"><button class="icon-btn" onclick="openTemplate('Reset Password','{{UserName}} — Reset Password','Hi {{FirstName}},\n\nYour password was changed successfully. If this wasn\'t you, contact support immediately.')">✎ Edit</button><button class="icon-btn danger" onclick="this.closest('.cfg-card').remove()">🗑 Delete</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="plat-modal-scrim" id="tpl-modal-scrim" onclick="if(event.target===this) closeTemplate()">
+  <div class="plat-modal wide">
+    <div class="plat-modal-head"><span class="title" id="tpl-title">Edit template</span><button class="plat-modal-close" onclick="closeTemplate()">✕</button></div>
+    <label>Name</label>
+    <input id="tpl-name" type="text">
+    <label>Subject</label>
+    <input id="tpl-subject" type="text">
+    <label>Body content</label>
+    <textarea id="tpl-body"></textarea>
+    <div style="margin-top:8px;">
+      <span class="field-chip">{{FirstName}}</span><span class="field-chip">{{UserName}}</span><span class="field-chip">{{PortalUrl}}</span><span class="field-chip">{{ResetLink}}</span><span class="field-chip">{{ConfirmLink}}</span>
+    </div>
+    <div class="plat-btn-row">
+      <button class="btn primary" style="flex:1;background:#1D9E75;border-color:#1D9E75;" onclick="closeTemplate()">Save template</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openTemplate(name, subject, body){
+  document.getElementById('tpl-title').textContent = name ? 'Edit template' : 'Add template';
+  document.getElementById('tpl-name').value = name;
+  document.getElementById('tpl-subject').value = subject;
+  document.getElementById('tpl-body').value = body;
+  document.getElementById('tpl-modal-scrim').classList.add('open');
+}
+function closeTemplate(){ document.getElementById('tpl-modal-scrim').classList.remove('open'); }
+</script>
+<script src="platform-chrome.js" defer></script>
+</body>
+</html>

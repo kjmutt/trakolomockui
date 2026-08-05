@@ -671,9 +671,12 @@ CREATE INDEX idx_wiki_comments_page ON docs.wiki_comments(wiki_page_id);
 
 
 -- ============================================================================
--- SCHEMA: platform — Trakolo-staff-only: plans, subscriptions, entitlements,
--- cross-tenant service health. Everything here is written by platform admins
--- (saas-admin-console.html), never by tenant users.
+-- SCHEMA: platform — Trakolo-staff-only: editions, licensing, entitlements,
+-- cross-tenant service health, SSP system email, and support intake.
+-- Everything here is written by platform admins (saas-admin-*.html), never by
+-- tenant users. Tables map directly to the platform console's pages: Home
+-- (subscriptions + subscription_history), Pricing (features + plan_features),
+-- Error log, Email settings / templates, and Callback requests.
 -- ============================================================================
 CREATE SCHEMA IF NOT EXISTS platform;
 
@@ -681,22 +684,77 @@ CREATE TABLE platform.plans (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name           text NOT NULL UNIQUE,     -- 'Free', 'Team', 'Business', 'Enterprise'
   price_monthly  numeric(10,2),
+  price_yearly   numeric(10,2),
   seat_based     boolean NOT NULL DEFAULT true,
-  features       jsonb NOT NULL DEFAULT '{}'
+  sort_order     int NOT NULL DEFAULT 0,
+  is_active      boolean NOT NULL DEFAULT true
 );
 
-CREATE TYPE platform.subscription_status AS ENUM ('trialing', 'active', 'past_due', 'canceled');
+-- Feature catalog behind the Pricing page's editable matrix — one row per
+-- capability. Platform admins add rows here via "+ Add feature".
+CREATE TABLE platform.features (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  key          text NOT NULL UNIQUE,       -- 'rest_api', 'custom_domain', 'mfa', 'sso', ...
+  category     text NOT NULL DEFAULT 'Essentials',
+  label        text NOT NULL,
+  value_type   text NOT NULL DEFAULT 'boolean' CHECK (value_type IN ('boolean', 'numeric')),
+  sort_order   int NOT NULL DEFAULT 0,
+  is_published boolean NOT NULL DEFAULT true,   -- shown on the public-facing pricing page
+  created_at   timestamptz NOT NULL DEFAULT now()
+);
+
+-- The matrix itself: which features each plan includes, and at what limit.
+CREATE TABLE platform.plan_features (
+  plan_id     uuid NOT NULL REFERENCES platform.plans(id) ON DELETE CASCADE,
+  feature_id  uuid NOT NULL REFERENCES platform.features(id) ON DELETE CASCADE,
+  enabled     boolean NOT NULL DEFAULT false,
+  value       text,                        -- numeric limit or label, e.g. '5', 'Unlimited'; null for plain booleans
+  PRIMARY KEY (plan_id, feature_id)
+);
+
+CREATE TYPE platform.subscription_status AS ENUM ('trialing', 'active', 'past_due', 'expired', 'canceled');
+CREATE TYPE platform.contract_type AS ENUM ('monthly', 'yearly', 'perpetual');
 
 CREATE TABLE platform.subscriptions (
-  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id    uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
-  plan_id      uuid NOT NULL REFERENCES platform.plans(id),
-  status       platform.subscription_status NOT NULL DEFAULT 'trialing',
-  seats        int NOT NULL DEFAULT 1,
-  started_at   timestamptz NOT NULL DEFAULT now(),
-  renews_at    timestamptz,
+  id                   uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id            uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
+  plan_id              uuid NOT NULL REFERENCES platform.plans(id),
+  status               platform.subscription_status NOT NULL DEFAULT 'trialing',
+  contract_type        platform.contract_type NOT NULL DEFAULT 'yearly',
+  total_license_count  int NOT NULL DEFAULT 1,
+  generated_date       date NOT NULL DEFAULT current_date,
+  contract_from_date   date NOT NULL,
+  contract_to_date     date NOT NULL,
+  drop_dead_date       date NOT NULL,      -- hard cutoff past contract_to_date; access suspended after this
+  license_key          text UNIQUE,
+  generated_by_email   citext,             -- platform staff who generated it
+  created_at           timestamptz NOT NULL DEFAULT now(),
+  updated_at           timestamptz NOT NULL DEFAULT now(),
   UNIQUE (tenant_id)                       -- one active subscription per tenant
 );
+CREATE TRIGGER trg_subscriptions_updated BEFORE UPDATE ON platform.subscriptions
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+-- Every Renew / Upgrade / Downgrade from the Home page, so "why did this
+-- tenant's contract change" always has an answer.
+CREATE TYPE platform.subscription_action AS ENUM ('generated', 'renewed', 'upgraded', 'downgraded', 'cancelled');
+
+CREATE TABLE platform.subscription_history (
+  id                         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  subscription_id            uuid NOT NULL REFERENCES platform.subscriptions(id) ON DELETE CASCADE,
+  action                     platform.subscription_action NOT NULL,
+  previous_plan_id           uuid REFERENCES platform.plans(id),
+  new_plan_id                uuid REFERENCES platform.plans(id),
+  previous_license_count     int,
+  new_license_count          int,
+  previous_contract_to_date  date,
+  new_contract_to_date       date,
+  cost                       numeric(12,2),
+  performed_by_email         citext,
+  note                       text,
+  created_at                 timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_subscription_history_subscription ON platform.subscription_history(subscription_id, created_at DESC);
 
 -- Per-tenant, per-feature overrides on top of the plan (e.g. a trial add-on).
 CREATE TABLE platform.tenant_entitlements (
@@ -716,8 +774,88 @@ CREATE TABLE platform.services (
   last_checked_at timestamptz NOT NULL DEFAULT now()
 );
 
+-- Home > Error log: platform + per-tenant API/background-job failures.
+CREATE TYPE platform.log_type AS ENUM ('info', 'warning', 'error');
+
+CREATE TABLE platform.error_logs (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id     uuid REFERENCES core.tenants(id) ON DELETE CASCADE,   -- null = platform-wide
+  service_name  text NOT NULL,
+  api_method    text,
+  api_url       text,
+  log_type      platform.log_type NOT NULL DEFAULT 'error',
+  message       text NOT NULL,
+  logged_on     timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_error_logs_tenant_time ON platform.error_logs(tenant_id, logged_on DESC);
+
+-- Outbound mail accounts used for SSP system email (signup, password reset —
+-- not the tenant's own ticket-ingestion mailboxes, see core.integrations).
+CREATE TABLE platform.ssp_email_settings (
+  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name                text NOT NULL,
+  provider            text NOT NULL DEFAULT 'smtp' CHECK (provider IN ('smtp', 'outlook', 'gmail')),
+  from_address        citext NOT NULL,
+  client_id           text,
+  client_secret_hash  text,               -- never store the raw secret
+  smtp_host           text,
+  smtp_port           int,
+  is_active           boolean NOT NULL DEFAULT true,
+  created_at          timestamptz NOT NULL DEFAULT now()
+);
+
+-- System email templates the SSP sends on account-lifecycle events.
+CREATE TABLE platform.ssp_email_templates (
+  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  code           text NOT NULL UNIQUE,   -- 'signup', 'account_created', 'forgot_password', 'reset_password'
+  name           text NOT NULL,
+  subject        text NOT NULL,
+  body_html      text NOT NULL,
+  dynamic_fields text[] NOT NULL DEFAULT '{}',
+  updated_at     timestamptz NOT NULL DEFAULT now()
+);
+CREATE TRIGGER trg_ssp_email_templates_updated BEFORE UPDATE ON platform.ssp_email_templates
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+-- "Request a callback" leads from the pricing/marketing site and SSP login.
+CREATE TYPE platform.callback_status AS ENUM ('new', 'contacted', 'closed');
+
+CREATE TABLE platform.callback_requests (
+  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id      uuid REFERENCES core.tenants(id),
+  name           text NOT NULL,
+  mobile_number  text,
+  email          citext,
+  available_at   timestamptz,
+  status         platform.callback_status NOT NULL DEFAULT 'new',
+  created_at     timestamptz NOT NULL DEFAULT now()
+);
+
+-- Every privileged action a Trakolo staff member takes in the platform
+-- console — separate from core.audit_log, which is per-tenant.
+CREATE TABLE platform.staff_audit_log (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  staff_email citext NOT NULL,
+  action      text NOT NULL,        -- 'subscription.renewed', 'plan_feature.toggled', ...
+  target_type text NOT NULL,
+  target_id   uuid,
+  metadata    jsonb NOT NULL DEFAULT '{}',
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_staff_audit_log_time ON platform.staff_audit_log(created_at DESC);
+
 
 -- ============================================================================
--- Seed: one demo tenant, matching the mockup's "Acme Corp" workspace
+-- Seed: one demo tenant + the plan catalog, matching the mockup's data
 -- ============================================================================
 INSERT INTO core.tenants (name, slug, edition) VALUES ('Acme Corp', 'acme', 'cloud');
+
+INSERT INTO platform.plans (name, price_monthly, price_yearly, seat_based, sort_order) VALUES
+  ('Free',       0,     0,     true, 0),
+  ('Team',       6.30,  63.00, true, 1),
+  ('Business',   14.00, 140.00, true, 2),
+  ('Enterprise', NULL,  NULL,  true, 3);   -- custom pricing, quoted per deal
+
+INSERT INTO platform.subscriptions (tenant_id, plan_id, status, contract_type, total_license_count, contract_from_date, contract_to_date, drop_dead_date)
+SELECT t.id, p.id, 'active', 'monthly', 84, '2026-03-01', '2027-03-01', '2027-03-15'
+FROM core.tenants t, platform.plans p WHERE t.slug = 'acme' AND p.name = 'Team';

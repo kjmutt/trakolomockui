@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — error log</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .plat-wrap{max-width:1180px;margin:0 auto;padding:32px 40px 60px;}
+  .plat-card{background:#151F1B;border:1px solid #26362F;border-radius:14px;}
+  .plat-card table{width:100%;border-collapse:collapse;}
+  .plat-card th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:#7C948A;font-family:var(--font-mono);font-weight:500;padding:12px 14px;border-bottom:1px solid #26362F;background:#151F1B;}
+  .plat-card td{padding:12px 14px;border-bottom:1px solid #26362F;font-size:12.5px;color:#D6E4DE;vertical-align:top;}
+  .plat-card tbody tr:last-child td{border-bottom:none;}
+  .plat-card tbody tr:hover{background:#1B2620;}
+  .log-type{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:.4px;}
+  .log-type.error{background:rgba(216,90,48,.14);color:#E8795A;}
+  .log-type.warning{background:rgba(221,162,52,.14);color:#DDA234;}
+  .log-type.info{background:rgba(93,169,224,.14);color:#5DA9E0;}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
+  .toolbar input[type=text]{width:280px;padding:8px 12px;border-radius:8px;border:1px solid #2B3B33;background:#151F1B;color:#EAF2ED;font-size:13px;}
+</style>
+</head>
+<body class="platform-body">
+<div class="platform-header">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#1B2E27" stroke="#5DCAA5" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#5DCAA5" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5"/><circle cx="100" cy="100" r="16" fill="#5DCAA5"/><circle cx="150" cy="50" r="21" fill="#5DCAA5"/></svg>
+    <span class="brand-name">Trakolo</span>
+    <span class="plat-tag">Platform</span>
+  </a>
+  <div class="top-right"><a href="saas-admin-login.html">Sign out</a></div>
+</div>
+<div class="plat-tabstrip">
+  <a href="saas-admin-console.html">Home</a>
+  <a href="saas-admin-errorlog.html" class="active">Error log</a>
+  <a href="saas-admin-pricing.html">Pricing</a>
+  <a href="saas-admin-plans.html">Entitlements</a>
+  <a href="saas-admin-email-settings.html">Email settings</a>
+  <a href="saas-admin-email-templates.html">Email templates</a>
+  <a href="saas-admin-callback-requests.html">Callback requests</a>
+  <a href="saas-admin-services.html">Services</a>
+  <a href="saas-admin-billing.html">Billing &amp; payments</a>
+</div>
+
+<div class="plat-wrap">
+  <div style="margin-bottom:6px;font-size:12px;color:#7C948A;"><a href="saas-admin-console.html" style="color:#7C948A;">Home</a> &gt; Error log<span id="org-crumb"></span></div>
+  <div class="toolbar">
+    <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;">Logs</div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <input type="text" id="log-search" placeholder="Search service, message, URL…" oninput="filterLogs()">
+      <button class="btn sm" style="background:#1B2620;border-color:#2B3B33;color:#D6E4DE;" onclick="location.reload()">↻ Refresh</button>
+    </div>
+  </div>
+
+  <div class="plat-card" style="overflow-x:auto;">
+    <table id="log-table">
+      <thead><tr><th style="width:26px;"><input type="checkbox" id="check-all" onclick="toggleAll(this)"></th><th>Service name</th><th>API method</th><th>API URL</th><th>Type</th><th>Message</th><th>Logged on</th></tr></thead>
+      <tbody id="log-body">
+        <tr data-org="Acme Corp"><td><input type="checkbox"></td><td>SystemManagement</td><td class="id-mono">POST</td><td class="id-mono" style="color:#5DA9E0;">/api/comm/EmailSettings</td><td><span class="log-type error">Error</span></td><td>NpgsqlException: 30000: database "Trakolo.SystemManagement" — connection pool exhausted</td><td class="id-mono">05/06/2026 09:57:11</td></tr>
+        <tr data-org="Acme Corp"><td><input type="checkbox"></td><td>SystemManagement</td><td class="id-mono">GET</td><td class="id-mono" style="color:#5DA9E0;">/api/comm/EmailSettings</td><td><span class="log-type error">Error</span></td><td>NpgsqlException: 30000: database "Trakolo.SystemManagement" — timeout expired</td><td class="id-mono">05/06/2026 11:40:06</td></tr>
+        <tr data-org="Northwind Traders"><td><input type="checkbox"></td><td>TicketManagement</td><td class="id-mono">POST</td><td class="id-mono" style="color:#5DA9E0;">/api/ticket/Create</td><td><span class="log-type warning">Warning</span></td><td>NpgsqlException: 30000: database "Trakolo.TicketManagement" — deadlock detected, retried</td><td class="id-mono">16/07/2026 16:32:52</td></tr>
+        <tr data-org="Acme Corp"><td><input type="checkbox"></td><td>SystemManagement</td><td class="id-mono">POST</td><td class="id-mono" style="color:#5DA9E0;">/api/comm/EmailTemplate</td><td><span class="log-type error">Error</span></td><td>NpgsqlException: 30000: database "Trakolo.SystemManagement" — unique constraint violated</td><td class="id-mono">07/11/2026 12:07:21</td></tr>
+        <tr data-org="Globex Industries"><td><input type="checkbox"></td><td>SystemManagement</td><td class="id-mono">PATCH</td><td class="id-mono" style="color:#5DA9E0;">/api/comm/EmailSettings</td><td><span class="log-type error">Error</span></td><td>NpgsqlException: 30000: database "Trakolo.SystemManagement" — connection reset by peer</td><td class="id-mono">07/11/2026 13:11:34</td></tr>
+        <tr data-org="Umbrella Group"><td><input type="checkbox"></td><td>AssetManagement</td><td class="id-mono">GET</td><td class="id-mono" style="color:#5DA9E0;">/api/sam/Discovery</td><td><span class="log-type info">Info</span></td><td>NpgsqlException: retried after transient network blip, succeeded on attempt 2</td><td class="id-mono">20/03/2026 17:41:25</td></tr>
+        <tr data-org="Northwind Traders"><td><input type="checkbox"></td><td>Billing</td><td class="id-mono">POST</td><td class="id-mono" style="color:#5DA9E0;">/api/platform/ChargeCard</td><td><span class="log-type error">Error</span></td><td>StripeException: card_declined — insufficient_funds</td><td class="id-mono">21/07/2026 08:02:15</td></tr>
+        <tr data-org="Initech"><td><input type="checkbox"></td><td>AuthService</td><td class="id-mono">POST</td><td class="id-mono" style="color:#5DA9E0;">/api/auth/ResetPassword</td><td><span class="log-type warning">Warning</span></td><td>SmtpException: relay timed out, queued for retry</td><td class="id-mono">22/07/2026 10:18:44</td></tr>
+        <tr data-org="Acme Corp"><td><input type="checkbox"></td><td>WorkflowEngine</td><td class="id-mono">POST</td><td class="id-mono" style="color:#5DA9E0;">/api/workflow/Evaluate</td><td><span class="log-type error">Error</span></td><td>NullReferenceException: condition set had no matching property</td><td class="id-mono">23/07/2026 14:52:09</td></tr>
+        <tr data-org="Umbrella Group"><td><input type="checkbox"></td><td>SyncWorker</td><td class="id-mono">POST</td><td class="id-mono" style="color:#5DA9E0;">/api/onprem/Sync</td><td><span class="log-type error">Error</span></td><td>TimeoutException: on-premise gateway did not respond within 30000ms</td><td class="id-mono">24/07/2026 06:33:52</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="text-align:center;margin-top:18px;">
+    <a href="saas-admin-console.html" class="btn primary" style="background:#1D9E75;border-color:#1D9E75;">← Go to Home Page</a>
+  </div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const org = params.get('org');
+if(org){
+  document.getElementById('org-crumb').textContent = ' > ' + org;
+  document.querySelectorAll('#log-body tr').forEach(r => { if(r.dataset.org !== org) r.style.display = 'none'; });
+}
+function filterLogs(){
+  const q = document.getElementById('log-search').value.toLowerCase();
+  document.querySelectorAll('#log-body tr').forEach(r => {
+    if(org && r.dataset.org !== org){ r.style.display = 'none'; return; }
+    r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+function toggleAll(box){ document.querySelectorAll('#log-body tr:not([style*="display: none"]) input[type=checkbox]').forEach(c => c.checked = box.checked); }
+</script>
+<script src="platform-chrome.js" defer></script>
+</body>
+</html>

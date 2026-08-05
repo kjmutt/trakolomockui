@@ -29,10 +29,12 @@
     '</div>' +
     '<div class="chrome-pop" id="plat-chrome-menu">' +
       '<div class="chrome-menu-id"><span class="avatar" style="width:34px;height:34px;">' + initials + '</span><span><b>' + name + '</b><span class="cn-sub">Platform operations · Trakolo staff</span></span></div>' +
-      '<a class="chrome-menu-item" href="saas-admin-console.html">🏢 Tenant workspaces</a>' +
-      '<a class="chrome-menu-item" href="saas-admin-services.html">⚙ Platform services</a>' +
-      '<a class="chrome-menu-item" href="saas-admin-plans.html">💳 Plans &amp; entitlements</a>' +
+      '<a class="chrome-menu-item" href="saas-admin-console.html">🏢 Home</a>' +
+      '<a class="chrome-menu-item" href="saas-admin-pricing.html">🏷 Pricing &amp; editions</a>' +
+      '<a class="chrome-menu-item" href="saas-admin-plans.html">💳 Entitlements</a>' +
       '<a class="chrome-menu-item" href="saas-admin-billing.html">🧾 Billing &amp; payments</a>' +
+      '<a class="chrome-menu-item" href="saas-admin-services.html">⚙ Platform services</a>' +
+      '<a class="chrome-menu-item" href="saas-admin-callback-requests.html">📞 Callback requests</a>' +
       '<a class="chrome-menu-item" href="' + signOutHref + '">→ Sign out</a>' +
     '</div>';
   document.body.appendChild(root);

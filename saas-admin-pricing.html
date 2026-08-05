@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — pricing &amp; editions</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .plat-wrap{max-width:1180px;margin:0 auto;padding:32px 40px 60px;}
+  .plat-card{background:#151F1B;border:1px solid #26362F;border-radius:14px;overflow:hidden;}
+  .cat-head{display:flex;justify-content:space-between;align-items:center;margin:26px 0 10px;}
+  .cat-head:first-of-type{margin-top:0;}
+  .cat-head .name{font-family:var(--font-display);font-size:16px;font-weight:700;color:#fff;}
+  .matrix{width:100%;border-collapse:collapse;}
+  .matrix th{text-align:center;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:#7C948A;font-family:var(--font-mono);font-weight:500;padding:12px 10px;border-bottom:1px solid #26362F;background:#151F1B;}
+  .matrix th:first-child{text-align:left;width:280px;}
+  .matrix td{padding:10px;border-bottom:1px solid #1E2B25;text-align:center;vertical-align:middle;}
+  .matrix tbody tr:last-child td{border-bottom:none;}
+  .matrix td:first-child{text-align:left;}
+  .feat-name{width:100%;padding:8px 10px;border-radius:7px;border:1px solid #2B3B33;background:#0E1613;color:#EAF2ED;font-size:12.5px;}
+  .feat-value{width:60px;padding:7px 8px;border-radius:7px;border:1px solid #2B3B33;background:#0E1613;color:#EAF2ED;font-size:12px;text-align:center;}
+  .matrix .pub-col{background:rgba(93,202,165,.05);}
+</style>
+</head>
+<body class="platform-body">
+<div class="platform-header">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#1B2E27" stroke="#5DCAA5" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#5DCAA5" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5"/><circle cx="100" cy="100" r="16" fill="#5DCAA5"/><circle cx="150" cy="50" r="21" fill="#5DCAA5"/></svg>
+    <span class="brand-name">Trakolo</span>
+    <span class="plat-tag">Platform</span>
+  </a>
+  <div class="top-right"><a href="saas-admin-login.html">Sign out</a></div>
+</div>
+<div class="plat-tabstrip">
+  <a href="saas-admin-console.html">Home</a>
+  <a href="saas-admin-errorlog.html">Error log</a>
+  <a href="saas-admin-pricing.html" class="active">Pricing</a>
+  <a href="saas-admin-plans.html">Entitlements</a>
+  <a href="saas-admin-email-settings.html">Email settings</a>
+  <a href="saas-admin-email-templates.html">Email templates</a>
+  <a href="saas-admin-callback-requests.html">Callback requests</a>
+  <a href="saas-admin-services.html">Services</a>
+  <a href="saas-admin-billing.html">Billing &amp; payments</a>
+</div>
+
+<div class="plat-wrap">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px;">
+    <div>
+      <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;">Pricing &amp; editions</div>
+      <div style="font-size:13px;color:#8FA79C;margin-top:4px;max-width:640px;">The feature catalog behind every edition. This is the source of truth the Upgrade modal reads from — toggle a cell to grant or withhold a feature per edition, or add a new row entirely.</div>
+    </div>
+  </div>
+
+  <div class="cat-head">
+    <span class="name">Essentials</span>
+    <button class="btn primary sm" style="background:#1D9E75;border-color:#1D9E75;" onclick="addFeatureRow()">+ Add feature</button>
+  </div>
+
+  <div class="plat-card">
+    <table class="matrix">
+      <thead><tr><th>Feature</th><th>Free</th><th>Team</th><th>Business</th><th>Enterprise</th><th class="pub-col">Published</th></tr></thead>
+      <tbody id="matrix-body">
+        <tr>
+          <td><input class="feat-name" value="REST API" readonly><input class="feat-value" value="1" style="margin-top:6px;" title="requests/sec limit"></td>
+          <td><div class="switch on"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td>
+          <td class="pub-col"><div class="switch on"></div></td>
+        </tr>
+        <tr>
+          <td><input class="feat-name" value="Custom domain" readonly></td>
+          <td><div class="switch"></div></td><td><div class="switch"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td>
+          <td class="pub-col"><div class="switch on"></div></td>
+        </tr>
+        <tr>
+          <td><input class="feat-name" value="Multi-factor authentication" readonly></td>
+          <td><div class="switch on"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td>
+          <td class="pub-col"><div class="switch on"></div></td>
+        </tr>
+        <tr>
+          <td><input class="feat-name" value="Active Directory integration" readonly></td>
+          <td><div class="switch"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td><td><div class="switch"></div></td>
+          <td class="pub-col"><div class="switch on"></div></td>
+        </tr>
+        <tr>
+          <td><input class="feat-name" value="Workflows" readonly></td>
+          <td><div class="switch on"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td>
+          <td class="pub-col"><div class="switch on"></div></td>
+        </tr>
+        <tr>
+          <td><input class="feat-name" value="Single sign-on" readonly></td>
+          <td><div class="switch"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td><td><div class="switch"></div></td>
+          <td class="pub-col"><div class="switch on"></div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="cat-head">
+    <span class="name">Support &amp; limits</span>
+  </div>
+  <div class="plat-card">
+    <table class="matrix">
+      <thead><tr><th>Feature</th><th>Free</th><th>Team</th><th>Business</th><th>Enterprise</th><th class="pub-col">Published</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><input class="feat-name" value="Seats included" readonly></td>
+          <td><input class="feat-value" value="5"></td><td><input class="feat-value" value="50"></td><td><input class="feat-value" value="250"></td><td><input class="feat-value" value="∞"></td>
+          <td class="pub-col"><div class="switch on"></div></td>
+        </tr>
+        <tr>
+          <td><input class="feat-name" value="AI Agent — Service desk" readonly></td>
+          <td><div class="switch"></div></td><td><div class="switch"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td>
+          <td class="pub-col"><div class="switch on"></div></td>
+        </tr>
+        <tr>
+          <td><input class="feat-name" value="Priority support (4h SLA)" readonly></td>
+          <td><div class="switch"></div></td><td><div class="switch"></div></td><td><div class="switch on"></div></td><td><div class="switch on"></div></td>
+          <td class="pub-col"><div class="switch on"></div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="save-bar-static" style="margin-top:20px;display:flex;justify-content:flex-end;gap:10px;">
+    <button class="btn sm" style="background:transparent;border-color:#37473F;color:#8FA79C;" onclick="location.reload()">Discard</button>
+    <button class="btn sm primary" style="background:#1D9E75;border-color:#1D9E75;" onclick="alert('Pricing matrix saved. Live on the marketing site and Upgrade modal immediately.')">Save changes</button>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.matrix .switch').forEach(s => s.addEventListener('click', () => s.classList.toggle('on')));
+function addFeatureRow(){
+  const tbody = document.getElementById('matrix-body');
+  const tr = document.createElement('tr');
+  tr.innerHTML = '<td><input class="feat-name" value="" placeholder="New feature name"></td>' +
+    '<td><div class="switch"></div></td><td><div class="switch"></div></td><td><div class="switch"></div></td><td><div class="switch"></div></td>' +
+    '<td class="pub-col"><div class="switch on"></div></td>';
+  tbody.appendChild(tr);
+  tr.querySelectorAll('.switch').forEach(s => s.addEventListener('click', () => s.classList.toggle('on')));
+  tr.querySelector('.feat-name').focus();
+}
+</script>
+<script src="platform-chrome.js" defer></script>
+</body>
+</html>
