@@ -3,7 +3,8 @@
     {
       "key": "free", "name": "Free",
       "description": "For small teams getting started with tickets.",
-      "priceMonthly": 0, "priceUnit": "/month", "wasPriceMonthly": null,
+      "regularPriceMonthly": 0, "priceUnit": "/month",
+      "promoPriceMonthly": null, "promoBadge": null, "promoStartDate": null, "promoEndDate": null,
       "badge": null, "badgeStyle": null, "featured": false,
       "cta": { "label": "Start free", "href": "https://portal.trakolo.com/login", "style": "ghost" },
       "highlights": ["Up to 10 users", "Up to 50 Self-Service Portal users", "Unlimited tickets", "Basic kanban board", "Email support", "1 GB database storage", "2 GB file & document storage"]
@@ -11,23 +12,26 @@
     {
       "key": "team", "name": "Team",
       "description": "For growing IT and dev teams that need it all.",
-      "priceMonthly": 6.30, "priceUnit": "/user/month", "wasPriceMonthly": 9.00,
-      "badge": "Most popular · 30% off", "badgeStyle": "primary", "featured": true,
+      "regularPriceMonthly": 9.00, "priceUnit": "/user/month",
+      "promoPriceMonthly": 6.30, "promoBadge": "30% off", "promoStartDate": "2026-01-01", "promoEndDate": "2026-12-31",
+      "badge": "Most popular", "badgeStyle": "primary", "featured": true,
       "cta": { "label": "Start free trial", "href": "https://portal.trakolo.com/login", "style": "primary" },
       "highlights": ["Everything in Free", "Up to 1,000 Self-Service Portal users", "Software asset management", "SLA timers & escalations", "Sprint boards & Git integration", "Custom dashboards", "REST API & bulk data access", "AI Agent licenses (add-on, per agent)", "20 GB database storage", "100 GB file & document storage"]
     },
     {
       "key": "business", "name": "Business",
       "description": "For multi-department IT operations.",
-      "priceMonthly": 12.60, "priceUnit": "/user/month", "wasPriceMonthly": 18.00,
-      "badge": "30% off", "badgeStyle": "muted", "featured": false,
+      "regularPriceMonthly": 18.00, "priceUnit": "/user/month",
+      "promoPriceMonthly": 12.60, "promoBadge": "30% off", "promoStartDate": "2026-01-01", "promoEndDate": "2026-12-31",
+      "badge": null, "badgeStyle": "muted", "featured": false,
       "cta": { "label": "Start free trial", "href": "https://portal.trakolo.com/login", "style": "ghost" },
       "highlights": ["Everything in Team", "Up to 10,000 Self-Service Portal users", "Audit-ready compliance exports", "Role-based permissions", "Priority support", "2 AI Agent licenses included", "100 GB database storage", "500 GB file & document storage"]
     },
     {
       "key": "enterprise", "name": "Enterprise",
       "description": "For large orgs with security & compliance needs.",
-      "priceMonthly": null, "priceLabel": "Custom", "priceUnit": null, "wasPriceMonthly": null,
+      "regularPriceMonthly": null, "priceLabel": "Custom", "priceUnit": null,
+      "promoPriceMonthly": null, "promoBadge": null, "promoStartDate": null, "promoEndDate": null,
       "badge": null, "badgeStyle": null, "featured": false,
       "cta": { "label": "Contact sales", "href": "contact.html", "style": "ghost" },
       "highlights": ["Everything in Business", "Unlimited Self-Service Portal users", "SSO & SCIM provisioning", "Dedicated onboarding", "Custom contract & SLA", "Custom AI Agent license count", "500 GB database storage, expandable", "2 TB file & document storage, expandable"]

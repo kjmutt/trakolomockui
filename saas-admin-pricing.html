@@ -21,11 +21,26 @@
   .matrix .pub-col{background:rgba(93,202,165,.05);}
   .source-note{font-size:12.5px;color:#8FA79C;margin-bottom:20px;max-width:720px;line-height:1.6;}
   .source-note b{color:#5DCAA5;}
-  .edition-price-row{display:flex;gap:12px;margin-bottom:24px;}
+  .edition-price-row{display:flex;gap:12px;margin-bottom:24px;align-items:flex-start;}
   .edition-price-card{flex:1;background:#151F1B;border:1px solid #26362F;border-radius:12px;padding:14px 16px;}
-  .edition-price-card .en{font-family:var(--font-display);font-weight:700;color:#fff;font-size:14px;}
-  .edition-price-card .ep{font-family:var(--font-display);font-size:20px;font-weight:700;color:#5DCAA5;margin-top:6px;}
-  .edition-price-card .ep span{font-size:11px;color:#7C948A;font-weight:400;}
+  .edition-price-card .en{font-family:var(--font-display);font-weight:700;color:#fff;font-size:14px;margin-bottom:10px;}
+  .price-edit-row{display:flex;align-items:center;gap:6px;}
+  .price-edit-row .cur{font-family:var(--font-display);font-size:18px;font-weight:700;color:#5DCAA5;}
+  input.price-input{width:70px;flex:0 0 70px;padding:6px 8px;border-radius:7px;border:1px solid #2B3B33;background:#0E1613;color:#5DCAA5;font-family:var(--font-display);font-size:15px;font-weight:700;}
+  input.price-unit-input{width:auto;flex:1 1 auto;min-width:0;padding:6px 8px;border-radius:7px;border:1px solid #2B3B33;background:#0E1613;color:#7C948A;font-size:11px;}
+  input.price-label-input{width:100%;padding:7px 9px;border-radius:7px;border:1px solid #2B3B33;background:#0E1613;color:#5DCAA5;font-family:var(--font-display);font-size:15px;font-weight:700;}
+  .promo-block{margin-top:12px;padding-top:12px;border-top:1px solid #26362F;}
+  .promo-block .pl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#7C948A;font-family:var(--font-mono);margin-bottom:6px;}
+  .promo-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+  .promo-row .cur{font-size:13px;color:#DDA234;font-weight:700;}
+  input.promo-price-input{width:60px;flex:0 0 60px;padding:5px 7px;border-radius:6px;border:1px solid #2B3B33;background:#0E1613;color:#DDA234;font-size:12.5px;font-weight:700;}
+  input.promo-badge-input{width:auto;flex:1 1 auto;min-width:0;padding:5px 7px;border-radius:6px;border:1px solid #2B3B33;background:#0E1613;color:#DDA234;font-size:11px;}
+  .promo-dates{display:flex;align-items:center;gap:5px;}
+  input.promo-date-input{width:auto;flex:1 1 0;min-width:0;padding:5px 6px;border-radius:6px;border:1px solid #2B3B33;background:#0E1613;color:#8FA79C;font-size:11px;color-scheme:dark;}
+  .promo-dates .arrow{color:#7C948A;font-size:11px;}
+  .promo-status{font-size:10.5px;font-weight:600;margin-top:7px;padding:3px 8px;border-radius:5px;display:inline-block;}
+  .promo-status.active{background:rgba(221,162,52,.14);color:#DDA234;}
+  .promo-status.inactive{background:rgba(143,167,156,.1);color:#7C948A;}
   .loading{padding:40px;text-align:center;color:#7C948A;}
 </style>
 </head>
@@ -84,12 +99,39 @@ fetch('pricing-config.json')
 
 function esc(s){ const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
+function isPromoActive(ed){
+  if(!ed.promoPriceMonthly || !ed.promoStartDate || !ed.promoEndDate) return false;
+  const today = new Date().toISOString().slice(0, 10);
+  return today >= ed.promoStartDate && today <= ed.promoEndDate;
+}
+
 function render(){
   const root = document.getElementById('pricing-root');
   let html = '<div class="edition-price-row">';
   CONFIG.editions.forEach(ed => {
-    const price = ed.priceLabel ? ed.priceLabel : ('£' + (ed.priceMonthly === 0 ? '0' : ed.priceMonthly.toFixed(2)));
-    html += '<div class="edition-price-card"><div class="en">' + esc(ed.name) + '</div><div class="ep">' + esc(price) + (ed.priceLabel ? '' : '<span> ' + esc(ed.priceUnit || '') + '</span>') + '</div></div>';
+    html += '<div class="edition-price-card" data-edition="' + ed.key + '"><div class="en">' + esc(ed.name) + '</div>';
+    if(ed.priceLabel != null){
+      html += '<input class="price-label-input" data-field="priceLabel" value="' + esc(ed.priceLabel) + '">';
+    } else {
+      html += '<div class="price-edit-row"><span class="cur">£</span>' +
+        '<input class="price-input" data-field="regularPriceMonthly" type="text" inputmode="decimal" value="' + esc(ed.regularPriceMonthly) + '">' +
+        '<input class="price-unit-input" data-field="priceUnit" value="' + esc(ed.priceUnit || '') + '"></div>';
+
+      const active = isPromoActive(ed);
+      html += '<div class="promo-block">' +
+        '<div class="pl">Promotion</div>' +
+        '<div class="promo-row"><span class="cur">£</span>' +
+          '<input class="promo-price-input" data-field="promoPriceMonthly" type="text" inputmode="decimal" placeholder="none" value="' + esc(ed.promoPriceMonthly == null ? '' : ed.promoPriceMonthly) + '">' +
+          '<input class="promo-badge-input" data-field="promoBadge" placeholder="badge text, e.g. 30% off" value="' + esc(ed.promoBadge || '') + '"></div>' +
+        '<div class="promo-dates">' +
+          '<input class="promo-date-input" data-field="promoStartDate" type="date" value="' + esc(ed.promoStartDate || '') + '">' +
+          '<span class="arrow">→</span>' +
+          '<input class="promo-date-input" data-field="promoEndDate" type="date" value="' + esc(ed.promoEndDate || '') + '">' +
+        '</div>' +
+        '<span class="promo-status ' + (active ? 'active' : 'inactive') + '" data-promo-status>' + (active ? '● Active now' : '○ Not active') + '</span>' +
+      '</div>';
+    }
+    html += '</div>';
   });
   html += '</div>';
 
@@ -128,6 +170,22 @@ function wireInteractions(){
   document.querySelectorAll('.matrix .switch').forEach(s => {
     if(!s.dataset.wired){ s.addEventListener('click', () => s.classList.toggle('on')); s.dataset.wired = '1'; }
   });
+  document.querySelectorAll('.promo-block input').forEach(inp => {
+    if(!inp.dataset.wired){ inp.addEventListener('input', () => recalcPromoStatus(inp)); inp.dataset.wired = '1'; }
+  });
+}
+
+function recalcPromoStatus(inp){
+  const card = inp.closest('.edition-price-card');
+  const fake = {
+    promoPriceMonthly: parseFloat(card.querySelector('[data-field="promoPriceMonthly"]').value) || null,
+    promoStartDate: card.querySelector('[data-field="promoStartDate"]').value || null,
+    promoEndDate: card.querySelector('[data-field="promoEndDate"]').value || null
+  };
+  const active = isPromoActive(fake);
+  const badge = card.querySelector('[data-promo-status]');
+  badge.className = 'promo-status ' + (active ? 'active' : 'inactive');
+  badge.textContent = active ? '● Active now' : '○ Not active';
 }
 
 function addFeatureRow(categoryKey){
@@ -147,6 +205,21 @@ function addFeatureRow(categoryKey){
 
 function saveConfig(){
   // Read the DOM back into CONFIG
+  document.querySelectorAll('.edition-price-card').forEach(card => {
+    const ed = CONFIG.editions.find(e => e.key === card.dataset.edition);
+    const labelInput = card.querySelector('[data-field="priceLabel"]');
+    if(labelInput){
+      ed.priceLabel = labelInput.value;
+    } else {
+      ed.regularPriceMonthly = parseFloat(card.querySelector('[data-field="regularPriceMonthly"]').value) || 0;
+      ed.priceUnit = card.querySelector('[data-field="priceUnit"]').value;
+      const promoPrice = card.querySelector('[data-field="promoPriceMonthly"]').value;
+      ed.promoPriceMonthly = promoPrice === '' ? null : (parseFloat(promoPrice) || null);
+      ed.promoBadge = card.querySelector('[data-field="promoBadge"]').value || null;
+      ed.promoStartDate = card.querySelector('[data-field="promoStartDate"]').value || null;
+      ed.promoEndDate = card.querySelector('[data-field="promoEndDate"]').value || null;
+    }
+  });
   document.querySelectorAll('.matrix').forEach(table => {
     const catKey = table.dataset.category;
     const cat = CONFIG.categories.find(c => c.key === catKey);
