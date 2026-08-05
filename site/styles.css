@@ -42,7 +42,7 @@ h1, h2, h3, h4 { font-family: 'Sora', sans-serif; font-weight: 600; letter-spaci
 /* Nav */
 nav { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; position: relative; }
 .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 19px; color: var(--teal-800); font-family: 'Sora', sans-serif; }
-.nav-links { display: flex; gap: 32px; font-size: 15px; color: var(--ink-soft); font-weight: 500; }
+.nav-links { display: flex; gap: 20px; font-size: 14px; color: var(--ink-soft); font-weight: 500; white-space: nowrap; }
 .nav-links a.current { color: var(--teal-800); }
 .nav-actions { display: flex; align-items: center; gap: 16px; }
 .nav-toggle { display: none; background: none; border: 1px solid var(--line); border-radius: 8px; font-size: 18px; line-height: 1; width: 40px; height: 40px; align-items: center; justify-content: center; cursor: pointer; color: var(--ink); }
