@@ -96,7 +96,7 @@
 
   <div class="card" style="margin-bottom:22px;">
     <div class="section-label">In one line</div>
-    <div class="page-desc" style="margin-top:2px;">Same six layers as the application architecture, mapped onto managed Azure services — Front Door at the edge, Container Apps for the fleet and the five job-type workers, Flexible Server for the hybrid data tier, Service Bus for background dispatch. Nothing about the app changes; only which cloud runs it.</div>
+    <div class="page-desc" style="margin-top:2px;">Same six layers as the application architecture, mapped onto managed Azure services — Front Door at the edge, Container Apps for the fleet and the five job-type workers, Flexible Server hosting one dedicated database per tenant, Service Bus for background dispatch. Nothing about the app changes; only which cloud runs it.</div>
   </div>
 
   <div class="section-label" style="margin-bottom:12px;">Flow diagram — Azure reference stack</div>
@@ -139,15 +139,15 @@
 <rect class="node-ctrl" x="234.0" y="140.0" width="610.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="539.0" y="159.5" font-weight="700">Azure API Management</tspan><tspan x="539.0" y="174.5">routing · auth (OAuth2/API key) · rate limits · versioning v1 · dev portal</tspan></text>
 <rect class="node-app" x="24.0" y="260.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="119.0" y="279.5" font-weight="700">apps/web</tspan><tspan x="119.0" y="294.5">React 18 (SPA)</tspan></text>
 <rect class="node-app" x="234.0" y="260.0" width="610.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="539.0" y="279.5" font-weight="700">apps/api — ASP.NET Core 8</tspan><tspan x="539.0" y="294.5">modular monolith (Container Apps): itsm · sam · dev · docs</tspan></text>
-<rect class="node-ctrl" x="864.0" y="260.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="959.0" y="279.5" font-weight="700">Tenant registry</tspan><tspan x="959.0" y="294.5">slug → db, bucket, plan</tspan></text>
+<rect class="node-ctrl" x="864.0" y="260.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="959.0" y="279.5" font-weight="700">trakolo-master</tspan><tspan x="959.0" y="294.5">slug → db_host, db_name</tspan></text>
 <rect class="node-ctrl" x="1074.0" y="260.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="1169.0" y="279.5" font-weight="700">Azure Cache</tspan><tspan x="1169.0" y="294.5">for Redis</tspan></text>
 <rect class="node-app dnode" x="294.0" y="338.0" width="230.0" height="34.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="409.0" y="347.5" font-weight="700">compute_pool</tspan><tspan x="409.0" y="362.5">shared / dedicated</tspan></text>
 <rect class="node-obs dnode" x="554.0" y="338.0" width="230.0" height="34.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="669.0" y="347.5" font-weight="700">xUnit test projects</tspan><tspan x="669.0" y="362.5">itsm.Tests · sam.Tests · dev.Tests · docs.Tests</tspan></text>
 <rect class="node-data" x="24.0" y="460.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="119.0" y="479.5" font-weight="700">PgBouncer</tspan><tspan x="119.0" y="494.5">sidecar</tspan></text>
-<rect class="node-data" x="234.0" y="460.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="329.0" y="479.5" font-weight="700">PostgreSQL — Flexible Server, shared</tspan><tspan x="329.0" y="494.5">zone-redundant HA</tspan></text>
-<rect class="node-data" x="444.0" y="460.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="539.0" y="479.5" font-weight="700">PostgreSQL — Flexible Server</tspan><tspan x="539.0" y="494.5">dedicated · Enterprise</tspan></text>
+<rect class="node-data" x="234.0" y="460.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="329.0" y="479.5" font-weight="700">Flexible Server</tspan><tspan x="329.0" y="494.5">many tenant DBs, zone-redundant HA</tspan></text>
+<rect class="node-data" x="444.0" y="460.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="539.0" y="479.5" font-weight="700">Flexible Server</tspan><tspan x="539.0" y="494.5">dedicated, opt-in per tenant</tspan></text>
 <rect class="node-data" x="654.0" y="460.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="749.0" y="479.5" font-weight="700">Read replica</tspan><tspan x="749.0" y="494.5">reporting</tspan></text>
-<rect class="node-data" x="864.0" y="460.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="959.0" y="479.5" font-weight="700">Blob Storage</tspan><tspan x="959.0" y="494.5">shared + dedicated</tspan></text>
+<rect class="node-data" x="864.0" y="460.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="959.0" y="479.5" font-weight="700">Blob Storage</tspan><tspan x="959.0" y="494.5">container + prefix per tenant</tspan></text>
 <rect class="node-work" x="24.0" y="560.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="119.0" y="579.5" font-weight="700">worker-sla</tspan><tspan x="119.0" y="594.5">SLA escalation</tspan></text>
 <rect class="node-work" x="234.0" y="560.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="329.0" y="579.5" font-weight="700">worker-rules</tspan><tspan x="329.0" y="594.5">business rules</tspan></text>
 <rect class="node-work" x="444.0" y="560.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="539.0" y="579.5" font-weight="700">worker-webhooks</tspan><tspan x="539.0" y="594.5">delivery + retries</tspan></text>
@@ -202,9 +202,9 @@
 
     <div class="arch-layer l-ctrl">
       <div class="al-head"><span class="al-num">④</span><span class="al-title">Control plane</span></div>
-      <div class="al-desc">Same Redis protocol as the AWS reference — the tenant-registry cache client code doesn't change between clouds.</div>
+      <div class="al-desc">Same Redis protocol as the AWS reference — the trakolo-master cache client code doesn't change between clouds.</div>
       <div class="arch-nodes">
-        <span class="arch-node node-ctrl">Tenant registry (slug → db host, bucket, plan, compute_pool)</span>
+        <span class="arch-node node-ctrl">trakolo-master — core.tenants (slug → db_host, db_name)</span>
         <span class="arch-node node-ctrl">Azure Cache for Redis</span>
       </div>
     </div>
@@ -212,13 +212,13 @@
 
     <div class="arch-layer l-data">
       <div class="al-head"><span class="al-num">⑤</span><span class="al-title">Data tier</span></div>
-      <div class="al-desc">Azure Database for PostgreSQL Flexible Server, zone-redundant HA, fronted by a PgBouncer sidecar — shared instance with row-level tenant_id scoping (see <a href="db/schema.sql" style="color:var(--amber-text);font-weight:600;">db/schema.sql</a>) for Free/Team/Business, a dedicated Flexible Server per Enterprise tenant, and a read replica isolating reporting from ticket-write traffic.</div>
+      <div class="al-desc">Azure Database for PostgreSQL Flexible Server, zone-redundant HA, fronted by a PgBouncer sidecar — one dedicated database per tenant (see <a href="db/schema.sql" style="color:var(--amber-text);font-weight:600;">db/schema.sql</a>), pooled onto a shared Flexible Server by default with a dedicated Flexible Server available per tenant on request, and a read replica isolating reporting from ticket-write traffic.</div>
       <div class="arch-nodes">
         <span class="arch-node node-data">PgBouncer sidecar</span>
-        <span class="arch-node node-data">Flexible Server — shared, zone-redundant HA</span>
-        <span class="arch-node node-data">Flexible Server — dedicated per Enterprise tenant</span>
+        <span class="arch-node node-data">Flexible Server — many tenant databases, zone-redundant HA</span>
+        <span class="arch-node node-data">Flexible Server — dedicated, opt-in per tenant</span>
         <span class="arch-node node-data">Read replica — reporting</span>
-        <span class="arch-node node-data">Blob Storage — shared container + prefix, dedicated for Enterprise</span>
+        <span class="arch-node node-data">Blob Storage — container + prefix per tenant</span>
       </div>
     </div>
     <div class="arch-arrow">▼</div>
@@ -255,8 +255,8 @@
         <tr><td style="color:var(--indigo-2);">Edge</td><td class="mono">Route 53, ACM, ALB/CloudFront</td><td class="mono">Azure DNS, Front Door (managed TLS + WAF)</td><td>Both resolve a subdomain, terminate TLS, and route to the app fleet — no app code touches this layer.</td></tr>
         <tr><td style="color:var(--violet-text);">API Gateway</td><td class="mono">Amazon API Gateway</td><td class="mono">Azure API Management</td><td>Both handle routing, auth, per-tenant rate limiting, versioning, and publish a developer portal — the API contract doesn't change, only which managed gateway enforces it.</td></tr>
         <tr><td style="color:var(--indigo-text);">App fleet</td><td class="mono">ECS Fargate / EKS</td><td class="mono">Container Apps (or AKS) + Static Web Apps</td><td>Container Apps auto-scales on HTTP/CPU load the same way Fargate does — the ASP.NET Core 8 API image doesn't change.</td></tr>
-        <tr><td style="color:var(--violet-text);">Control plane</td><td class="mono">ElastiCache</td><td class="mono">Azure Cache for Redis</td><td>Same Redis protocol — the tenant-registry cache client code is identical either way.</td></tr>
-        <tr><td style="color:var(--amber-text);">Data tier</td><td class="mono">RDS Postgres Multi-AZ + read replica, S3</td><td class="mono">Flexible Server (zone-redundant HA) + read replica, Blob Storage</td><td>Both are managed Postgres with automated failover and backups — <span class="id-mono">db/schema.sql</span> runs unmodified on either.</td></tr>
+        <tr><td style="color:var(--violet-text);">Control plane</td><td class="mono">ElastiCache</td><td class="mono">Azure Cache for Redis</td><td>Same Redis protocol — the trakolo-master cache client code is identical either way.</td></tr>
+        <tr><td style="color:var(--amber-text);">Data tier</td><td class="mono">RDS Postgres Multi-AZ + read replica, S3</td><td class="mono">Flexible Server (zone-redundant HA) + read replica, Blob Storage</td><td>Both are managed Postgres with automated failover and backups — <span class="id-mono">db/schema.sql</span> runs unmodified per tenant database on either.</td></tr>
         <tr><td style="color:var(--green-text);">Background services</td><td class="mono">5 separate ECS services (sla, rules, webhooks, reports, ai-agent), each SQS-backed or Postgres-backed</td><td class="mono">5 separate Container Apps jobs, each on its own Service Bus queue</td><td>Workers only need a queue to pull from — the job-processing code, including the idempotency-key check, is cloud-agnostic per worker.</td></tr>
         <tr><td style="color:var(--ink-2);">Monitoring</td><td class="mono">CloudWatch / Datadog → PagerDuty</td><td class="mono">Azure Monitor + Application Insights → PagerDuty</td><td>Both ingest the same per-worker health signals already shown in Admin → System status.</td></tr>
         <tr><td style="color:var(--ink-2);">Secrets</td><td class="mono">Secrets Manager</td><td class="mono">Azure Key Vault</td><td>DB passwords, API keys, and the license-signing key are read at boot from a managed vault either way — never committed, never in a plain <span class="id-mono">.env</span> in production.</td></tr>
@@ -272,6 +272,10 @@
     <div class="row-line"><div><div class="rname">docker-compose.yml</div><div class="rdesc">Postgres 18, Redis 8, a one-shot migrate step that applies db/schema.sql, and the app — one command, one host</div></div><a href="install/docker-compose.yml" class="btn sm">View →</a></div>
     <div class="row-line"><div><div class="rname">install.sh</div><div class="rdesc">Generates .env with a random DB password if missing, brings up the stack in dependency order, waits for health checks, applies the schema, starts the app</div></div><a href="install/install.sh" class="btn sm">View →</a></div>
     <div class="row-line" style="border-bottom:none;"><div><div class="rname">.env.example</div><div class="rdesc">Database credentials, app port, and the license file path — copied to .env on first run</div></div><a href="install/.env.example" class="btn sm">View →</a></div>
+  </div>
+  <div class="card" style="margin-top:14px;">
+    <div class="section-label">Domain and database — there isn't a Trakolo-managed one</div>
+    <div class="page-desc" style="margin-top:2px;">Every cloud tenant gets a <span class="id-mono">*.trakolo.com</span> subdomain resolved to its dedicated database through trakolo-master's tenant registry (see <a href="technical-design.html" style="color:var(--indigo-text);">Application architecture</a>). A standalone install has neither: <span class="id-mono">core.tenants.subdomain</span>, <span class="id-mono">db_host</span>, and <span class="id-mono">db_name</span> are all <span class="id-mono">NULL</span> for a standalone row — enforced by a check constraint in <a href="db/schema-master.sql" style="color:var(--indigo-text);font-weight:600;">db/schema-master.sql</a>, not left to convention. The customer points whatever hostname their own network uses (an internal DNS entry, a bare IP, a VPN-only address) at the container — Trakolo neither hosts nor routes to it. trakolo-master keeps that tenant's row only for licensing: <span class="id-mono">install_contact_email</span> and <span class="id-mono">last_license_checkin_at</span>, updated each time <span class="id-mono">.trklic</span> validates, are the only signal that ever comes back — never a live connection.</div>
   </div>
   <div class="card" style="margin-top:14px;">
     <div class="section-label">License activation</div>

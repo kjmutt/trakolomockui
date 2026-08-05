@@ -49,28 +49,28 @@
 
 <div class="wrap" style="max-width:980px;">
   <div class="page-head">
-    <div><div class="page-title">Entity relationships</div><div class="page-desc">How the 68 tables in db/schema.sql relate — every foreign key here was extracted from a live PostgreSQL instance running the real schema via pg_constraint, not typed from memory.</div></div>
+    <div><div class="page-title">Entity relationships</div><div class="page-desc">How the 69 tables across Trakolo's two databases relate — every foreign key here was extracted from a live PostgreSQL instance running the real schema via pg_constraint, not typed from memory.</div></div>
     <a href="technical-design.html" class="btn">← Technical design</a>
   </div>
 
   <div class="card" style="margin-bottom:18px;background:var(--indigo-bg);border-color:#A9E0CD;">
     <div class="section-label" style="color:var(--indigo-text);">Is it an RDBMS?</div>
-    <div class="page-desc" style="margin-top:4px;color:var(--indigo-text);">Yes. PostgreSQL is a Relational Database Management System — relationships are foreign keys enforced by the database at write time, not application code. You cannot insert a ticket for a tenant that doesn't exist, or delete a tenant while its tickets still reference it, without an explicit cascade. That enforcement is the entire point of choosing an RDBMS here.</div>
+    <div class="page-desc" style="margin-top:4px;color:var(--indigo-text);">Yes. PostgreSQL is a Relational Database Management System — relationships are foreign keys enforced by the database at write time, not application code. You cannot insert a ticket for an assignee that doesn't exist, or delete a project while its backlog items still reference it, without an explicit cascade. That enforcement is the entire point of choosing an RDBMS here — and it's also why tenancy moved from a <span class="id-mono">tenant_id</span> column to a database boundary: Postgres has no cross-database foreign key, so putting each tenant in its own database makes "can't leak into another tenant's rows" true by construction, not by remembering to filter.</div>
   </div>
 
   <div class="strip">
-    <div class="mcard info"><div class="mlabel">Tables</div><div class="mval">68</div><div class="mdelta">across 6 module schemas</div></div>
-    <div class="mcard info"><div class="mlabel">Foreign keys</div><div class="mval">129</div><div class="mdelta">extracted from pg_constraint</div></div>
-    <div class="mcard info"><div class="mlabel">Module schemas</div><div class="mval">6</div><div class="mdelta">core · itsm · sam · dev · docs · platform</div></div>
-    <div class="mcard ok"><div class="mlabel">Tenant scoping</div><div class="mval">Every row</div><div class="mdelta">tenant_id → core.tenants, everywhere</div></div>
+    <div class="mcard info"><div class="mlabel">Databases</div><div class="mval">2</div><div class="mdelta">trakolo-master + one per tenant</div></div>
+    <div class="mcard info"><div class="mlabel">Tables</div><div class="mval">69</div><div class="mdelta">17 in trakolo-master, 52 per tenant</div></div>
+    <div class="mcard info"><div class="mlabel">Foreign keys</div><div class="mval">85</div><div class="mdelta">70 per tenant + 15 in trakolo-master</div></div>
+    <div class="mcard ok"><div class="mlabel">Tenant scoping</div><div class="mval">The database itself</div><div class="mdelta">no tenant_id column anywhere — see below</div></div>
   </div>
 
   <div class="section-label" style="margin:22px 0 12px;">Relationships that matter, by module</div>
   <div class="rel-grid">
     <div class="rel-card s-core">
-      <div class="rc-head">core — tenancy &amp; identity</div>
+      <div class="rc-head">core — identity &amp; access, per tenant database</div>
       <ul>
-        <li><b>tenants</b> → users, contacts, roles, teams, approval_groups</li>
+        <li><b>workspace</b> — single row, this database's own name/slug/deployment_model; no FK, no other row can exist (see below)</li>
         <li><b>roles</b> ↔ users (via user_roles)</li>
         <li><b>roles</b> ↔ permissions (via role_permissions)</li>
         <li><b>teams</b> ↔ users (via team_members)</li>
@@ -117,8 +117,9 @@
       </ul>
     </div>
     <div class="rel-card s-platform">
-      <div class="rc-head">platform — licensing, pricing &amp; SSP</div>
+      <div class="rc-head">trakolo-master — tenant registry, licensing, pricing &amp; SSP</div>
       <ul>
+        <li><b>tenants</b> — the registry itself; <span class="id-mono">db_host</span>/<span class="id-mono">db_name</span> point at the tenant database each row owns</li>
         <li><b>plans</b> → subscriptions ← tenants — one active license per tenant</li>
         <li><b>subscriptions</b> → subscription_history — every Renew/Upgrade, audited</li>
         <li><b>plans</b> ↔ features (via plan_features) — the Pricing page's edition matrix</li>
@@ -135,129 +136,19 @@
   <div class="hint" style="margin-top:16px;flex-direction:column;align-items:stretch;gap:4px;">
     <span><b>One genuinely unusual pair:</b> <span class="id-mono">dev.backlog_items.change_request_id</span> and <span class="id-mono">itsm.change_requests.backlog_item_id</span> point at each other — a backlog card can name "its" change request, and a change request separately records which card it promotes. That mirrors the app's own UI, where you can link a card to a CR from either side.</span>
   </div>
-  <div class="page-desc" style="margin-top:10px;">Every table above (and 30+ more not listed — attachments, audit rows, settings) also carries its own <span class="id-mono">tenant_id → core.tenants.id</span> foreign key — the single most repeated relationship in the schema, and what makes the row-level multi-tenancy design in <a href="technical-design.html" style="color:var(--indigo-text);">Technical design</a> enforceable by the database itself, not just application code.</div>
+  <div class="page-desc" style="margin-top:10px;">Notice what's <i>not</i> in the tables above: no <span class="id-mono">tenant_id</span> column anywhere in core/itsm/sam/dev/docs. That's not an oversight — the database-per-tenant design in <a href="technical-design.html" style="color:var(--indigo-text);">Technical design</a> makes the database itself the tenant boundary, so a per-row scoping column would be redundant (and Postgres can't even express a foreign key to another database's <span class="id-mono">core.tenants</span> to justify keeping one). The one place tenancy still shows up here is <span class="id-mono">core.workspace</span> — a single-row table each tenant database carries so the app can identify itself locally — and in trakolo-master's own <span class="id-mono">core.tenants</span>, where every <span class="id-mono">platform.*</span> table below still scopes by <span class="id-mono">tenant_id</span> because trakolo-master is the one database that legitimately holds every tenant's row side by side.</div>
 
-  <div class="section-label" style="margin:26px 0 12px;">Every foreign key, extracted from the live schema</div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="fk-filters">
-    <div class="chip active" data-schema="all">All (129)</div>
-    <div class="chip" data-schema="core">core (21)</div>
-    <div class="chip" data-schema="itsm">itsm (45)</div>
-    <div class="chip" data-schema="dev">dev (20)</div>
-    <div class="chip" data-schema="sam">sam (8)</div>
-    <div class="chip" data-schema="docs">docs (20)</div>
+  <div class="section-label" style="margin:26px 0 12px;">trakolo-master — every foreign key</div>
+  <div class="page-desc" style="margin:-6px 0 12px;">One database, one schema (<span class="id-mono">platform</span>) plus the tenant registry (<span class="id-mono">core.tenants</span>). Trakolo owns this database; no tenant ever connects to it.</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="fk-filters-master">
+    <div class="chip active" data-schema="all">All (15)</div>
     <div class="chip" data-schema="platform">platform (15)</div>
   </div>
-  <div class="panel">
+  <div class="panel" style="margin-bottom:26px;">
     <div class="fk-scroll">
       <table class="fk-table">
         <thead><tr><th>Table</th><th>Column</th><th></th><th>References</th><th>Column</th></tr></thead>
-        <tbody id="fk-body">
-<tr data-schema="core"><td class="mono">core.api_keys</td><td class="mono">created_by</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.api_keys</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.approval_group_members</td><td class="mono">approval_group_id</td><td>→</td><td class="mono">core.approval_groups</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.approval_group_members</td><td class="mono">user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.approval_groups</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.audit_log</td><td class="mono">actor_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.audit_log</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.contacts</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.feature_flags</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.integrations</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.notifications</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.notifications</td><td class="mono">user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.role_permissions</td><td class="mono">permission_id</td><td>→</td><td class="mono">core.permissions</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.role_permissions</td><td class="mono">role_id</td><td>→</td><td class="mono">core.roles</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.roles</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.team_members</td><td class="mono">team_id</td><td>→</td><td class="mono">core.teams</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.team_members</td><td class="mono">user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.teams</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.user_roles</td><td class="mono">role_id</td><td>→</td><td class="mono">core.roles</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.user_roles</td><td class="mono">user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="core"><td class="mono">core.users</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.backlog_items</td><td class="mono">change_request_id</td><td>→</td><td class="mono">itsm.change_requests</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.backlog_items</td><td class="mono">epic_id</td><td>→</td><td class="mono">dev.epics</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.backlog_items</td><td class="mono">incident_ticket_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.backlog_items</td><td class="mono">owner_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.backlog_items</td><td class="mono">problem_id</td><td>→</td><td class="mono">itsm.problems</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.backlog_items</td><td class="mono">project_id</td><td>→</td><td class="mono">dev.projects</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.backlog_items</td><td class="mono">sprint_id</td><td>→</td><td class="mono">dev.sprints</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.backlog_items</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.deployments</td><td class="mono">change_request_id</td><td>→</td><td class="mono">itsm.change_requests</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.deployments</td><td class="mono">deployed_by_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.deployments</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.epics</td><td class="mono">project_id</td><td>→</td><td class="mono">dev.projects</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.epics</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.projects</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.scrum_teams</td><td class="mono">project_id</td><td>→</td><td class="mono">dev.projects</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.scrum_teams</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.sprints</td><td class="mono">project_id</td><td>→</td><td class="mono">dev.projects</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.sprints</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.team_memberships</td><td class="mono">scrum_team_id</td><td>→</td><td class="mono">dev.scrum_teams</td><td class="mono">id</td></tr>
-<tr data-schema="dev"><td class="mono">dev.team_memberships</td><td class="mono">user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.document_versions</td><td class="mono">document_id</td><td>→</td><td class="mono">docs.documents</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.document_versions</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.document_versions</td><td class="mono">uploaded_by</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.documents</td><td class="mono">folder_id</td><td>→</td><td class="mono">docs.folders</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.documents</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.documents</td><td class="mono">uploaded_by</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.folders</td><td class="mono">parent_folder_id</td><td>→</td><td class="mono">docs.folders</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.folders</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.wiki_comments</td><td class="mono">author_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.wiki_comments</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.wiki_comments</td><td class="mono">wiki_page_id</td><td>→</td><td class="mono">docs.wiki_pages</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.wiki_page_history</td><td class="mono">edited_by</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.wiki_page_history</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.wiki_page_history</td><td class="mono">wiki_page_id</td><td>→</td><td class="mono">docs.wiki_pages</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.wiki_pages</td><td class="mono">created_by</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.wiki_pages</td><td class="mono">parent_page_id</td><td>→</td><td class="mono">docs.wiki_pages</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.wiki_pages</td><td class="mono">space_id</td><td>→</td><td class="mono">docs.wiki_spaces</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.wiki_pages</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.wiki_pages</td><td class="mono">updated_by</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="docs"><td class="mono">docs.wiki_spaces</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.business_rules</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.catalog_requests</td><td class="mono">catalog_item_id</td><td>→</td><td class="mono">itsm.service_catalog_items</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.catalog_requests</td><td class="mono">requested_by_contact_id</td><td>→</td><td class="mono">core.contacts</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.catalog_requests</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.catalog_requests</td><td class="mono">ticket_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.change_approvals</td><td class="mono">approval_group_id</td><td>→</td><td class="mono">core.approval_groups</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.change_approvals</td><td class="mono">approver_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.change_approvals</td><td class="mono">change_request_id</td><td>→</td><td class="mono">itsm.change_requests</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.change_approvals</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.change_requests</td><td class="mono">backlog_item_id</td><td>→</td><td class="mono">dev.backlog_items</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.change_requests</td><td class="mono">requested_by_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.change_requests</td><td class="mono">source_ticket_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.change_requests</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.kb_articles</td><td class="mono">category_id</td><td>→</td><td class="mono">itsm.kb_categories</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.kb_articles</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.kb_categories</td><td class="mono">parent_category_id</td><td>→</td><td class="mono">itsm.kb_categories</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.kb_categories</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.oncall_rotations</td><td class="mono">schedule_id</td><td>→</td><td class="mono">itsm.oncall_schedules</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.oncall_rotations</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.oncall_rotations</td><td class="mono">user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.oncall_schedules</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.problem_incidents</td><td class="mono">problem_id</td><td>→</td><td class="mono">itsm.problems</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.problem_incidents</td><td class="mono">ticket_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.problems</td><td class="mono">owner_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.problems</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.service_catalog_categories</td><td class="mono">parent_category_id</td><td>→</td><td class="mono">itsm.service_catalog_categories</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.service_catalog_categories</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.service_catalog_items</td><td class="mono">category_id</td><td>→</td><td class="mono">itsm.service_catalog_categories</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.service_catalog_items</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.sla_policies</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.ticket_activity</td><td class="mono">actor_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.ticket_activity</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.ticket_activity</td><td class="mono">ticket_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.ticket_attachments</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.ticket_attachments</td><td class="mono">ticket_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.ticket_attachments</td><td class="mono">uploaded_by</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.ticket_categories</td><td class="mono">parent_category_id</td><td>→</td><td class="mono">itsm.ticket_categories</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.ticket_categories</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.ticket_links</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.ticket_links</td><td class="mono">ticket_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.tickets</td><td class="mono">assignee_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.tickets</td><td class="mono">category_id</td><td>→</td><td class="mono">itsm.ticket_categories</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.tickets</td><td class="mono">merged_into_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.tickets</td><td class="mono">requester_contact_id</td><td>→</td><td class="mono">core.contacts</td><td class="mono">id</td></tr>
-<tr data-schema="itsm"><td class="mono">itsm.tickets</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
+        <tbody id="fk-body-master">
 <tr data-schema="platform"><td class="mono">platform.account_contacts</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.callback_requests</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.campaign_recipients</td><td class="mono">campaign_id</td><td>→</td><td class="mono">platform.campaigns</td><td class="mono">id</td></tr>
@@ -273,14 +164,96 @@
 <tr data-schema="platform"><td class="mono">platform.subscriptions</td><td class="mono">plan_id</td><td>→</td><td class="mono">platform.plans</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.subscriptions</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.tenant_entitlements</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin:26px 0 12px;">Per-tenant database — every foreign key</div>
+  <div class="page-desc" style="margin:-6px 0 12px;">Applied once per cloud tenant's dedicated database, and identically for a standalone/on-premise install. No table here references <span class="id-mono">core.tenants</span> — it doesn't exist in this database.</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="fk-filters-tenant">
+    <div class="chip active" data-schema="all">All (70)</div>
+    <div class="chip" data-schema="core">core (11)</div>
+    <div class="chip" data-schema="itsm">itsm (28)</div>
+    <div class="chip" data-schema="dev">dev (14)</div>
+    <div class="chip" data-schema="sam">sam (4)</div>
+    <div class="chip" data-schema="docs">docs (13)</div>
+  </div>
+  <div class="panel">
+    <div class="fk-scroll">
+      <table class="fk-table">
+        <thead><tr><th>Table</th><th>Column</th><th></th><th>References</th><th>Column</th></tr></thead>
+        <tbody id="fk-body-tenant">
+<tr data-schema="core"><td class="mono">core.api_keys</td><td class="mono">created_by</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="core"><td class="mono">core.approval_group_members</td><td class="mono">approval_group_id</td><td>→</td><td class="mono">core.approval_groups</td><td class="mono">id</td></tr>
+<tr data-schema="core"><td class="mono">core.approval_group_members</td><td class="mono">user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="core"><td class="mono">core.audit_log</td><td class="mono">actor_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="core"><td class="mono">core.notifications</td><td class="mono">user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="core"><td class="mono">core.role_permissions</td><td class="mono">permission_id</td><td>→</td><td class="mono">core.permissions</td><td class="mono">id</td></tr>
+<tr data-schema="core"><td class="mono">core.role_permissions</td><td class="mono">role_id</td><td>→</td><td class="mono">core.roles</td><td class="mono">id</td></tr>
+<tr data-schema="core"><td class="mono">core.team_members</td><td class="mono">team_id</td><td>→</td><td class="mono">core.teams</td><td class="mono">id</td></tr>
+<tr data-schema="core"><td class="mono">core.team_members</td><td class="mono">user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="core"><td class="mono">core.user_roles</td><td class="mono">role_id</td><td>→</td><td class="mono">core.roles</td><td class="mono">id</td></tr>
+<tr data-schema="core"><td class="mono">core.user_roles</td><td class="mono">user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="dev"><td class="mono">dev.backlog_items</td><td class="mono">change_request_id</td><td>→</td><td class="mono">itsm.change_requests</td><td class="mono">id</td></tr>
+<tr data-schema="dev"><td class="mono">dev.backlog_items</td><td class="mono">epic_id</td><td>→</td><td class="mono">dev.epics</td><td class="mono">id</td></tr>
+<tr data-schema="dev"><td class="mono">dev.backlog_items</td><td class="mono">incident_ticket_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
+<tr data-schema="dev"><td class="mono">dev.backlog_items</td><td class="mono">owner_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="dev"><td class="mono">dev.backlog_items</td><td class="mono">problem_id</td><td>→</td><td class="mono">itsm.problems</td><td class="mono">id</td></tr>
+<tr data-schema="dev"><td class="mono">dev.backlog_items</td><td class="mono">project_id</td><td>→</td><td class="mono">dev.projects</td><td class="mono">id</td></tr>
+<tr data-schema="dev"><td class="mono">dev.backlog_items</td><td class="mono">sprint_id</td><td>→</td><td class="mono">dev.sprints</td><td class="mono">id</td></tr>
+<tr data-schema="dev"><td class="mono">dev.deployments</td><td class="mono">change_request_id</td><td>→</td><td class="mono">itsm.change_requests</td><td class="mono">id</td></tr>
+<tr data-schema="dev"><td class="mono">dev.deployments</td><td class="mono">deployed_by_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="dev"><td class="mono">dev.epics</td><td class="mono">project_id</td><td>→</td><td class="mono">dev.projects</td><td class="mono">id</td></tr>
+<tr data-schema="dev"><td class="mono">dev.scrum_teams</td><td class="mono">project_id</td><td>→</td><td class="mono">dev.projects</td><td class="mono">id</td></tr>
+<tr data-schema="dev"><td class="mono">dev.sprints</td><td class="mono">project_id</td><td>→</td><td class="mono">dev.projects</td><td class="mono">id</td></tr>
+<tr data-schema="dev"><td class="mono">dev.team_memberships</td><td class="mono">scrum_team_id</td><td>→</td><td class="mono">dev.scrum_teams</td><td class="mono">id</td></tr>
+<tr data-schema="dev"><td class="mono">dev.team_memberships</td><td class="mono">user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="docs"><td class="mono">docs.document_versions</td><td class="mono">document_id</td><td>→</td><td class="mono">docs.documents</td><td class="mono">id</td></tr>
+<tr data-schema="docs"><td class="mono">docs.document_versions</td><td class="mono">uploaded_by</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="docs"><td class="mono">docs.documents</td><td class="mono">folder_id</td><td>→</td><td class="mono">docs.folders</td><td class="mono">id</td></tr>
+<tr data-schema="docs"><td class="mono">docs.documents</td><td class="mono">uploaded_by</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="docs"><td class="mono">docs.folders</td><td class="mono">parent_folder_id</td><td>→</td><td class="mono">docs.folders</td><td class="mono">id</td></tr>
+<tr data-schema="docs"><td class="mono">docs.wiki_comments</td><td class="mono">author_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="docs"><td class="mono">docs.wiki_comments</td><td class="mono">wiki_page_id</td><td>→</td><td class="mono">docs.wiki_pages</td><td class="mono">id</td></tr>
+<tr data-schema="docs"><td class="mono">docs.wiki_page_history</td><td class="mono">edited_by</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="docs"><td class="mono">docs.wiki_page_history</td><td class="mono">wiki_page_id</td><td>→</td><td class="mono">docs.wiki_pages</td><td class="mono">id</td></tr>
+<tr data-schema="docs"><td class="mono">docs.wiki_pages</td><td class="mono">created_by</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="docs"><td class="mono">docs.wiki_pages</td><td class="mono">parent_page_id</td><td>→</td><td class="mono">docs.wiki_pages</td><td class="mono">id</td></tr>
+<tr data-schema="docs"><td class="mono">docs.wiki_pages</td><td class="mono">space_id</td><td>→</td><td class="mono">docs.wiki_spaces</td><td class="mono">id</td></tr>
+<tr data-schema="docs"><td class="mono">docs.wiki_pages</td><td class="mono">updated_by</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.catalog_requests</td><td class="mono">catalog_item_id</td><td>→</td><td class="mono">itsm.service_catalog_items</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.catalog_requests</td><td class="mono">requested_by_contact_id</td><td>→</td><td class="mono">core.contacts</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.catalog_requests</td><td class="mono">ticket_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.change_approvals</td><td class="mono">approval_group_id</td><td>→</td><td class="mono">core.approval_groups</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.change_approvals</td><td class="mono">approver_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.change_approvals</td><td class="mono">change_request_id</td><td>→</td><td class="mono">itsm.change_requests</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.change_requests</td><td class="mono">backlog_item_id</td><td>→</td><td class="mono">dev.backlog_items</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.change_requests</td><td class="mono">requested_by_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.change_requests</td><td class="mono">source_ticket_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.kb_articles</td><td class="mono">category_id</td><td>→</td><td class="mono">itsm.kb_categories</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.kb_categories</td><td class="mono">parent_category_id</td><td>→</td><td class="mono">itsm.kb_categories</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.oncall_rotations</td><td class="mono">schedule_id</td><td>→</td><td class="mono">itsm.oncall_schedules</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.oncall_rotations</td><td class="mono">user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.problem_incidents</td><td class="mono">problem_id</td><td>→</td><td class="mono">itsm.problems</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.problem_incidents</td><td class="mono">ticket_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.problems</td><td class="mono">owner_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.service_catalog_categories</td><td class="mono">parent_category_id</td><td>→</td><td class="mono">itsm.service_catalog_categories</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.service_catalog_items</td><td class="mono">category_id</td><td>→</td><td class="mono">itsm.service_catalog_categories</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.ticket_activity</td><td class="mono">actor_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.ticket_activity</td><td class="mono">ticket_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.ticket_attachments</td><td class="mono">ticket_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.ticket_attachments</td><td class="mono">uploaded_by</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.ticket_categories</td><td class="mono">parent_category_id</td><td>→</td><td class="mono">itsm.ticket_categories</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.ticket_links</td><td class="mono">ticket_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.tickets</td><td class="mono">assignee_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.tickets</td><td class="mono">category_id</td><td>→</td><td class="mono">itsm.ticket_categories</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.tickets</td><td class="mono">merged_into_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
+<tr data-schema="itsm"><td class="mono">itsm.tickets</td><td class="mono">requester_contact_id</td><td>→</td><td class="mono">core.contacts</td><td class="mono">id</td></tr>
 <tr data-schema="sam"><td class="mono">sam.asset_assignments</td><td class="mono">asset_id</td><td>→</td><td class="mono">sam.assets</td><td class="mono">id</td></tr>
 <tr data-schema="sam"><td class="mono">sam.asset_assignments</td><td class="mono">assigned_to_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="sam"><td class="mono">sam.asset_assignments</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
 <tr data-schema="sam"><td class="mono">sam.assets</td><td class="mono">owner_user_id</td><td>→</td><td class="mono">core.users</td><td class="mono">id</td></tr>
-<tr data-schema="sam"><td class="mono">sam.assets</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
-<tr data-schema="sam"><td class="mono">sam.discovery_scans</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
 <tr data-schema="sam"><td class="mono">sam.license_renewals</td><td class="mono">asset_id</td><td>→</td><td class="mono">sam.assets</td><td class="mono">id</td></tr>
-<tr data-schema="sam"><td class="mono">sam.license_renewals</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
         </tbody>
       </table>
     </div>
@@ -288,16 +261,20 @@
 
 </div>
 <script>
-  document.querySelectorAll('#fk-filters .chip').forEach(function(chip){
-    chip.addEventListener('click', function(){
-      document.querySelectorAll('#fk-filters .chip').forEach(function(c){ c.classList.remove('active'); });
-      chip.classList.add('active');
-      var s = chip.dataset.schema;
-      document.querySelectorAll('#fk-body tr').forEach(function(row){
-        row.hidden = (s !== 'all' && row.dataset.schema !== s);
+  function wireFilters(filterId, bodyId){
+    document.querySelectorAll('#' + filterId + ' .chip').forEach(function(chip){
+      chip.addEventListener('click', function(){
+        document.querySelectorAll('#' + filterId + ' .chip').forEach(function(c){ c.classList.remove('active'); });
+        chip.classList.add('active');
+        var s = chip.dataset.schema;
+        document.querySelectorAll('#' + bodyId + ' tr').forEach(function(row){
+          row.hidden = (s !== 'all' && row.dataset.schema !== s);
+        });
       });
     });
-  });
+  }
+  wireFilters('fk-filters-master', 'fk-body-master');
+  wireFilters('fk-filters-tenant', 'fk-body-tenant');
 </script>
 <script src="app-chrome.js" defer></script>
 </body>

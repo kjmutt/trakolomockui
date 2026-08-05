@@ -1,15 +1,23 @@
 -- ============================================================================
--- Trakolo — relational database schema (PostgreSQL 14+)
+-- Trakolo — per-tenant database schema (PostgreSQL 14+)
 --
--- Mirrors the modular-monolith architecture: one database, one schema per
--- product module (core, itsm, sam, dev, docs, platform), not one schema per
--- microservice. Every tenant-owned table carries tenant_id and is scoped by
--- it — this is a shared-database, row-level multi-tenancy model (see
--- core.tenants). Split a module into its own service later only if it earns
--- that separately; the schema boundary already makes that split possible
--- without a rewrite.
+-- Database-per-tenant model: every cloud tenant gets its own dedicated
+-- Postgres database running exactly this file, and an on-premise/standalone
+-- install is the same thing on the customer's own server — one tenant, one
+-- database, no shared infrastructure to reason about. Because the database
+-- itself is the tenant boundary, nothing in here carries a tenant_id column;
+-- the old shared-cluster / row-level-scoping design lived in a single
+-- database and is retired in favor of this one.
 --
--- Apply with:  psql -d trakolo -f db/schema.sql
+-- Trakolo's own control plane — the tenant registry (which db each tenant's
+-- data lives in, cloud vs. standalone, subdomain routing), plans, pricing,
+-- subscriptions, leads, campaigns — lives in a separate database and file:
+-- see db/schema-master.sql ("trakolo-master"). Nothing in this file
+-- references that database; Postgres has no cross-database foreign keys,
+-- so the two are linked only by tenant_id, stored here in core.workspace and
+-- resolved to a db_host/db_name by trakolo-master at connection time.
+--
+-- Apply with:  psql -d <tenant db, e.g. trakolo_acme> -f db/schema.sql
 -- ============================================================================
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto; -- gen_random_uuid()
@@ -28,22 +36,28 @@ $$ LANGUAGE plpgsql;
 -- ============================================================================
 CREATE SCHEMA IF NOT EXISTS core;
 
-CREATE TABLE core.tenants (
-  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+-- This database belongs to exactly one tenant — that's the whole point of the
+-- database-per-tenant model (see trakolo-master's core.tenants for the
+-- registry every one of these is provisioned from). workspace is a single-row
+-- table so the app running against this DB can identify itself without a
+-- cross-database lookup; enforced by the fixed id default plus the check.
+CREATE TABLE core.workspace (
+  id           uuid PRIMARY KEY DEFAULT '00000000-0000-0000-0000-000000000001',
+  tenant_id    uuid NOT NULL,        -- mirrors this workspace's row id in trakolo-master core.tenants
   name         text NOT NULL,
-  slug         text NOT NULL UNIQUE,
-  edition      text NOT NULL DEFAULT 'cloud' CHECK (edition IN ('cloud', 'standalone')),
+  slug         text NOT NULL,
+  deployment_model text NOT NULL DEFAULT 'cloud' CHECK (deployment_model IN ('cloud', 'standalone')),
   created_at   timestamptz NOT NULL DEFAULT now(),
-  updated_at   timestamptz NOT NULL DEFAULT now()
+  updated_at   timestamptz NOT NULL DEFAULT now(),
+  CHECK (id = '00000000-0000-0000-0000-000000000001')
 );
-CREATE TRIGGER trg_tenants_updated BEFORE UPDATE ON core.tenants
+CREATE TRIGGER trg_workspace_updated BEFORE UPDATE ON core.workspace
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TYPE core.user_status AS ENUM ('active', 'invited', 'suspended');
 
 CREATE TABLE core.users (
   id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id        uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   email            citext NOT NULL,
   name             text NOT NULL,
   avatar_initials  text,
@@ -51,9 +65,8 @@ CREATE TABLE core.users (
   last_login_at    timestamptz,
   created_at       timestamptz NOT NULL DEFAULT now(),
   updated_at       timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (tenant_id, email)
+  UNIQUE (email)
 );
-CREATE INDEX idx_users_tenant ON core.users(tenant_id);
 CREATE TRIGGER trg_users_updated BEFORE UPDATE ON core.users
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
@@ -61,22 +74,19 @@ CREATE TRIGGER trg_users_updated BEFORE UPDATE ON core.users
 -- distinct population from core.users, who are internal agents/admins.
 CREATE TABLE core.contacts (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id   uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   name        text NOT NULL,
   email       citext NOT NULL,
   department  text,
   title       text,
   created_at  timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (tenant_id, email)
+  UNIQUE (email)
 );
-CREATE INDEX idx_contacts_tenant ON core.contacts(tenant_id);
 
 CREATE TABLE core.roles (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id   uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   name        text NOT NULL,               -- Admin, Manager, Agent, Viewer, or a custom role
   is_system   boolean NOT NULL DEFAULT false,
-  UNIQUE (tenant_id, name)
+  UNIQUE (name)
 );
 
 CREATE TABLE core.permissions (
@@ -100,9 +110,8 @@ CREATE TABLE core.user_roles (
 -- Support groups (e.g. "IT Ops", "Infrastructure", "Security")
 CREATE TABLE core.teams (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id   uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   name        text NOT NULL,
-  UNIQUE (tenant_id, name)
+  UNIQUE (name)
 );
 CREATE TABLE core.team_members (
   team_id  uuid NOT NULL REFERENCES core.teams(id) ON DELETE CASCADE,
@@ -113,9 +122,8 @@ CREATE TABLE core.team_members (
 -- Approval groups (used by change requests, access requests, catalog items)
 CREATE TABLE core.approval_groups (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id   uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   name        text NOT NULL,
-  UNIQUE (tenant_id, name)
+  UNIQUE (name)
 );
 CREATE TABLE core.approval_group_members (
   approval_group_id  uuid NOT NULL REFERENCES core.approval_groups(id) ON DELETE CASCADE,
@@ -125,7 +133,6 @@ CREATE TABLE core.approval_group_members (
 
 CREATE TABLE core.notifications (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id   uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   user_id     uuid NOT NULL REFERENCES core.users(id) ON DELETE CASCADE,
   type        text NOT NULL,               -- 'sla_breach', 'approval_pending', 'oncall_assigned', ...
   title       text NOT NULL,
@@ -138,7 +145,6 @@ CREATE INDEX idx_notifications_user_unread ON core.notifications(user_id) WHERE 
 
 CREATE TABLE core.api_keys (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id   uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   name        text NOT NULL,
   key_hash    text NOT NULL,               -- never store the raw key
   scopes      text[] NOT NULL DEFAULT '{}',
@@ -146,29 +152,25 @@ CREATE TABLE core.api_keys (
   revoked_at  timestamptz,
   created_at  timestamptz NOT NULL DEFAULT now()
 );
-CREATE INDEX idx_api_keys_tenant ON core.api_keys(tenant_id);
 
 CREATE TABLE core.integrations (
   id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id        uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   provider         text NOT NULL,          -- 'slack', 'github', 'okta', 'jira', ...
   status           text NOT NULL DEFAULT 'not_connected',
   config           jsonb NOT NULL DEFAULT '{}',
   last_synced_at   timestamptz,
-  UNIQUE (tenant_id, provider)
+  UNIQUE (provider)
 );
 
 CREATE TABLE core.feature_flags (
-  tenant_id   uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   feature_key text NOT NULL,               -- 'knowledge_base', 'ai_copilot', 'change_management', ...
   enabled     boolean NOT NULL DEFAULT true,
-  PRIMARY KEY (tenant_id, feature_key)
+  PRIMARY KEY (feature_key)
 );
 
 -- Every admin action and privileged change — see Admin > Audit log.
 CREATE TABLE core.audit_log (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id    uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   actor_user_id uuid REFERENCES core.users(id),
   action       text NOT NULL,              -- 'role.updated', 'business_rule.created', ...
   target_type  text NOT NULL,
@@ -176,7 +178,7 @@ CREATE TABLE core.audit_log (
   metadata     jsonb NOT NULL DEFAULT '{}',
   created_at   timestamptz NOT NULL DEFAULT now()
 );
-CREATE INDEX idx_audit_log_tenant_time ON core.audit_log(tenant_id, created_at DESC);
+CREATE INDEX idx_audit_log_time ON core.audit_log(created_at DESC);
 
 
 -- ============================================================================
@@ -191,21 +193,17 @@ CREATE TYPE itsm.ticket_status AS ENUM (
 );
 
 -- Tree-structured, unlimited depth (e.g. Hardware > Laptops > Battery), same
--- self-referencing pattern as docs.folders. One tenant's category tree is
--- independent of another's.
+-- self-referencing pattern as docs.folders.
 CREATE TABLE itsm.ticket_categories (
   id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id           uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   parent_category_id  uuid REFERENCES itsm.ticket_categories(id),
   name                text NOT NULL,
   sort_order          int NOT NULL DEFAULT 0
 );
 CREATE INDEX idx_ticket_categories_parent ON itsm.ticket_categories(parent_category_id);
-CREATE INDEX idx_ticket_categories_tenant ON itsm.ticket_categories(tenant_id);
 
 CREATE TABLE itsm.tickets (
   id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id          uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   ticket_number      text NOT NULL,        -- display id, e.g. 'TS-4833'
   subject            text NOT NULL,
   category_id        uuid REFERENCES itsm.ticket_categories(id),
@@ -221,9 +219,9 @@ CREATE TABLE itsm.tickets (
   merged_into_id     uuid REFERENCES itsm.tickets(id),
   created_at         timestamptz NOT NULL DEFAULT now(),
   updated_at         timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (tenant_id, ticket_number)
+  UNIQUE (ticket_number)
 );
-CREATE INDEX idx_tickets_tenant_status ON itsm.tickets(tenant_id, status);
+CREATE INDEX idx_tickets_status ON itsm.tickets(status);
 CREATE INDEX idx_tickets_assignee ON itsm.tickets(assignee_user_id);
 CREATE INDEX idx_tickets_category ON itsm.tickets(category_id);
 CREATE INDEX idx_tickets_sla_due ON itsm.tickets(sla_due_at) WHERE status NOT IN ('resolved', 'closed', 'merged');
@@ -234,7 +232,6 @@ CREATE TYPE itsm.actor_type AS ENUM ('user', 'contact', 'ai_agent', 'system');
 
 CREATE TABLE itsm.ticket_activity (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id    uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   ticket_id    uuid NOT NULL REFERENCES itsm.tickets(id) ON DELETE CASCADE,
   actor_type   itsm.actor_type NOT NULL,
   actor_user_id uuid REFERENCES core.users(id),
@@ -246,7 +243,6 @@ CREATE INDEX idx_ticket_activity_ticket ON itsm.ticket_activity(ticket_id, creat
 
 CREATE TABLE itsm.ticket_attachments (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id     uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   ticket_id     uuid NOT NULL REFERENCES itsm.tickets(id) ON DELETE CASCADE,
   filename      text NOT NULL,
   content_type  text,
@@ -263,7 +259,6 @@ CREATE INDEX idx_ticket_attachments_ticket ON itsm.ticket_attachments(ticket_id)
 -- doesn't scale as new modules link into tickets.
 CREATE TABLE itsm.ticket_links (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id    uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   ticket_id    uuid NOT NULL REFERENCES itsm.tickets(id) ON DELETE CASCADE,
   linked_type  text NOT NULL,              -- 'ticket' | 'backlog_item' | 'change_request' | 'problem'
   linked_id    uuid NOT NULL,
@@ -276,7 +271,6 @@ CREATE TYPE itsm.problem_status AS ENUM ('open', 'workaround_posted', 'monitorin
 
 CREATE TABLE itsm.problems (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id      uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   problem_number text NOT NULL,            -- 'PRB-0007'
   title          text NOT NULL,
   status         itsm.problem_status NOT NULL DEFAULT 'open',
@@ -285,7 +279,7 @@ CREATE TABLE itsm.problems (
   owner_user_id  uuid REFERENCES core.users(id),
   created_at     timestamptz NOT NULL DEFAULT now(),
   closed_at      timestamptz,
-  UNIQUE (tenant_id, problem_number)
+  UNIQUE (problem_number)
 );
 CREATE TABLE itsm.problem_incidents (
   problem_id  uuid NOT NULL REFERENCES itsm.problems(id) ON DELETE CASCADE,
@@ -298,7 +292,6 @@ CREATE TYPE itsm.change_risk AS ENUM ('low', 'medium', 'high');
 
 CREATE TABLE itsm.change_requests (
   id                     uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id              uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   cr_number              text NOT NULL,    -- 'CR-0091'
   title                  text NOT NULL,
   description            text,
@@ -312,15 +305,14 @@ CREATE TABLE itsm.change_requests (
   deployed_at            timestamptz,
   rollback_plan          text,
   created_at             timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (tenant_id, cr_number)
+  UNIQUE (cr_number)
 );
-CREATE INDEX idx_change_requests_status ON itsm.change_requests(tenant_id, status);
+CREATE INDEX idx_change_requests_status ON itsm.change_requests(status);
 
 CREATE TYPE itsm.approval_decision AS ENUM ('pending', 'approved', 'rejected');
 
 CREATE TABLE itsm.change_approvals (
   id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id          uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   change_request_id  uuid NOT NULL REFERENCES itsm.change_requests(id) ON DELETE CASCADE,
   approval_group_id  uuid REFERENCES core.approval_groups(id),
   approver_user_id   uuid REFERENCES core.users(id),
@@ -331,16 +323,14 @@ CREATE TABLE itsm.change_approvals (
 
 CREATE TABLE itsm.sla_policies (
   id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id         uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   priority          itsm.priority NOT NULL,
   response_minutes  int NOT NULL,
   resolution_minutes int NOT NULL,
-  UNIQUE (tenant_id, priority)
+  UNIQUE (priority)
 );
 
 CREATE TABLE itsm.business_rules (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id   uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   name        text NOT NULL,
   trigger     text NOT NULL,               -- 'ticket.created', 'ticket.escalated', ...
   conditions  jsonb NOT NULL DEFAULT '[]',
@@ -349,21 +339,18 @@ CREATE TABLE itsm.business_rules (
   enabled     boolean NOT NULL DEFAULT true,
   created_at  timestamptz NOT NULL DEFAULT now()
 );
-CREATE INDEX idx_business_rules_tenant_order ON itsm.business_rules(tenant_id, run_order);
+CREATE INDEX idx_business_rules_order ON itsm.business_rules(run_order);
 
 CREATE TABLE itsm.service_catalog_categories (
   id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id           uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   parent_category_id  uuid REFERENCES itsm.service_catalog_categories(id),
   name                text NOT NULL,
   sort_order          int NOT NULL DEFAULT 0
 );
 CREATE INDEX idx_service_catalog_categories_parent ON itsm.service_catalog_categories(parent_category_id);
-CREATE INDEX idx_service_catalog_categories_tenant ON itsm.service_catalog_categories(tenant_id);
 
 CREATE TABLE itsm.service_catalog_items (
   id                      uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id               uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   name                    text NOT NULL,
   description             text,
   category_id             uuid REFERENCES itsm.service_catalog_categories(id),
@@ -375,7 +362,6 @@ CREATE INDEX idx_service_catalog_items_category ON itsm.service_catalog_items(ca
 
 CREATE TABLE itsm.catalog_requests (
   id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id           uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   catalog_item_id     uuid NOT NULL REFERENCES itsm.service_catalog_items(id),
   requested_by_contact_id uuid REFERENCES core.contacts(id),
   ticket_id           uuid REFERENCES itsm.tickets(id),
@@ -385,17 +371,14 @@ CREATE TABLE itsm.catalog_requests (
 
 CREATE TABLE itsm.kb_categories (
   id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id           uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   parent_category_id  uuid REFERENCES itsm.kb_categories(id),
   name                text NOT NULL,
   sort_order          int NOT NULL DEFAULT 0
 );
 CREATE INDEX idx_kb_categories_parent ON itsm.kb_categories(parent_category_id);
-CREATE INDEX idx_kb_categories_tenant ON itsm.kb_categories(tenant_id);
 
 CREATE TABLE itsm.kb_articles (
   id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id         uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   article_number    text,                 -- 'KB-0041'
   title             text NOT NULL,
   body              text NOT NULL,
@@ -411,13 +394,11 @@ CREATE TRIGGER trg_kb_articles_updated BEFORE UPDATE ON itsm.kb_articles
 
 CREATE TABLE itsm.oncall_schedules (
   id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id          uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   name               text NOT NULL,
   escalation_policy  jsonb NOT NULL DEFAULT '{}'  -- L1 -> L2 -> L3 timing/paging rules
 );
 CREATE TABLE itsm.oncall_rotations (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id    uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   schedule_id  uuid NOT NULL REFERENCES itsm.oncall_schedules(id) ON DELETE CASCADE,
   user_id      uuid NOT NULL REFERENCES core.users(id),
   starts_at    timestamptz NOT NULL,
@@ -436,7 +417,6 @@ CREATE TYPE sam.asset_status AS ENUM ('active', 'in_repair', 'idle', 'retired');
 
 CREATE TABLE sam.assets (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id      uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   asset_tag      text NOT NULL,            -- 'HW-00417', 'SW-01188'
   name           text NOT NULL,
   type           sam.asset_type NOT NULL,
@@ -450,16 +430,15 @@ CREATE TABLE sam.assets (
   renews_at      date,
   created_at     timestamptz NOT NULL DEFAULT now(),
   updated_at     timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (tenant_id, asset_tag)
+  UNIQUE (asset_tag)
 );
-CREATE INDEX idx_assets_tenant_type ON sam.assets(tenant_id, type);
+CREATE INDEX idx_assets_type ON sam.assets(type);
 CREATE INDEX idx_assets_renews_at ON sam.assets(renews_at) WHERE status = 'active';
 CREATE TRIGGER trg_assets_updated BEFORE UPDATE ON sam.assets
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 CREATE TABLE sam.asset_assignments (
   id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id       uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   asset_id        uuid NOT NULL REFERENCES sam.assets(id) ON DELETE CASCADE,
   assigned_to_user_id uuid NOT NULL REFERENCES core.users(id),
   assigned_at     timestamptz NOT NULL DEFAULT now(),
@@ -471,7 +450,6 @@ CREATE TYPE sam.renewal_status AS ENUM ('upcoming', 'renewed', 'reclaimed', 'lap
 
 CREATE TABLE sam.license_renewals (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id     uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   asset_id      uuid NOT NULL REFERENCES sam.assets(id) ON DELETE CASCADE,
   renews_at     date NOT NULL,
   value         numeric(12,2),
@@ -485,7 +463,6 @@ CREATE TYPE sam.scan_status AS ENUM ('running', 'completed', 'failed');
 
 CREATE TABLE sam.discovery_scans (
   id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id        uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   scan_type        sam.scan_type NOT NULL,
   status           sam.scan_status NOT NULL DEFAULT 'running',
   assets_found     int NOT NULL DEFAULT 0,
@@ -502,7 +479,6 @@ CREATE SCHEMA IF NOT EXISTS dev;
 
 CREATE TABLE dev.projects (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id   uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   name        text NOT NULL,
   goal        text,
   created_at  timestamptz NOT NULL DEFAULT now()
@@ -510,7 +486,6 @@ CREATE TABLE dev.projects (
 
 CREATE TABLE dev.scrum_teams (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id   uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   project_id  uuid NOT NULL REFERENCES dev.projects(id) ON DELETE CASCADE,
   name        text NOT NULL
 );
@@ -522,7 +497,6 @@ CREATE TABLE dev.team_memberships (
 
 CREATE TABLE dev.epics (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id   uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   project_id  uuid NOT NULL REFERENCES dev.projects(id) ON DELETE CASCADE,
   title       text NOT NULL,
   quarter     text,                       -- 'Q3 2026'
@@ -531,7 +505,6 @@ CREATE TABLE dev.epics (
 
 CREATE TABLE dev.sprints (
   id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id       uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   project_id      uuid NOT NULL REFERENCES dev.projects(id) ON DELETE CASCADE,
   name            text NOT NULL,          -- 'Sprint 34'
   starts_on       date NOT NULL,
@@ -544,7 +517,6 @@ CREATE TYPE dev.card_status AS ENUM ('backlog', 'in_progress', 'in_review', 'don
 
 CREATE TABLE dev.backlog_items (
   id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id        uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   project_id       uuid NOT NULL REFERENCES dev.projects(id) ON DELETE CASCADE,
   card_number      text NOT NULL,          -- 'DEV-1058'
   epic_id          uuid REFERENCES dev.epics(id),
@@ -563,10 +535,10 @@ CREATE TABLE dev.backlog_items (
   ends_on          date,
   created_at       timestamptz NOT NULL DEFAULT now(),
   updated_at       timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (tenant_id, card_number)
+  UNIQUE (card_number)
 );
 CREATE INDEX idx_backlog_items_sprint ON dev.backlog_items(sprint_id);
-CREATE INDEX idx_backlog_items_status ON dev.backlog_items(tenant_id, status);
+CREATE INDEX idx_backlog_items_status ON dev.backlog_items(status);
 CREATE TRIGGER trg_backlog_items_updated BEFORE UPDATE ON dev.backlog_items
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
@@ -579,7 +551,6 @@ CREATE TYPE dev.environment AS ENUM ('dev', 'int', 'uat', 'pre', 'prod');
 
 CREATE TABLE dev.deployments (
   id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id          uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   change_request_id  uuid NOT NULL REFERENCES itsm.change_requests(id) ON DELETE CASCADE,
   environment        dev.environment NOT NULL,
   deployed_by_user_id uuid REFERENCES core.users(id),
@@ -596,14 +567,12 @@ CREATE SCHEMA IF NOT EXISTS docs;
 
 CREATE TABLE docs.folders (
   id               uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id        uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   parent_folder_id uuid REFERENCES docs.folders(id),
   name             text NOT NULL
 );
 
 CREATE TABLE docs.documents (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id     uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   folder_id     uuid REFERENCES docs.folders(id),
   name          text NOT NULL,
   content_type  text,
@@ -616,7 +585,6 @@ CREATE INDEX idx_documents_folder ON docs.documents(folder_id);
 
 CREATE TABLE docs.document_versions (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id      uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   document_id    uuid NOT NULL REFERENCES docs.documents(id) ON DELETE CASCADE,
   version_number int NOT NULL,
   storage_url    text NOT NULL,
@@ -627,14 +595,12 @@ CREATE TABLE docs.document_versions (
 
 CREATE TABLE docs.wiki_spaces (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id   uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   name        text NOT NULL,
   description text
 );
 
 CREATE TABLE docs.wiki_pages (
   id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id       uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   space_id        uuid NOT NULL REFERENCES docs.wiki_spaces(id) ON DELETE CASCADE,
   parent_page_id  uuid REFERENCES docs.wiki_pages(id),
   title           text NOT NULL,
@@ -650,7 +616,6 @@ CREATE TRIGGER trg_wiki_pages_updated BEFORE UPDATE ON docs.wiki_pages
 
 CREATE TABLE docs.wiki_page_history (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id      uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   wiki_page_id   uuid NOT NULL REFERENCES docs.wiki_pages(id) ON DELETE CASCADE,
   version_number int NOT NULL,
   body           text NOT NULL,
@@ -661,7 +626,6 @@ CREATE TABLE docs.wiki_page_history (
 
 CREATE TABLE docs.wiki_comments (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id      uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   wiki_page_id   uuid NOT NULL REFERENCES docs.wiki_pages(id) ON DELETE CASCADE,
   author_user_id uuid REFERENCES core.users(id),
   body           text NOT NULL,
@@ -671,252 +635,12 @@ CREATE INDEX idx_wiki_comments_page ON docs.wiki_comments(wiki_page_id);
 
 
 -- ============================================================================
--- SCHEMA: platform — Trakolo-staff-only: editions, licensing, entitlements,
--- cross-tenant service health, SSP system email, and support intake.
--- Everything here is written by platform admins (saas-admin-*.html), never by
--- tenant users. Tables map directly to the platform console's pages: Home
--- (subscriptions + subscription_history), Pricing (features + plan_features),
--- Error log, Email settings / templates, and Callback requests.
--- ============================================================================
-CREATE SCHEMA IF NOT EXISTS platform;
-
-CREATE TABLE platform.plans (
-  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name           text NOT NULL UNIQUE,     -- 'Free', 'Team', 'Business', 'Enterprise'
-  price_monthly  numeric(10,2),
-  price_yearly   numeric(10,2),
-  seat_based     boolean NOT NULL DEFAULT true,
-  sort_order     int NOT NULL DEFAULT 0,
-  is_active      boolean NOT NULL DEFAULT true
-);
-
--- Feature catalog behind the Pricing page's editable matrix — one row per
--- capability. Platform admins add rows here via "+ Add feature".
-CREATE TABLE platform.features (
-  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  key          text NOT NULL UNIQUE,       -- 'rest_api', 'custom_domain', 'mfa', 'sso', ...
-  category     text NOT NULL DEFAULT 'Essentials',
-  label        text NOT NULL,
-  value_type   text NOT NULL DEFAULT 'boolean' CHECK (value_type IN ('boolean', 'numeric')),
-  sort_order   int NOT NULL DEFAULT 0,
-  is_published boolean NOT NULL DEFAULT true,   -- shown on the public-facing pricing page
-  created_at   timestamptz NOT NULL DEFAULT now()
-);
-
--- The matrix itself: which features each plan includes, and at what limit.
-CREATE TABLE platform.plan_features (
-  plan_id     uuid NOT NULL REFERENCES platform.plans(id) ON DELETE CASCADE,
-  feature_id  uuid NOT NULL REFERENCES platform.features(id) ON DELETE CASCADE,
-  enabled     boolean NOT NULL DEFAULT false,
-  value       text,                        -- numeric limit or label, e.g. '5', 'Unlimited'; null for plain booleans
-  PRIMARY KEY (plan_id, feature_id)
-);
-
-CREATE TYPE platform.subscription_status AS ENUM ('trialing', 'active', 'past_due', 'expired', 'canceled');
-CREATE TYPE platform.contract_type AS ENUM ('monthly', 'yearly', 'perpetual');
-
-CREATE TABLE platform.subscriptions (
-  id                   uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id            uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
-  plan_id              uuid NOT NULL REFERENCES platform.plans(id),
-  status               platform.subscription_status NOT NULL DEFAULT 'trialing',
-  contract_type        platform.contract_type NOT NULL DEFAULT 'yearly',
-  total_license_count  int NOT NULL DEFAULT 1,
-  generated_date       date NOT NULL DEFAULT current_date,
-  contract_from_date   date NOT NULL,
-  contract_to_date     date NOT NULL,
-  drop_dead_date       date NOT NULL,      -- hard cutoff past contract_to_date; access suspended after this
-  license_key          text UNIQUE,
-  generated_by_email   citext,             -- platform staff who generated it
-  created_at           timestamptz NOT NULL DEFAULT now(),
-  updated_at           timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (tenant_id)                       -- one active subscription per tenant
-);
-CREATE TRIGGER trg_subscriptions_updated BEFORE UPDATE ON platform.subscriptions
-  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
-
--- Every Renew / Upgrade / Downgrade from the Home page, so "why did this
--- tenant's contract change" always has an answer.
-CREATE TYPE platform.subscription_action AS ENUM ('generated', 'renewed', 'upgraded', 'downgraded', 'cancelled');
-
-CREATE TABLE platform.subscription_history (
-  id                         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  subscription_id            uuid NOT NULL REFERENCES platform.subscriptions(id) ON DELETE CASCADE,
-  action                     platform.subscription_action NOT NULL,
-  previous_plan_id           uuid REFERENCES platform.plans(id),
-  new_plan_id                uuid REFERENCES platform.plans(id),
-  previous_license_count     int,
-  new_license_count          int,
-  previous_contract_to_date  date,
-  new_contract_to_date       date,
-  cost                       numeric(12,2),
-  performed_by_email         citext,
-  note                       text,
-  created_at                 timestamptz NOT NULL DEFAULT now()
-);
-CREATE INDEX idx_subscription_history_subscription ON platform.subscription_history(subscription_id, created_at DESC);
-
--- Per-tenant, per-feature overrides on top of the plan (e.g. a trial add-on).
-CREATE TABLE platform.tenant_entitlements (
-  tenant_id    uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
-  feature_key  text NOT NULL,
-  enabled      boolean NOT NULL DEFAULT true,
-  PRIMARY KEY (tenant_id, feature_key)
-);
-
-CREATE TYPE platform.service_status AS ENUM ('operational', 'degraded', 'outage');
-
--- Cross-tenant infra health — what Admin > System status reads from.
-CREATE TABLE platform.services (
-  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name           text NOT NULL UNIQUE,     -- 'API service', 'Database', 'AI agent worker', ...
-  status         platform.service_status NOT NULL DEFAULT 'operational',
-  last_checked_at timestamptz NOT NULL DEFAULT now()
-);
-
--- Home > Error log: platform + per-tenant API/background-job failures.
-CREATE TYPE platform.log_type AS ENUM ('info', 'warning', 'error');
-
-CREATE TABLE platform.error_logs (
-  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id     uuid REFERENCES core.tenants(id) ON DELETE CASCADE,   -- null = platform-wide
-  service_name  text NOT NULL,
-  api_method    text,
-  api_url       text,
-  log_type      platform.log_type NOT NULL DEFAULT 'error',
-  message       text NOT NULL,
-  logged_on     timestamptz NOT NULL DEFAULT now()
-);
-CREATE INDEX idx_error_logs_tenant_time ON platform.error_logs(tenant_id, logged_on DESC);
-
--- Outbound mail accounts used for SSP system email (signup, password reset —
--- not the tenant's own ticket-ingestion mailboxes, see core.integrations).
-CREATE TABLE platform.ssp_email_settings (
-  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name                text NOT NULL,
-  provider            text NOT NULL DEFAULT 'smtp' CHECK (provider IN ('smtp', 'outlook', 'gmail')),
-  from_address        citext NOT NULL,
-  client_id           text,
-  client_secret_hash  text,               -- never store the raw secret
-  smtp_host           text,
-  smtp_port           int,
-  is_active           boolean NOT NULL DEFAULT true,
-  created_at          timestamptz NOT NULL DEFAULT now()
-);
-
--- System email templates the SSP sends on account-lifecycle events.
-CREATE TABLE platform.ssp_email_templates (
-  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  code           text NOT NULL UNIQUE,   -- 'signup', 'account_created', 'forgot_password', 'reset_password'
-  name           text NOT NULL,
-  subject        text NOT NULL,
-  body_html      text NOT NULL,
-  dynamic_fields text[] NOT NULL DEFAULT '{}',
-  updated_at     timestamptz NOT NULL DEFAULT now()
-);
-CREATE TRIGGER trg_ssp_email_templates_updated BEFORE UPDATE ON platform.ssp_email_templates
-  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
-
--- "Request a callback" leads from the pricing/marketing site and SSP login.
-CREATE TYPE platform.callback_status AS ENUM ('new', 'contacted', 'closed');
-
-CREATE TABLE platform.callback_requests (
-  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id      uuid REFERENCES core.tenants(id),
-  name           text NOT NULL,
-  mobile_number  text,
-  email          citext,
-  available_at   timestamptz,
-  status         platform.callback_status NOT NULL DEFAULT 'new',
-  created_at     timestamptz NOT NULL DEFAULT now()
-);
-
--- Every privileged action a Trakolo staff member takes in the platform
--- console — separate from core.audit_log, which is per-tenant.
-CREATE TABLE platform.staff_audit_log (
-  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  staff_email citext NOT NULL,
-  action      text NOT NULL,        -- 'subscription.renewed', 'plan_feature.toggled', ...
-  target_type text NOT NULL,
-  target_id   uuid,
-  metadata    jsonb NOT NULL DEFAULT '{}',
-  created_at  timestamptz NOT NULL DEFAULT now()
-);
-CREATE INDEX idx_staff_audit_log_time ON platform.staff_audit_log(created_at DESC);
-
--- Inbound sales enquiries — phone calls logged by staff, web/referral leads —
--- ahead of becoming a core.tenants row. See Platform Admin > Leads.
-CREATE TYPE platform.lead_source AS ENUM ('phone', 'web', 'referral', 'email', 'walk_in', 'other');
-CREATE TYPE platform.lead_status AS ENUM ('new', 'contacted', 'qualified', 'converted', 'lost');
-
-CREATE TABLE platform.leads (
-  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  contact_name        text NOT NULL,
-  organisation_name   text NOT NULL,
-  organisation_notes  text,                    -- industry, size, anything freeform from the call
-  email               citext,
-  phone               text,
-  users_interested    int,
-  modules_interested  text[] NOT NULL DEFAULT '{}',   -- 'IT', 'SAM', 'Dev', 'Ops', 'Docs'
-  source              platform.lead_source NOT NULL DEFAULT 'other',
-  status              platform.lead_status NOT NULL DEFAULT 'new',
-  notes               text,
-  converted_tenant_id uuid REFERENCES core.tenants(id),   -- set once they sign
-  logged_by_email     citext,
-  created_at          timestamptz NOT NULL DEFAULT now()
-);
-CREATE INDEX idx_leads_status ON platform.leads(status);
-
--- Who Trakolo staff actually call at each account — sales/success-facing,
--- distinct from core.contacts (the tenant's own SSP requesters).
-CREATE TABLE platform.account_contacts (
-  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id   uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
-  name        text NOT NULL,
-  title       text,
-  email       citext,
-  phone       text,
-  is_primary  boolean NOT NULL DEFAULT false,
-  created_at  timestamptz NOT NULL DEFAULT now()
-);
-CREATE INDEX idx_account_contacts_tenant ON platform.account_contacts(tenant_id);
-
--- Promotional email blasts to the customer base — separate from
--- ssp_email_templates, which is transactional account-lifecycle mail.
-CREATE TYPE platform.campaign_segment AS ENUM ('all', 'by_plan', 'by_status', 'custom');
-CREATE TYPE platform.campaign_status AS ENUM ('draft', 'sent');
-
-CREATE TABLE platform.campaigns (
-  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  subject         text NOT NULL,
-  body_html       text NOT NULL,
-  segment         platform.campaign_segment NOT NULL DEFAULT 'all',
-  segment_plan_id uuid REFERENCES platform.plans(id),   -- set when segment = 'by_plan'
-  status          platform.campaign_status NOT NULL DEFAULT 'draft',
-  sent_by_email   citext,
-  sent_at         timestamptz,
-  created_at      timestamptz NOT NULL DEFAULT now()
-);
-
-CREATE TABLE platform.campaign_recipients (
-  campaign_id  uuid NOT NULL REFERENCES platform.campaigns(id) ON DELETE CASCADE,
-  tenant_id    uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
-  opened_at    timestamptz,
-  PRIMARY KEY (campaign_id, tenant_id)
-);
 
 
 -- ============================================================================
--- Seed: one demo tenant + the plan catalog, matching the mockup's data
+-- Seed: this database's own workspace row. id/tenant_id/slug must match the
+-- corresponding row in trakolo-master's core.tenants exactly — that's the
+-- entire link between the two databases.
 -- ============================================================================
-INSERT INTO core.tenants (name, slug, edition) VALUES ('Acme Corp', 'acme', 'cloud');
-
-INSERT INTO platform.plans (name, price_monthly, price_yearly, seat_based, sort_order) VALUES
-  ('Free',       0,     0,     true, 0),
-  ('Team',       6.30,  63.00, true, 1),
-  ('Business',   14.00, 140.00, true, 2),
-  ('Enterprise', NULL,  NULL,  true, 3);   -- custom pricing, quoted per deal
-
-INSERT INTO platform.subscriptions (tenant_id, plan_id, status, contract_type, total_license_count, contract_from_date, contract_to_date, drop_dead_date)
-SELECT t.id, p.id, 'active', 'monthly', 84, '2026-03-01', '2027-03-01', '2027-03-15'
-FROM core.tenants t, platform.plans p WHERE t.slug = 'acme' AND p.name = 'Team';
+INSERT INTO core.workspace (tenant_id, name, slug, deployment_model) VALUES
+  ('a1111111-1111-4111-8111-111111111111', 'Acme Corp', 'acme', 'cloud');

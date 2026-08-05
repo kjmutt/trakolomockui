@@ -187,15 +187,16 @@
       <h2>How this becomes a real product</h2>
       <p>Multi-tenant architecture, subdomain routing, hybrid database model, background services — not part of the product itself, internal reference.</p>
       <div class="mod-links">
-        <a href="technical-design.html">Application architecture <span class="desc">reference architecture — app fleet, tenant routing, hybrid data tier, job-type-split background services, monitoring</span></a>
+        <a href="technical-design.html">Application architecture <span class="desc">reference architecture — app fleet, tenant routing, database-per-tenant data tier, job-type-split background services, monitoring</span></a>
         <a href="cloud-hosting-azure.html">Cloud hosting <span class="desc">Azure reference stack, AWS-vs-Azure comparison &amp; the standalone on-premise install</span></a>
         <a href="system-requirements.html">System requirements <span class="desc">service versions, on-prem hardware sizing &amp; cloud SaaS capacity planning by concurrent-user tier</span></a>
         <a href="how-it-works.html">How it works <span class="desc">the same architecture explained in plain English with an office-building analogy</span></a>
         <a href="release-engineering.html">Release engineering &amp; DR <span class="desc">branching, environments, the promotion pipeline, testing gates, production updates &amp; disaster recovery</span></a>
         <a href="api-reference.html">API reference <span class="desc">the REST API behind the gateway — auth, versioning, rate limits, endpoints &amp; a downloadable OpenAPI spec</span></a>
-        <a href="deployment-options.html">Deployment options <span class="desc">SaaS vs. Enterprise vs. on-premise, plus the AKS/EKS microservices alternative</span></a>
-        <a href="db/schema.sql">Database schema <span class="desc">PostgreSQL schema for the full data model — tickets, assets, sprints, docs, tenancy &amp; roles</span></a>
-        <a href="er-diagram.html">Entity relationships <span class="desc">all 117 foreign keys across the 56 tables, extracted from a live database</span></a>
+        <a href="deployment-options.html">Deployment options <span class="desc">Cloud vs. on-premise, plus the AKS/EKS microservices alternative</span></a>
+        <a href="db/schema.sql">Database schema — per tenant <span class="desc">PostgreSQL schema applied once per cloud tenant's dedicated database — tickets, assets, sprints, docs, identity &amp; roles</span></a>
+        <a href="db/schema-master.sql">Database schema — trakolo-master <span class="desc">Trakolo's own control-plane database — the tenant registry, plans, subscriptions, leads, campaigns</span></a>
+        <a href="er-diagram.html">Entity relationships <span class="desc">all 85 foreign keys across the 69 tables in trakolo-master and the per-tenant database, extracted from a live database</span></a>
         <a href="install/docker-compose.yml">docker-compose.yml <span class="desc">Standalone/on-premise reference stack — Postgres, Redis, schema migration, app</span></a>
         <a href="install/install.sh">install.sh <span class="desc">one-command installer — generates .env, brings up the stack, applies the schema</span></a>
       </div>

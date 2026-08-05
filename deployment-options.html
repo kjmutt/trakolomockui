@@ -77,20 +77,20 @@
 
   <div class="card" style="margin-bottom:22px;">
     <div class="section-label">In one line</div>
-    <div class="page-desc" style="margin-top:2px;">Default every customer to shared-cluster SaaS; move to a dedicated database (still the same modular-monolith app) the moment a contract requires data isolation; reserve on-premise for air-gapped or data-residency requirements the cloud genuinely can't satisfy. Full microservices-on-Kubernetes is a real, documented option below — held in reserve for the 50,000-concurrent-user inflection point already flagged in <a href="system-requirements.html" style="color:var(--indigo-text);">System requirements</a>, not adopted today.</div>
+    <div class="page-desc" style="margin-top:2px;">Every cloud customer — Free through Enterprise — gets its own Postgres database from day one, routed to by the trakolo-master control-plane database; move a tenant onto its own dedicated physical cluster (still the same modular-monolith app) the moment a contract requires it. Reserve on-premise for air-gapped or data-residency requirements the cloud genuinely can't satisfy. Full microservices-on-Kubernetes is a real, documented option below — held in reserve for the 50,000-concurrent-user inflection point already flagged in <a href="system-requirements.html" style="color:var(--indigo-text);">System requirements</a>, not adopted today.</div>
   </div>
 
   <div class="section-label" style="margin-bottom:12px;">Which deployment fits which scenario</div>
   <div class="panel" style="margin-bottom:22px;">
     <table class="layer-ref">
-      <thead><tr><th></th><th>SaaS — shared</th><th>SaaS — Enterprise</th><th>On-premise</th></tr></thead>
+      <thead><tr><th></th><th>Cloud (SaaS)</th><th>On-premise</th></tr></thead>
       <tbody>
-        <tr><td style="color:var(--indigo-text);">Who it's for</td><td>Free, Team, Business plans</td><td>Large accounts needing data isolation</td><td>Air-gapped networks, strict data residency, perpetual-license buyers</td></tr>
-        <tr><td style="color:var(--violet-text);">Data isolation</td><td>Row-level, shared Postgres cluster (<span class="id-mono">tenant_id</span>)</td><td>Dedicated Postgres + storage, same shared app fleet</td><td>Single-tenant by construction — nothing else on the box</td></tr>
-        <tr><td style="color:var(--amber-text);">Compute</td><td>Shared pool, no pinning</td><td>Shared by default; <span class="id-mono">compute_pool</span> can dedicate it if contractually required</td><td>Customer's own hardware/VM, sized per <a href="system-requirements.html" style="color:var(--amber-text);font-weight:600;">System requirements</a></td></tr>
-        <tr><td style="color:var(--green-text);">Cost model</td><td>Lowest — shared infrastructure amortized across tenants</td><td>Higher — dedicated DB/storage cost, same app cost</td><td>Perpetual license + customer's own infra spend</td></tr>
-        <tr><td style="color:var(--ink-2);">Ops burden</td><td>Fully Trakolo-operated</td><td>Fully Trakolo-operated</td><td>Customer-operated — one <span class="id-mono">docker compose up</span>, per <a href="cloud-hosting-azure.html" style="color:var(--ink-2);font-weight:600;">Cloud hosting</a></td></tr>
-        <tr><td style="color:var(--coral-text);">Recommended when</td><td>Default for every new customer</td><td>Contract explicitly requires isolated data at rest</td><td>Regulatory/network requirement makes any shared cloud a non-starter</td></tr>
+        <tr><td style="color:var(--indigo-text);">Who it's for</td><td>Every plan, Free through Enterprise</td><td>Air-gapped networks, strict data residency, perpetual-license buyers</td></tr>
+        <tr><td style="color:var(--violet-text);">Data isolation</td><td>One dedicated Postgres database per tenant (see <a href="db/schema.sql" style="color:var(--violet-text);font-weight:600;">db/schema.sql</a>), routed to via trakolo-master — a boundary Postgres enforces itself, not application-level <span class="id-mono">tenant_id</span> scoping</td><td>Single-tenant by construction — nothing else on the box, no Trakolo-managed domain at all</td></tr>
+        <tr><td style="color:var(--amber-text);">Compute</td><td>Shared pool, no pinning by default; a tenant's database — and optionally its compute — can move to a dedicated physical cluster the moment a contract requires it</td><td>Customer's own hardware/VM, sized per <a href="system-requirements.html" style="color:var(--amber-text);font-weight:600;">System requirements</a></td></tr>
+        <tr><td style="color:var(--green-text);">Cost model</td><td>Lowest on the default pooled cluster; a dedicated physical cluster costs more for the same app</td><td>Perpetual license + customer's own infra spend</td></tr>
+        <tr><td style="color:var(--ink-2);">Ops burden</td><td>Fully Trakolo-operated</td><td>Customer-operated — one <span class="id-mono">docker compose up</span>, per <a href="cloud-hosting-azure.html" style="color:var(--ink-2);font-weight:600;">Cloud hosting</a></td></tr>
+        <tr><td style="color:var(--coral-text);">Recommended when</td><td>Default for every new customer</td><td>Regulatory/network requirement makes any shared cloud a non-starter</td></tr>
       </tbody>
     </table>
   </div>
@@ -98,20 +98,20 @@
   <div class="grid-3" style="margin-bottom:26px;">
     <div class="opt-card o-saas">
       <div class="oname">Startup / SMB</div>
-      <div class="odesc">SaaS shared tier, no exceptions. Cheapest, fastest to onboard, and the row-level tenant_id model already gives real isolation guarantees enforced by the database itself — see <a href="er-diagram.html" style="color:var(--indigo-text);">Entity relationships</a>.</div>
+      <div class="odesc">Cloud, pooled physical cluster (default). Cheapest, fastest to onboard — and each tenant already has its own dedicated Postgres database, so isolation doesn't depend on getting a query-level filter right. See <a href="er-diagram.html" style="color:var(--indigo-text);">Entity relationships</a>.</div>
     </div>
     <div class="opt-card o-ent">
       <div class="oname">Mid-market / regulated</div>
-      <div class="odesc">SaaS with the dedicated-database flag on. Same app, same release train, same on-call — only the database and storage bucket are exclusive. This is a config difference, not a fork.</div>
+      <div class="odesc">Cloud, dedicated physical cluster. Same app, same release train, same on-call — only this tenant's already-dedicated database moves off the shared cluster onto its own. A trakolo-master config change (<span class="id-mono">db_host</span>), not a fork.</div>
     </div>
     <div class="opt-card o-prem">
       <div class="oname">Government / air-gapped</div>
-      <div class="odesc">On-premise perpetual license. <span class="id-mono">install/docker-compose.yml</span> plus offline <span class="id-mono">.trklic</span> activation — see the Standalone section of <a href="cloud-hosting-azure.html" style="color:var(--amber-text);font-weight:600;">Cloud hosting</a>.</div>
+      <div class="odesc">On-premise perpetual license — no Trakolo-hosted subdomain or database at all. <span class="id-mono">install/docker-compose.yml</span> plus offline <span class="id-mono">.trklic</span> activation — see the Standalone section of <a href="cloud-hosting-azure.html" style="color:var(--amber-text);font-weight:600;">Cloud hosting</a>.</div>
     </div>
   </div>
 
   <div class="section-label" style="margin-bottom:12px;">If you outgrow the modular monolith — microservices on Kubernetes</div>
-  <div class="page-desc" style="margin:-6px 0 12px;">Not what's recommended today — <a href="technical-design.html" style="color:var(--indigo-text);">Application architecture</a>'s modular monolith is justified by 117 real foreign keys across the schema, including tickets ↔ backlog items pointing at each other directly. Splitting that into services means distributed transactions across a genuinely tight data model. This is what it would look like <i>if</i> a single deployment ever needed independent per-module scaling or release cadence badly enough to accept that cost — held in reserve for the 50,000-concurrent-user inflection point in <a href="system-requirements.html" style="color:var(--indigo-text);">System requirements</a>, not a current plan.</div>
+  <div class="page-desc" style="margin:-6px 0 12px;">Not what's recommended today — <a href="technical-design.html" style="color:var(--indigo-text);">Application architecture</a>'s modular monolith is justified by 70 real foreign keys within a single tenant's database, including tickets ↔ backlog items pointing at each other directly. Splitting that into services means distributed transactions across a genuinely tight data model. This is what it would look like <i>if</i> a single deployment ever needed independent per-module scaling or release cadence badly enough to accept that cost — held in reserve for the 50,000-concurrent-user inflection point in <a href="system-requirements.html" style="color:var(--indigo-text);">System requirements</a>, not a current plan.</div>
 
   <div class="card" style="margin-bottom:22px;background:var(--coral-bg);border-color:#F0C4B2;">
     <div class="section-label" style="color:var(--coral-text);">Orchestrator choice does not fix duplicate-job bugs</div>

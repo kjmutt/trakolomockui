@@ -20,8 +20,9 @@ Static HTML/CSS/JS mockups for Trakolo: an IT service desk, asset tracking (SAM)
 - `admin.html` — workspace settings (SLAs, routing, users, portal config)
 - `contact.html`, `track.html` — public support pages
 - `styles.css` — shared design system (design tokens, components)
-- `db/schema.sql` — PostgreSQL schema for the data model implied by the mockup (tickets, problems, changes, assets, sprints, docs/wiki, tenancy & roles), for when this becomes a real backend
+- `db/schema.sql` — PostgreSQL schema applied once per cloud tenant's own dedicated database, and identically for a standalone/on-premise install (tickets, problems, changes, assets, sprints, docs/wiki, identity & roles) — no `tenant_id` column, the database itself is the tenant boundary
+- `db/schema-master.sql` — Trakolo's own control-plane database ("trakolo-master"): the tenant registry (which database and subdomain each cloud tenant routes to) plus every table behind the Platform Admin console (plans, subscriptions, leads, campaigns, error log)
 
 ## Notes
 
-This is a static, front-end-only mockup — there's no backend or auth behind any of it. Form submissions and "sign in" buttons link to other mockup pages to simulate a flow; nothing is persisted. `db/schema.sql` is a forward-looking companion piece, not something the mockup runs against.
+This is a static, front-end-only mockup — there's no backend or auth behind any of it. Form submissions and "sign in" buttons link to other mockup pages to simulate a flow; nothing is persisted. `db/schema.sql` and `db/schema-master.sql` are forward-looking companion pieces, not something the mockup runs against.

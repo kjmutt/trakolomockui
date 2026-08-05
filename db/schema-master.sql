@@ -1,119 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Trakolo — platform schema</title>
-<link rel="stylesheet" href="styles.css">
-<style>
-  .plat-wrap{max-width:1180px;margin:0 auto;padding:32px 40px 60px;}
-  .plat-card{background:#151F1B;border:1px solid #26362F;border-radius:14px;}
-  .plat-mcard{background:#151F1B;border:1px solid #26362F;border-radius:12px;padding:16px 18px;}
-  .plat-mcard .mlabel{font-size:11px;color:#7C948A;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.5px;}
-  .plat-mcard .mval{font-family:var(--font-display);font-size:23px;font-weight:700;margin-top:6px;color:#fff;}
-  .section-title{font-family:var(--font-display);font-size:16px;font-weight:700;color:#fff;margin:26px 0 12px;}
-  .section-title:first-of-type{margin-top:0;}
-  .rel-list{margin:0;padding-left:18px;font-size:12.5px;color:#B9C7C0;line-height:1.8;}
-  .rel-list b{color:#EAF2ED;font-weight:600;}
-  .tbl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-  @media (max-width:900px){.tbl-grid{grid-template-columns:1fr 1fr;}}
-  @media (max-width:640px){.tbl-grid{grid-template-columns:1fr;}}
-  .tbl-item{background:#151F1B;border:1px solid #26362F;border-radius:10px;padding:13px 15px;}
-  .tbl-item .tname{font-family:var(--font-mono);font-size:12.5px;font-weight:600;color:#5DCAA5;}
-  .tbl-item .tdesc{font-size:12px;color:#8FA79C;margin-top:5px;line-height:1.5;}
-  .code-block{background:#0B120F;border:1px solid #26362F;border-radius:12px;padding:18px 20px;font-family:var(--font-mono);font-size:11.5px;line-height:1.65;color:#B9C7C0;overflow-x:auto;white-space:pre;max-height:640px;overflow-y:auto;}
-  .code-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-  .copy-btn{font-family:var(--font-body);font-size:11.5px;font-weight:600;padding:6px 12px;border-radius:7px;border:1px solid #2B3B33;background:#1B2620;color:#D6E4DE;cursor:pointer;}
-  .copy-btn:hover{background:#26362F;}
-  .link-row{display:flex;gap:10px;flex-wrap:wrap;}
-</style>
-</head>
-<body class="platform-body">
-<div class="platform-header">
-  <a class="brand" href="index.html">
-    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#1B2E27" stroke="#5DCAA5" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#5DCAA5" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5"/><circle cx="100" cy="100" r="16" fill="#5DCAA5"/><circle cx="150" cy="50" r="21" fill="#5DCAA5"/></svg>
-    <span class="brand-name">Trakolo</span>
-    <span class="plat-tag">Platform</span>
-  </a>
-  <div class="top-right"><a href="saas-admin-login.html">Sign out</a></div>
-</div>
-<div class="plat-tabstrip">
-  <a href="saas-admin-console.html">Home</a>
-  <a href="saas-admin-errorlog.html">Error log</a>
-  <a href="saas-admin-pricing.html">Pricing</a>
-  <a href="saas-admin-plans.html">Entitlements</a>
-  <a href="saas-admin-email-settings.html">Email settings</a>
-  <a href="saas-admin-email-templates.html">Email templates</a>
-  <a href="saas-admin-callback-requests.html">Callback requests</a>
-  <a href="saas-admin-leads.html">Leads</a>
-  <a href="saas-admin-campaigns.html">Campaigns</a>
-  <a href="saas-admin-services.html">Services</a>
-  <a href="saas-admin-billing.html">Billing &amp; payments</a>
-  <a href="saas-admin-technical.html" class="active">Technical</a>
-</div>
+-- ============================================================================
+-- trakolo-master — the platform control-plane database (PostgreSQL 14+)
+--
+-- One database, owned by Trakolo, never by a tenant. It holds the tenant
+-- registry (core.tenants) and every table behind the Platform Admin console
+-- (platform.*: plans, pricing, subscriptions, leads, campaigns, error log,
+-- email settings/templates, callback requests, staff audit log). It holds
+-- no ticket, asset, backlog, or document data — that lives in each cloud
+-- tenant's own dedicated database (see db/schema.sql), applied once per
+-- tenant and routed to by core.tenants.db_host/db_name below.
+--
+-- Standalone/on-premise tenants are the exception: they run db/schema.sql on
+-- their own Postgres, on their own network, with no subdomain and no
+-- database connection Trakolo can reach. Their core.tenants row here exists
+-- for licensing and reporting only — db_host/db_name/subdomain stay NULL by
+-- the CHECK constraint below, and last_license_checkin_at is the only signal
+-- Trakolo gets back from them (via periodic .trklic license validation, not
+-- a live connection).
+--
+-- Apply with:  psql -d trakolo_master -f db/schema-master.sql
+-- ============================================================================
 
-<div class="plat-wrap">
-  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px;gap:20px;flex-wrap:wrap;">
-    <div>
-      <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;">trakolo-master schema</div>
-      <div style="font-size:13px;color:#8FA79C;margin-top:4px;max-width:640px;">The tenant registry (<span class="id-mono">core.tenants</span>) plus the <span class="id-mono">platform</span> schema in db/schema-master.sql — the control-plane database backing every page in this console. Extracted directly from the live file, not retyped.</div>
-    </div>
-    <div class="link-row">
-      <a href="db/schema-master.sql" class="btn sm" style="background:#1B2620;border-color:#2B3B33;color:#D6E4DE;">Full db/schema-master.sql →</a>
-      <a href="er-diagram.html" class="btn sm" style="background:#1B2620;border-color:#2B3B33;color:#D6E4DE;">App-wide ER diagram →</a>
-      <a href="technical-design.html" class="btn sm" style="background:#1B2620;border-color:#2B3B33;color:#D6E4DE;">Architecture →</a>
-    </div>
-  </div>
+CREATE EXTENSION IF NOT EXISTS pgcrypto; -- gen_random_uuid()
+CREATE EXTENSION IF NOT EXISTS citext;   -- case-insensitive email columns
 
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0;">
-    <div class="plat-mcard"><div class="mlabel">Tables</div><div class="mval">17</div></div>
-    <div class="plat-mcard"><div class="mlabel">Foreign keys</div><div class="mval">15</div></div>
-    <div class="plat-mcard"><div class="mlabel">Enum types</div><div class="mval">11</div></div>
-    <div class="plat-mcard"><div class="mlabel">Written by</div><div class="mval" style="font-size:15px;">Platform admins only</div></div>
-  </div>
+-- Shared trigger: every table with updated_at gets touched automatically.
+CREATE OR REPLACE FUNCTION set_updated_at() RETURNS trigger AS $$
+BEGIN
+  NEW.updated_at := now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
-  <div class="section-title">How the tables relate</div>
-  <div class="plat-card" style="padding:18px 20px;">
-    <ul class="rel-list">
-      <li><b>plans</b> → subscriptions ← tenants — one active license per tenant</li>
-      <li><b>subscriptions</b> → subscription_history — every Renew/Upgrade on Home, audited</li>
-      <li><b>plans</b> ↔ features (via plan_features) — the Pricing page's edition matrix</li>
-      <li><b>tenants</b> → tenant_entitlements — per-tenant overrides on top of the plan</li>
-      <li><b>tenants</b> → error_logs, callback_requests (both nullable — platform-wide rows allowed)</li>
-      <li><b>tenants</b> → account_contacts — who Trakolo staff actually call at each account</li>
-      <li><b>leads</b> → tenants (converted_tenant_id) — set once a phone/web enquiry signs</li>
-      <li><b>campaigns</b> ↔ tenants (via campaign_recipients) — who got which promo email</li>
-      <li><b>services</b>, <b>ssp_email_settings</b>, <b>ssp_email_templates</b>, <b>staff_audit_log</b> stand alone — no tenant_id, platform-scoped by design</li>
-    </ul>
-  </div>
-
-  <div class="section-title">Tables, at a glance</div>
-  <div class="tbl-grid">
-    <div class="tbl-item"><div class="tname">core.tenants</div><div class="tdesc">The tenant registry — cloud tenants route to their own database via subdomain/db_host/db_name; standalone tenants have neither.</div></div>
-    <div class="tbl-item"><div class="tname">platform.plans</div><div class="tdesc">The edition catalog — Free, Team, Business, Enterprise.</div></div>
-    <div class="tbl-item"><div class="tname">platform.features</div><div class="tdesc">Feature catalog behind the Pricing page's "+ Add feature".</div></div>
-    <div class="tbl-item"><div class="tname">platform.plan_features</div><div class="tdesc">The matrix itself — which features each edition includes.</div></div>
-    <div class="tbl-item"><div class="tname">platform.subscriptions</div><div class="tdesc">One row per tenant — contract dates, license count, drives Home.</div></div>
-    <div class="tbl-item"><div class="tname">platform.subscription_history</div><div class="tdesc">Audit trail for every Renew / Upgrade / Downgrade.</div></div>
-    <div class="tbl-item"><div class="tname">platform.tenant_entitlements</div><div class="tdesc">Per-tenant feature overrides — the Entitlements page.</div></div>
-    <div class="tbl-item"><div class="tname">platform.services</div><div class="tdesc">Cross-tenant infra health registry.</div></div>
-    <div class="tbl-item"><div class="tname">platform.error_logs</div><div class="tdesc">API/job failures behind the Error log page.</div></div>
-    <div class="tbl-item"><div class="tname">platform.ssp_email_settings</div><div class="tdesc">Outbound mail accounts for SSP system email.</div></div>
-    <div class="tbl-item"><div class="tname">platform.ssp_email_templates</div><div class="tdesc">Sign-up, account-created, forgot/reset-password copy.</div></div>
-    <div class="tbl-item"><div class="tname">platform.callback_requests</div><div class="tdesc">Leads from the marketing site's callback form.</div></div>
-    <div class="tbl-item"><div class="tname">platform.staff_audit_log</div><div class="tdesc">Every privileged action a Trakolo staffer takes here.</div></div>
-    <div class="tbl-item"><div class="tname">platform.leads</div><div class="tdesc">Phone/web/referral enquiries, ahead of becoming a tenant.</div></div>
-    <div class="tbl-item"><div class="tname">platform.account_contacts</div><div class="tdesc">Who Trakolo staff call at each account.</div></div>
-    <div class="tbl-item"><div class="tname">platform.campaigns</div><div class="tdesc">Promotional email blasts to the customer base.</div></div>
-    <div class="tbl-item"><div class="tname">platform.campaign_recipients</div><div class="tdesc">Who got which campaign, and whether they opened it.</div></div>
-  </div>
-
-  <div class="section-title">DDL</div>
-  <div class="plat-card" style="padding:18px 20px;">
-    <div class="code-head">
-      <span style="font-size:12px;color:#7C948A;font-family:var(--font-mono);">db/schema-master.sql — verbatim</span>
-      <button class="copy-btn" onclick="copySchema()">⧉ Copy</button>
-    </div>
-    <pre class="code-block" id="schema-code">-- ============================================================================
+-- ============================================================================
 -- SCHEMA: core — the tenant registry. This is the ONLY core table in
 -- trakolo-master; everything else core.* (users, roles, teams, ...) lives
 -- per-tenant, in the database this table points to.
@@ -129,14 +47,17 @@ CREATE TABLE core.tenants (
   deployment_model         core.deployment_model NOT NULL DEFAULT 'cloud',
 
   -- Cloud only: how the app fleet finds and routes to this tenant's
-  -- dedicated database.
-  subdomain                text UNIQUE,              -- 'acme' -&gt; acme.trakolo.com
+  -- dedicated database. subdomain resolves to db_host/db_name on every
+  -- request (see technical-design.html); wildcard DNS + TLS cover every
+  -- subdomain, so adding a tenant never touches edge config.
+  subdomain                text UNIQUE,              -- 'acme' -> acme.trakolo.com
   db_host                  text,                      -- e.g. 'tenant-db-12.postgres.trakolo.internal'
   db_name                  text,                      -- e.g. 'trakolo_acme'
   db_provisioned_at        timestamptz,
 
   -- Standalone/on-premise only: no Trakolo-managed domain and no database
-  -- Trakolo can connect to — the customer's own network owns both.
+  -- Trakolo can connect to — the customer's own network owns both. These
+  -- columns exist purely for license lifecycle, never for routing.
   install_contact_email    citext,
   last_license_checkin_at  timestamptz,
 
@@ -249,7 +170,7 @@ CREATE TABLE platform.tenant_entitlements (
 
 CREATE TYPE platform.service_status AS ENUM ('operational', 'degraded', 'outage');
 
--- Cross-tenant infra health — what Admin &gt; System status reads from.
+-- Cross-tenant infra health — what Admin > System status reads from.
 CREATE TABLE platform.services (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name           text NOT NULL UNIQUE,     -- 'API service', 'Database', 'AI agent worker', ...
@@ -257,7 +178,7 @@ CREATE TABLE platform.services (
   last_checked_at timestamptz NOT NULL DEFAULT now()
 );
 
--- Home &gt; Error log: platform + per-tenant API/background-job failures.
+-- Home > Error log: platform + per-tenant API/background-job failures.
 CREATE TYPE platform.log_type AS ENUM ('info', 'warning', 'error');
 
 CREATE TABLE platform.error_logs (
@@ -328,7 +249,7 @@ CREATE TABLE platform.staff_audit_log (
 CREATE INDEX idx_staff_audit_log_time ON platform.staff_audit_log(created_at DESC);
 
 -- Inbound sales enquiries — phone calls logged by staff, web/referral leads —
--- ahead of becoming a core.tenants row. See Platform Admin &gt; Leads.
+-- ahead of becoming a core.tenants row. See Platform Admin > Leads.
 CREATE TYPE platform.lead_source AS ENUM ('phone', 'web', 'referral', 'email', 'walk_in', 'other');
 CREATE TYPE platform.lead_status AS ENUM ('new', 'contacted', 'qualified', 'converted', 'lost');
 
@@ -386,21 +307,34 @@ CREATE TABLE platform.campaign_recipients (
   tenant_id    uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
   opened_at    timestamptz,
   PRIMARY KEY (campaign_id, tenant_id)
-);</pre>
-  </div>
-</div>
+);
 
-<script>
-function copySchema(){
-  const text = document.getElementById('schema-code').textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.querySelector('.copy-btn');
-    const original = btn.textContent;
-    btn.textContent = '✓ Copied';
-    setTimeout(() => { btn.textContent = original; }, 1500);
-  });
-}
-</script>
-<script src="platform-chrome.js" defer></script>
-</body>
-</html>
+
+-- ============================================================================
+
+
+-- ============================================================================
+-- Seed: the plan catalog, plus the two tenants already in the mockup — Acme
+-- Corp (an ordinary cloud customer) and Trakolo itself (customer #1,
+-- dogfooding its own product on its own dedicated tenant database — see
+-- saas-admin-console.html).
+-- ============================================================================
+INSERT INTO platform.plans (name, price_monthly, price_yearly, seat_based, sort_order) VALUES
+  ('Free',       0,     0,      true, 0),
+  ('Team',       6.30,  63.00,  true, 1),
+  ('Business',   14.00, 140.00, true, 2),
+  ('Enterprise', NULL,  NULL,   true, 3);   -- custom pricing, quoted per deal
+
+INSERT INTO core.tenants (id, name, slug, deployment_model, subdomain, db_host, db_name, db_provisioned_at) VALUES
+  ('a1111111-1111-4111-8111-111111111111', 'Acme Corp', 'acme',    'cloud', 'acme',    'tenant-db-01.postgres.trakolo.internal', 'trakolo_acme',    now()),
+  ('a2222222-2222-4222-8222-222222222222', 'Trakolo',   'trakolo', 'cloud', 'support', 'tenant-db-00.postgres.trakolo.internal', 'trakolo_support', '2025-01-01');
+
+INSERT INTO platform.subscriptions (tenant_id, plan_id, status, contract_type, total_license_count, generated_date, contract_from_date, contract_to_date, drop_dead_date, license_key, generated_by_email)
+SELECT t.id, p.id, 'active', 'monthly', 84, current_date, '2026-03-01', '2027-03-01', '2027-03-15', NULL, NULL
+FROM core.tenants t, platform.plans p WHERE t.slug = 'acme' AND p.name = 'Team';
+
+-- Perpetual/internal: contract_to_date and drop_dead_date use the same
+-- far-future sentinel the console already renders as "—" for Perpetual rows.
+INSERT INTO platform.subscriptions (tenant_id, plan_id, status, contract_type, total_license_count, generated_date, contract_from_date, contract_to_date, drop_dead_date, license_key, generated_by_email)
+SELECT t.id, p.id, 'active', 'perpetual', 46, '2025-01-01', '2025-01-01', '2099-01-01', '2099-01-01', 'TRK-TRAKOLO-2025-INTERNAL', 'platform-ops@trakolo.com'
+FROM core.tenants t, platform.plans p WHERE t.slug = 'trakolo' AND p.name = 'Enterprise';

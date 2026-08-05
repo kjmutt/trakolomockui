@@ -95,14 +95,14 @@
     <div class="sicon"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="2" width="10" height="12" rx="1"/><path d="M6 5.5h4M6 8h4M6 10.5h2"/></svg></div>
     <div class="stitle">The front desk directory</div>
     <div class="stag">Azure Cache for Redis</div>
-    <div class="sbody">Before staff can help a visitor, they need to know: which company is this, and which filing cabinet belongs to them? <b>Azure Cache for Redis</b> is the front desk's quick-reference card — instead of walking to records every single time, the desk just glances at a cheat sheet it already has memorized. Fast, so nobody waits.</div>
+    <div class="sbody">Before staff can help a visitor, they need to know: which company is this, and which filing room belongs to them? That lookup lives in a separate building record office altogether — <b>trakolo-master</b>, the one place that knows every company's room number — and <b>Azure Cache for Redis</b> is the front desk's quick-reference card for it, so staff don't walk to records every single time. Fast, so nobody waits.</div>
   </div>
 
   <div class="story-card c-data">
     <div class="sicon"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="5" height="12" rx=".5"/><rect x="9" y="2" width="5" height="5" rx=".5"/><rect x="9" y="9" width="5" height="5" rx=".5"/></svg></div>
     <div class="stitle">The filing room</div>
     <div class="stag">Azure Database for PostgreSQL + Blob Storage</div>
-    <div class="sbody">This is where everyone's actual data — tickets, assets, documents — physically lives. Most companies share one big <b>filing cabinet system</b> (a shared Postgres database), but every drawer is labeled with the company's name (<span class="id-mono">tenant_id</span>) so nobody can open someone else's folder. A few big customers get their own <b>separate locked filing room</b> entirely — a dedicated database just for them, because their contract requires it. There's also a <b>photocopy-only room</b> (a read replica), so someone pulling a big report doesn't hold up people actively filing new paperwork. Large attachments go to <b>Blob Storage</b> — an off-site warehouse rather than a desk drawer, cheaper for bulky stuff.</div>
+    <div class="sbody">This is where everyone's actual data — tickets, assets, documents — physically lives. Every company gets its own <b>locked filing room</b> from day one — a dedicated Postgres database, never a shared drawer labeled with the company's name. Most of those rooms sit in the same <b>building</b> (a shared Postgres cluster) to keep costs down, but a room's lock doesn't depend on anyone remembering to check a label — there's no door between rooms at all. A few big or sensitive customers get their <b>own building</b> entirely — a dedicated cluster just for them, because their contract requires it. There's also a <b>photocopy-only room</b> (a read replica), so someone pulling a big report doesn't hold up people actively filing new paperwork. Large attachments go to <b>Blob Storage</b> — an off-site warehouse rather than a desk drawer, cheaper for bulky stuff.</div>
   </div>
 
   <div class="story-card c-work">
