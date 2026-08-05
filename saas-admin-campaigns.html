@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — promotional campaigns</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .plat-wrap{max-width:1180px;margin:0 auto;padding:32px 40px 60px;}
+  .plat-card{background:#151F1B;border:1px solid #26362F;border-radius:14px;}
+  .plat-card table{width:100%;border-collapse:collapse;}
+  .plat-card th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:#7C948A;font-family:var(--font-mono);font-weight:500;padding:12px 14px;border-bottom:1px solid #26362F;background:#151F1B;}
+  .plat-card td{padding:12px 14px;border-bottom:1px solid #26362F;font-size:12.5px;color:#D6E4DE;}
+  .plat-card tbody tr:last-child td{border-bottom:none;}
+  .plat-card tbody tr:hover{background:#1B2620;}
+  .plat-mcard{background:#151F1B;border:1px solid #26362F;border-radius:12px;padding:16px 18px;}
+  .plat-mcard .mlabel{font-size:11px;color:#7C948A;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.5px;}
+  .plat-mcard .mval{font-family:var(--font-display);font-size:23px;font-weight:700;margin-top:6px;color:#fff;}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;}
+  .status-pill{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;}
+  .status-pill.sent{background:rgba(93,202,165,.14);color:#5DCAA5;}
+  .status-pill.draft{background:rgba(143,167,156,.14);color:#8FA79C;}
+  .plat-modal.wide{width:min(640px,92vw);}
+  .plat-modal textarea{width:100%;min-height:150px;padding:10px 12px;border-radius:8px;border:1px solid #2B3B33;background:#0E1613;color:#EAF2ED;font-family:var(--font-body);font-size:13px;resize:vertical;}
+  .field-chip{display:inline-block;font-family:var(--font-mono);font-size:11px;background:#1B2E27;color:#5DCAA5;border:1px solid #2E4A3E;border-radius:5px;padding:2px 7px;margin:2px 4px 0 0;}
+  .recip-preview{background:#0E1613;border:1px solid #2B3B33;border-radius:8px;padding:10px 12px;font-size:12.5px;color:#B9C7C0;margin-top:6px;}
+  .recip-preview b{color:#5DCAA5;}
+  .seg-row{display:flex;gap:10px;}
+  .seg-row select{flex:1;}
+</style>
+</head>
+<body class="platform-body">
+<div class="platform-header">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#1B2E27" stroke="#5DCAA5" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#5DCAA5" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5"/><circle cx="100" cy="100" r="16" fill="#5DCAA5"/><circle cx="150" cy="50" r="21" fill="#5DCAA5"/></svg>
+    <span class="brand-name">Trakolo</span>
+    <span class="plat-tag">Platform</span>
+  </a>
+  <div class="top-right"><a href="saas-admin-login.html">Sign out</a></div>
+</div>
+<div class="plat-tabstrip">
+  <a href="saas-admin-console.html">Home</a>
+  <a href="saas-admin-errorlog.html">Error log</a>
+  <a href="saas-admin-pricing.html">Pricing</a>
+  <a href="saas-admin-plans.html">Entitlements</a>
+  <a href="saas-admin-email-settings.html">Email settings</a>
+  <a href="saas-admin-email-templates.html">Email templates</a>
+  <a href="saas-admin-callback-requests.html">Callback requests</a>
+  <a href="saas-admin-leads.html">Leads</a>
+  <a href="saas-admin-campaigns.html" class="active">Campaigns</a>
+  <a href="saas-admin-services.html">Services</a>
+  <a href="saas-admin-billing.html">Billing &amp; payments</a>
+  <a href="saas-admin-technical.html">Technical</a>
+</div>
+
+<div class="plat-wrap">
+  <div class="toolbar">
+    <div>
+      <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;">Promotional campaigns</div>
+      <div style="font-size:13px;color:#8FA79C;margin-top:4px;max-width:600px;">Marketing email to the customer base — new features, edition upgrades, seasonal offers. Separate from the transactional SSP email templates, which fire on account events.</div>
+    </div>
+    <button class="btn primary" style="background:#1D9E75;border-color:#1D9E75;white-space:nowrap;" onclick="openModal()">+ New campaign</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
+    <div class="plat-mcard"><div class="mlabel">Active tenants</div><div class="mval">5</div></div>
+    <div class="plat-mcard"><div class="mlabel">Campaigns sent</div><div class="mval" id="m-sent">2</div></div>
+    <div class="plat-mcard"><div class="mlabel">Avg. open rate</div><div class="mval">61%</div></div>
+    <div class="plat-mcard"><div class="mlabel">Last sent</div><div class="mval" style="font-size:15px;">18/07/2026</div></div>
+  </div>
+
+  <div class="plat-card" style="overflow-x:auto;">
+    <table id="camp-table">
+      <thead><tr><th>Subject</th><th>Segment</th><th>Recipients</th><th>Status</th><th>Sent</th></tr></thead>
+      <tbody id="camp-body">
+        <tr>
+          <td><b style="color:#fff;">Introducing the AI Agent for Coding</b></td>
+          <td>All customers</td>
+          <td>5</td>
+          <td><span class="status-pill sent">Sent</span></td>
+          <td class="id-mono">18/07/2026</td>
+        </tr>
+        <tr>
+          <td><b style="color:#fff;">Free → Team: your first 3 months at 30% off</b></td>
+          <td>Free edition only</td>
+          <td>1</td>
+          <td><span class="status-pill sent">Sent</span></td>
+          <td class="id-mono">02/06/2026</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="plat-modal-scrim" id="camp-modal-scrim" onclick="if(event.target===this) closeModal()">
+  <div class="plat-modal wide">
+    <div class="plat-modal-head"><span class="title">New campaign</span><button class="plat-modal-close" onclick="closeModal()">✕</button></div>
+    <label>Subject</label>
+    <input id="cp-subject" type="text" placeholder="What's the headline?">
+    <label>Segment</label>
+    <div class="seg-row">
+      <select id="cp-segment" onchange="recalcRecipients()">
+        <option value="all">All customers</option>
+        <option value="edition">By edition</option>
+        <option value="custom">Custom selection</option>
+      </select>
+      <select id="cp-edition" style="display:none;" onchange="recalcRecipients()">
+        <option>Free</option><option>Team</option><option>Business</option><option>Enterprise</option>
+      </select>
+    </div>
+    <div id="cp-custom-list" style="display:none;margin-top:8px;">
+      <label style="display:flex;align-items:center;gap:8px;margin:6px 0;font-size:12.5px;color:#D6E4DE;"><input type="checkbox" class="cp-org" value="Acme Corp" checked style="width:auto;"> Acme Corp (Team)</label>
+      <label style="display:flex;align-items:center;gap:8px;margin:6px 0;font-size:12.5px;color:#D6E4DE;"><input type="checkbox" class="cp-org" value="Northwind Traders" checked style="width:auto;"> Northwind Traders (Enterprise)</label>
+      <label style="display:flex;align-items:center;gap:8px;margin:6px 0;font-size:12.5px;color:#D6E4DE;"><input type="checkbox" class="cp-org" value="Globex Industries" checked style="width:auto;"> Globex Industries (Enterprise)</label>
+      <label style="display:flex;align-items:center;gap:8px;margin:6px 0;font-size:12.5px;color:#D6E4DE;"><input type="checkbox" class="cp-org" value="Initech" checked style="width:auto;"> Initech (Free)</label>
+      <label style="display:flex;align-items:center;gap:8px;margin:6px 0;font-size:12.5px;color:#D6E4DE;"><input type="checkbox" class="cp-org" value="Umbrella Group" checked style="width:auto;"> Umbrella Group (Enterprise)</label>
+    </div>
+    <div class="recip-preview" id="cp-preview">Sends to <b>5</b> tenants.</div>
+    <label>Body</label>
+    <textarea id="cp-body" placeholder="Hi {{ContactName}}, ..."></textarea>
+    <div style="margin-top:8px;">
+      <span class="field-chip">{{ContactName}}</span><span class="field-chip">{{OrgName}}</span><span class="field-chip">{{Edition}}</span>
+    </div>
+    <div class="plat-btn-row">
+      <button class="btn primary" style="flex:1;background:#1D9E75;border-color:#1D9E75;" onclick="sendCampaign()">Send campaign</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const EDITIONS = { 'Acme Corp':'Team', 'Northwind Traders':'Enterprise', 'Globex Industries':'Enterprise', 'Initech':'Free', 'Umbrella Group':'Enterprise' };
+const ALL_ORGS = Object.keys(EDITIONS);
+
+function openModal(){
+  const preselect = new URLSearchParams(location.search).get('org');
+  if(preselect){
+    document.getElementById('cp-segment').value = 'custom';
+    document.querySelectorAll('.cp-org').forEach(c => c.checked = (c.value === preselect));
+  }
+  document.getElementById('cp-segment').dispatchEvent(new Event('change'));
+  document.getElementById('camp-modal-scrim').classList.add('open');
+}
+function closeModal(){ document.getElementById('camp-modal-scrim').classList.remove('open'); }
+
+document.getElementById('cp-segment').addEventListener('change', () => {
+  const seg = document.getElementById('cp-segment').value;
+  document.getElementById('cp-edition').style.display = seg === 'edition' ? '' : 'none';
+  document.getElementById('cp-custom-list').style.display = seg === 'custom' ? '' : 'none';
+  recalcRecipients();
+});
+document.querySelectorAll('.cp-org').forEach(c => c.addEventListener('change', recalcRecipients));
+
+function recalcRecipients(){
+  const seg = document.getElementById('cp-segment').value;
+  let n, label;
+  if(seg === 'all'){ n = ALL_ORGS.length; label = 'all customers'; }
+  else if(seg === 'edition'){
+    const ed = document.getElementById('cp-edition').value;
+    n = ALL_ORGS.filter(o => EDITIONS[o] === ed).length;
+    label = ed + ' edition';
+  } else {
+    n = document.querySelectorAll('.cp-org:checked').length;
+    label = 'the selected tenants';
+  }
+  document.getElementById('cp-preview').innerHTML = 'Sends to <b>' + n + '</b> tenant' + (n===1?'':'s') + ' — ' + label + '.';
+}
+
+function sendCampaign(){
+  const subject = document.getElementById('cp-subject').value.trim();
+  if(!subject){ alert('Enter a subject.'); return; }
+  const seg = document.getElementById('cp-segment').value;
+  const segLabel = seg === 'all' ? 'All customers' : seg === 'edition' ? document.getElementById('cp-edition').value + ' edition only' : 'Custom selection';
+  let n;
+  if(seg === 'all') n = ALL_ORGS.length;
+  else if(seg === 'edition') n = ALL_ORGS.filter(o => EDITIONS[o] === document.getElementById('cp-edition').value).length;
+  else n = document.querySelectorAll('.cp-org:checked').length;
+
+  const tr = document.createElement('tr');
+  tr.innerHTML = '<td><b style="color:#fff;">'+subject+'</b></td><td>'+segLabel+'</td><td>'+n+'</td><td><span class="status-pill sent">Sent</span></td><td class="id-mono">'+new Date().toLocaleDateString('en-GB')+'</td>';
+  document.getElementById('camp-body').prepend(tr);
+  document.getElementById('m-sent').textContent = document.querySelectorAll('#camp-body tr').length;
+  closeModal();
+}
+recalcRecipients();
+</script>
+<script src="platform-chrome.js" defer></script>
+</body>
+</html>

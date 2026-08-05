@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — customer profile</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .plat-wrap{max-width:1080px;margin:0 auto;padding:32px 40px 60px;}
+  .plat-card{background:#151F1B;border:1px solid #26362F;border-radius:14px;padding:20px 22px;}
+  .cust-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:22px;flex-wrap:wrap;}
+  .cust-name{font-family:var(--font-display);font-size:24px;font-weight:700;color:#fff;}
+  .cust-meta{font-size:12.5px;color:#8FA79C;margin-top:6px;}
+  .edition-pill{font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;background:#1B2E27;color:#5DCAA5;border:1px solid #2E4A3E;white-space:nowrap;}
+  .edition-pill.free{background:#26362F;color:#8FA79C;border-color:#37473F;}
+  .edition-pill.enterprise{background:#2A2338;color:#B9A8ED;border-color:#453A61;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+  @media (max-width:800px){.two-col{grid-template-columns:1fr;}}
+  .kv{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #1E2B25;gap:12px;font-size:12.5px;}
+  .kv:last-child{border-bottom:none;}
+  .kv .k{color:#7C948A;}
+  .kv .v{color:#EAF2ED;text-align:right;}
+  .section-title{font-family:var(--font-display);font-size:15px;font-weight:700;color:#fff;margin:22px 0 10px;}
+  .ent-col-label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:#7C948A;font-family:var(--font-mono);font-weight:600;padding:8px 0 4px;border-bottom:1px solid #26362F;}
+  .ent-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1E2B25;gap:12px;font-size:12.5px;}
+  .ent-row:last-child{border-bottom:none;}
+  .ent-name{color:#D6E4DE;}
+  .ent-note{font-size:11px;color:#7C948A;margin-top:1px;}
+  .ent-yes{color:#5DCAA5;font-size:11.5px;font-weight:600;}
+  .ent-no{color:#5C7268;font-size:11.5px;}
+  .action-bar{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;}
+  .not-found{padding:60px 0;text-align:center;color:#8FA79C;}
+</style>
+</head>
+<body class="platform-body">
+<div class="platform-header">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#1B2E27" stroke="#5DCAA5" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#5DCAA5" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5"/><circle cx="100" cy="100" r="16" fill="#5DCAA5"/><circle cx="150" cy="50" r="21" fill="#5DCAA5"/></svg>
+    <span class="brand-name">Trakolo</span>
+    <span class="plat-tag">Platform</span>
+  </a>
+  <div class="top-right"><a href="saas-admin-login.html">Sign out</a></div>
+</div>
+<div class="plat-tabstrip">
+  <a href="saas-admin-console.html">Home</a>
+  <a href="saas-admin-errorlog.html">Error log</a>
+  <a href="saas-admin-pricing.html">Pricing</a>
+  <a href="saas-admin-plans.html">Entitlements</a>
+  <a href="saas-admin-email-settings.html">Email settings</a>
+  <a href="saas-admin-email-templates.html">Email templates</a>
+  <a href="saas-admin-callback-requests.html">Callback requests</a>
+  <a href="saas-admin-leads.html">Leads</a>
+  <a href="saas-admin-campaigns.html">Campaigns</a>
+  <a href="saas-admin-services.html">Services</a>
+  <a href="saas-admin-billing.html">Billing &amp; payments</a>
+  <a href="saas-admin-technical.html">Technical</a>
+</div>
+
+<div class="plat-wrap">
+  <div style="margin-bottom:14px;font-size:12px;color:#7C948A;"><a href="saas-admin-console.html" style="color:#7C948A;">Home</a> &gt; Customer profile</div>
+  <div id="profile-root"></div>
+</div>
+
+<script>
+const CUSTOMERS = {
+  'Acme Corp': {
+    edition: 'Team', editionClass: '',
+    deployment: 'Cloud · us-east', since: 'Mar 2026',
+    contact: { name: 'Sarah Chen', title: 'IT Director', email: 'sarah.chen@acmecorp.com', phone: '+1 415 555 0142' },
+    sub: { type: 'Monthly', licenses: 84, from: '01/03/2026', to: '01/03/2027', dropDead: '15/03/2027', key: 'TRK-ACME-2026-Y84', billing: '$529.20/mo · paid' },
+    products: [
+      ['Service desk (ITSM)', 'Incl. change management', true],
+      ['Asset management (SAM)', '', true],
+      ['Dev boards & sprints', '', true],
+      ['Reporting & compliance', 'Business-tier feature, granted as a trial', true],
+    ],
+    features: [
+      ['AI Agent — Service desk', 'Paid add-on · 1 license active', true],
+      ['AI Agent — Coding', 'Paid add-on · not purchased', false],
+      ['REST API & bulk upload', '', true],
+      ['Service catalog & knowledge base', '', true],
+      ['Problem management & on-call', '', true],
+      ['Live chat', '', true],
+      ['Sandbox workspace', 'Not purchased', false],
+    ]
+  },
+  'Northwind Traders': {
+    edition: 'Enterprise', editionClass: 'enterprise',
+    deployment: 'Cloud · eu-west', since: 'Nov 2025',
+    contact: { name: 'David Okafor', title: 'VP Operations', email: 'd.okafor@northwindtraders.com', phone: '+44 20 7946 0958' },
+    sub: { type: 'Yearly', licenses: 412, from: '01/11/2025', to: '01/11/2026', dropDead: '15/11/2026', key: 'TRK-NWTR-2025-Y412', billing: 'Annual · payment failed' },
+    products: [
+      ['Service desk (ITSM)', 'Incl. change management', true],
+      ['Asset management (SAM)', '', true],
+      ['Dev boards & sprints', 'Not bought — they use a separate tool', false],
+      ['Reporting & compliance', '', true],
+    ],
+    features: [
+      ['AI Agent — Service desk', 'Included · 4 licenses active', true],
+      ['AI Agent — Coding', 'Included · 2 licenses active', true],
+      ['REST API & bulk upload', '', true],
+      ['SSO & SCIM', '', true],
+      ['Service catalog & knowledge base', '', true],
+      ['Problem management & on-call', '', true],
+      ['Asset discovery', '', true],
+    ]
+  },
+  'Globex Industries': {
+    edition: 'Enterprise', editionClass: 'enterprise',
+    deployment: 'On-premise · self-hosted', since: 'Jan 2025',
+    contact: { name: 'Elena Petrova', title: 'CIO', email: 'e.petrova@globex.com', phone: '+1 312 555 0199' },
+    sub: { type: 'Perpetual', licenses: 1204, from: '06/01/2025', to: '06/01/2029', dropDead: '08/02/2029', key: 'TRK-GLBX-2025-P1204', billing: 'Perpetual + support' },
+    products: [
+      ['Service desk (ITSM)', 'In license', true],
+      ['Asset management (SAM)', 'In license', true],
+      ['Dev boards & sprints', 'In license', true],
+      ['Reporting & compliance', 'In license', true],
+    ],
+    features: [
+      ['AI Agent — Service desk', 'Not in their license', false],
+      ['AI Agent — Coding', 'Not in their license', false],
+      ['REST API & bulk upload', 'In license', true],
+      ['Support & upgrades plan', 'Renews Jan 2027', true],
+    ]
+  },
+  'Initech': {
+    edition: 'Free', editionClass: 'free',
+    deployment: 'Cloud · us-east', since: 'Jun 2026',
+    contact: { name: 'Peter Gibbons', title: 'IT Manager', email: 'peter.gibbons@initech.com', phone: '+1 512 555 0173' },
+    sub: { type: 'Yearly', licenses: 18, from: '21/06/2026', to: '21/06/2027', dropDead: '05/07/2027', key: 'TRK-INTC-2026-Y18', billing: '— (Free)' },
+    products: [
+      ['Service desk (ITSM)', 'Free tier — portal + email channels only', true],
+      ['Asset management (SAM)', 'Not on Free', false],
+      ['Dev boards & sprints', 'Basic kanban only', true],
+      ['Reporting & compliance', '', false],
+    ],
+    features: [
+      ['AI Agent — Service desk', 'Not purchased', false],
+      ['REST API & bulk upload', 'Not purchased', false],
+      ['Data migration wizard', 'Free on every plan', true],
+      ['Service catalog & knowledge base', 'Team plan and above', false],
+      ['Live chat', 'Team plan and above', false],
+    ]
+  },
+  'Umbrella Group': {
+    edition: 'Enterprise', editionClass: 'enterprise',
+    deployment: 'On-premise · ap-south', since: 'Aug 2023',
+    contact: { name: 'Alice Marcus', title: 'Head of IT', email: 'alice.marcus@umbrella-group.com', phone: '+81 3 5555 0142' },
+    sub: { type: 'Perpetual', licenses: 2880, from: '11/08/2023', to: '11/08/2026', dropDead: '25/08/2026', key: 'TRK-UMBR-2023-P2880', billing: 'Perpetual · renewal in 6d' },
+    products: [
+      ['Service desk (ITSM)', 'In license', true],
+      ['Asset management (SAM)', 'In license', true],
+      ['Dev boards & sprints', 'In license', true],
+      ['Reporting & compliance', 'In license', true],
+    ],
+    features: [
+      ['AI Agent — Service desk', 'In license', true],
+      ['AI Agent — Coding', 'Not in their license', false],
+      ['Support & upgrades plan', 'Expiring in 6 days — renewal quote sent', true],
+    ]
+  }
+};
+
+function esc(s){ const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function render(){
+  const org = new URLSearchParams(location.search).get('org') || 'Acme Corp';
+  const c = CUSTOMERS[org];
+  const root = document.getElementById('profile-root');
+  if(!c){
+    root.innerHTML = '<div class="not-found">No customer profile found for "' + esc(org) + '". <a href="saas-admin-console.html" style="color:#5DCAA5;">Back to Home →</a></div>';
+    return;
+  }
+  const rowsHtml = (rows) => rows.map(([name, note, on]) =>
+    '<div class="ent-row"><div><div class="ent-name">'+esc(name)+'</div>'+(note?'<div class="ent-note">'+esc(note)+'</div>':'')+'</div><span class="'+(on?'ent-yes':'ent-no')+'">'+(on?'✓ Included':'Not included')+'</span></div>'
+  ).join('');
+
+  root.innerHTML =
+    '<div class="cust-head">' +
+      '<div><div class="cust-name">'+esc(org)+'</div><div class="cust-meta">'+esc(c.deployment)+' · '+c.sub.licenses.toLocaleString()+' seats · customer since '+esc(c.since)+'</div></div>' +
+      '<span class="edition-pill '+c.editionClass+'">'+esc(c.edition)+' edition</span>' +
+    '</div>' +
+    '<div class="two-col">' +
+      '<div class="plat-card">' +
+        '<div class="section-title" style="margin-top:0;">Primary contact</div>' +
+        '<div class="kv"><span class="k">Name</span><span class="v">'+esc(c.contact.name)+'</span></div>' +
+        '<div class="kv"><span class="k">Title</span><span class="v">'+esc(c.contact.title)+'</span></div>' +
+        '<div class="kv"><span class="k">Email</span><span class="v id-mono">'+esc(c.contact.email)+'</span></div>' +
+        '<div class="kv"><span class="k">Phone</span><span class="v id-mono">'+esc(c.contact.phone)+'</span></div>' +
+      '</div>' +
+      '<div class="plat-card">' +
+        '<div class="section-title" style="margin-top:0;">Subscription</div>' +
+        '<div class="kv"><span class="k">Type</span><span class="v">'+esc(c.sub.type)+'</span></div>' +
+        '<div class="kv"><span class="k">Contract</span><span class="v">'+esc(c.sub.from)+' → '+esc(c.sub.to)+'</span></div>' +
+        '<div class="kv"><span class="k">Drop dead date</span><span class="v">'+esc(c.sub.dropDead)+'</span></div>' +
+        '<div class="kv"><span class="k">License key</span><span class="v id-mono">'+esc(c.sub.key)+'</span></div>' +
+        '<div class="kv"><span class="k">Billing</span><span class="v">'+esc(c.sub.billing)+'</span></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="plat-card">' +
+      '<div class="two-col" style="margin-bottom:0;">' +
+        '<div><div class="ent-col-label">Products bought</div>'+rowsHtml(c.products)+'</div>' +
+        '<div><div class="ent-col-label">Feature flags</div>'+rowsHtml(c.features)+'</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="action-bar">' +
+      '<a class="btn primary" style="background:#1D9E75;border-color:#1D9E75;" href="saas-admin-console.html">Manage renewal / upgrade →</a>' +
+      '<a class="btn sm" style="background:#1B2620;border-color:#2B3B33;color:#D6E4DE;" href="saas-admin-plans.html">Edit entitlements →</a>' +
+      '<a class="btn sm" style="background:#1B2620;border-color:#2B3B33;color:#D6E4DE;" href="saas-admin-campaigns.html?org='+encodeURIComponent(org)+'">Send promotional email →</a>' +
+      '<a class="btn sm" style="background:#1B2620;border-color:#2B3B33;color:#D6E4DE;" href="saas-admin-errorlog.html?org='+encodeURIComponent(org)+'">View error log →</a>' +
+    '</div>';
+}
+render();
+</script>
+<script src="platform-chrome.js" defer></script>
+</body>
+</html>

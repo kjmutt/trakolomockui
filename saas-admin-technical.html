@@ -44,6 +44,8 @@
   <a href="saas-admin-email-settings.html">Email settings</a>
   <a href="saas-admin-email-templates.html">Email templates</a>
   <a href="saas-admin-callback-requests.html">Callback requests</a>
+  <a href="saas-admin-leads.html">Leads</a>
+  <a href="saas-admin-campaigns.html">Campaigns</a>
   <a href="saas-admin-services.html">Services</a>
   <a href="saas-admin-billing.html">Billing &amp; payments</a>
   <a href="saas-admin-technical.html" class="active">Technical</a>
@@ -63,9 +65,9 @@
   </div>
 
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0;">
-    <div class="plat-mcard"><div class="mlabel">Tables</div><div class="mval">12</div></div>
-    <div class="plat-mcard"><div class="mlabel">Foreign keys</div><div class="mval">10</div></div>
-    <div class="plat-mcard"><div class="mlabel">Enum types</div><div class="mval">6</div></div>
+    <div class="plat-mcard"><div class="mlabel">Tables</div><div class="mval">16</div></div>
+    <div class="plat-mcard"><div class="mlabel">Foreign keys</div><div class="mval">15</div></div>
+    <div class="plat-mcard"><div class="mlabel">Enum types</div><div class="mval">10</div></div>
     <div class="plat-mcard"><div class="mlabel">Written by</div><div class="mval" style="font-size:15px;">Platform admins only</div></div>
   </div>
 
@@ -77,6 +79,9 @@
       <li><b>plans</b> ↔ features (via plan_features) — the Pricing page's edition matrix</li>
       <li><b>tenants</b> → tenant_entitlements — per-tenant overrides on top of the plan</li>
       <li><b>tenants</b> → error_logs, callback_requests (both nullable — platform-wide rows allowed)</li>
+      <li><b>tenants</b> → account_contacts — who Trakolo staff actually call at each account</li>
+      <li><b>leads</b> → tenants (converted_tenant_id) — set once a phone/web enquiry signs</li>
+      <li><b>campaigns</b> ↔ tenants (via campaign_recipients) — who got which promo email</li>
       <li><b>services</b>, <b>ssp_email_settings</b>, <b>ssp_email_templates</b>, <b>staff_audit_log</b> stand alone — no tenant_id, platform-scoped by design</li>
     </ul>
   </div>
@@ -95,6 +100,10 @@
     <div class="tbl-item"><div class="tname">platform.ssp_email_templates</div><div class="tdesc">Sign-up, account-created, forgot/reset-password copy.</div></div>
     <div class="tbl-item"><div class="tname">platform.callback_requests</div><div class="tdesc">Leads from the marketing site's callback form.</div></div>
     <div class="tbl-item"><div class="tname">platform.staff_audit_log</div><div class="tdesc">Every privileged action a Trakolo staffer takes here.</div></div>
+    <div class="tbl-item"><div class="tname">platform.leads</div><div class="tdesc">Phone/web/referral enquiries, ahead of becoming a tenant.</div></div>
+    <div class="tbl-item"><div class="tname">platform.account_contacts</div><div class="tdesc">Who Trakolo staff call at each account.</div></div>
+    <div class="tbl-item"><div class="tname">platform.campaigns</div><div class="tdesc">Promotional email blasts to the customer base.</div></div>
+    <div class="tbl-item"><div class="tname">platform.campaign_recipients</div><div class="tdesc">Who got which campaign, and whether they opened it.</div></div>
   </div>
 
   <div class="section-title">DDL</div>
@@ -275,7 +284,68 @@ CREATE TABLE platform.staff_audit_log (
   metadata    jsonb NOT NULL DEFAULT '{}',
   created_at  timestamptz NOT NULL DEFAULT now()
 );
-CREATE INDEX idx_staff_audit_log_time ON platform.staff_audit_log(created_at DESC);</pre>
+CREATE INDEX idx_staff_audit_log_time ON platform.staff_audit_log(created_at DESC);
+
+-- Inbound sales enquiries — phone calls logged by staff, web/referral leads —
+-- ahead of becoming a core.tenants row. See Platform Admin &gt; Leads.
+CREATE TYPE platform.lead_source AS ENUM ('phone', 'web', 'referral', 'email', 'walk_in', 'other');
+CREATE TYPE platform.lead_status AS ENUM ('new', 'contacted', 'qualified', 'converted', 'lost');
+
+CREATE TABLE platform.leads (
+  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  contact_name        text NOT NULL,
+  organisation_name   text NOT NULL,
+  organisation_notes  text,                    -- industry, size, anything freeform from the call
+  email               citext,
+  phone               text,
+  users_interested    int,
+  modules_interested  text[] NOT NULL DEFAULT '{}',   -- 'IT', 'SAM', 'Dev', 'Ops', 'Docs'
+  source              platform.lead_source NOT NULL DEFAULT 'other',
+  status              platform.lead_status NOT NULL DEFAULT 'new',
+  notes               text,
+  converted_tenant_id uuid REFERENCES core.tenants(id),   -- set once they sign
+  logged_by_email     citext,
+  created_at          timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_leads_status ON platform.leads(status);
+
+-- Who Trakolo staff actually call at each account — sales/success-facing,
+-- distinct from core.contacts (the tenant's own SSP requesters).
+CREATE TABLE platform.account_contacts (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id   uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
+  name        text NOT NULL,
+  title       text,
+  email       citext,
+  phone       text,
+  is_primary  boolean NOT NULL DEFAULT false,
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_account_contacts_tenant ON platform.account_contacts(tenant_id);
+
+-- Promotional email blasts to the customer base — separate from
+-- ssp_email_templates, which is transactional account-lifecycle mail.
+CREATE TYPE platform.campaign_segment AS ENUM ('all', 'by_plan', 'by_status', 'custom');
+CREATE TYPE platform.campaign_status AS ENUM ('draft', 'sent');
+
+CREATE TABLE platform.campaigns (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  subject         text NOT NULL,
+  body_html       text NOT NULL,
+  segment         platform.campaign_segment NOT NULL DEFAULT 'all',
+  segment_plan_id uuid REFERENCES platform.plans(id),   -- set when segment = 'by_plan'
+  status          platform.campaign_status NOT NULL DEFAULT 'draft',
+  sent_by_email   citext,
+  sent_at         timestamptz,
+  created_at      timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE platform.campaign_recipients (
+  campaign_id  uuid NOT NULL REFERENCES platform.campaigns(id) ON DELETE CASCADE,
+  tenant_id    uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
+  opened_at    timestamptz,
+  PRIMARY KEY (campaign_id, tenant_id)
+);</pre>
   </div>
 </div>
 

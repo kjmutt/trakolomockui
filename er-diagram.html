@@ -49,7 +49,7 @@
 
 <div class="wrap" style="max-width:980px;">
   <div class="page-head">
-    <div><div class="page-title">Entity relationships</div><div class="page-desc">How the 64 tables in db/schema.sql relate — every foreign key here was extracted from a live PostgreSQL instance running the real schema via pg_constraint, not typed from memory.</div></div>
+    <div><div class="page-title">Entity relationships</div><div class="page-desc">How the 68 tables in db/schema.sql relate — every foreign key here was extracted from a live PostgreSQL instance running the real schema via pg_constraint, not typed from memory.</div></div>
     <a href="technical-design.html" class="btn">← Technical design</a>
   </div>
 
@@ -59,8 +59,8 @@
   </div>
 
   <div class="strip">
-    <div class="mcard info"><div class="mlabel">Tables</div><div class="mval">64</div><div class="mdelta">across 6 module schemas</div></div>
-    <div class="mcard info"><div class="mlabel">Foreign keys</div><div class="mval">124</div><div class="mdelta">extracted from pg_constraint</div></div>
+    <div class="mcard info"><div class="mlabel">Tables</div><div class="mval">68</div><div class="mdelta">across 6 module schemas</div></div>
+    <div class="mcard info"><div class="mlabel">Foreign keys</div><div class="mval">129</div><div class="mdelta">extracted from pg_constraint</div></div>
     <div class="mcard info"><div class="mlabel">Module schemas</div><div class="mval">6</div><div class="mdelta">core · itsm · sam · dev · docs · platform</div></div>
     <div class="mcard ok"><div class="mlabel">Tenant scoping</div><div class="mval">Every row</div><div class="mdelta">tenant_id → core.tenants, everywhere</div></div>
   </div>
@@ -124,6 +124,9 @@
         <li><b>plans</b> ↔ features (via plan_features) — the Pricing page's edition matrix</li>
         <li><b>tenants</b> → tenant_entitlements — per-tenant overrides on top of the plan</li>
         <li><b>tenants</b> → error_logs, callback_requests (both nullable — platform-wide rows allowed)</li>
+        <li><b>tenants</b> → account_contacts — who Trakolo staff actually call at each account</li>
+        <li><b>leads</b> → tenants (converted_tenant_id) — set once a phone/web enquiry signs</li>
+        <li><b>campaigns</b> ↔ tenants (via campaign_recipients) — who got which promo email</li>
         <li><b>services</b>, <b>ssp_email_settings</b>, <b>ssp_email_templates</b>, <b>staff_audit_log</b> stand alone — no tenant_id, platform-scoped by design</li>
       </ul>
     </div>
@@ -136,13 +139,13 @@
 
   <div class="section-label" style="margin:26px 0 12px;">Every foreign key, extracted from the live schema</div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="fk-filters">
-    <div class="chip active" data-schema="all">All (124)</div>
+    <div class="chip active" data-schema="all">All (129)</div>
     <div class="chip" data-schema="core">core (21)</div>
     <div class="chip" data-schema="itsm">itsm (45)</div>
     <div class="chip" data-schema="dev">dev (20)</div>
     <div class="chip" data-schema="sam">sam (8)</div>
     <div class="chip" data-schema="docs">docs (20)</div>
-    <div class="chip" data-schema="platform">platform (10)</div>
+    <div class="chip" data-schema="platform">platform (15)</div>
   </div>
   <div class="panel">
     <div class="fk-scroll">
@@ -255,8 +258,13 @@
 <tr data-schema="itsm"><td class="mono">itsm.tickets</td><td class="mono">merged_into_id</td><td>→</td><td class="mono">itsm.tickets</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.tickets</td><td class="mono">requester_contact_id</td><td>→</td><td class="mono">core.contacts</td><td class="mono">id</td></tr>
 <tr data-schema="itsm"><td class="mono">itsm.tickets</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
+<tr data-schema="platform"><td class="mono">platform.account_contacts</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.callback_requests</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
+<tr data-schema="platform"><td class="mono">platform.campaign_recipients</td><td class="mono">campaign_id</td><td>→</td><td class="mono">platform.campaigns</td><td class="mono">id</td></tr>
+<tr data-schema="platform"><td class="mono">platform.campaign_recipients</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
+<tr data-schema="platform"><td class="mono">platform.campaigns</td><td class="mono">segment_plan_id</td><td>→</td><td class="mono">platform.plans</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.error_logs</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
+<tr data-schema="platform"><td class="mono">platform.leads</td><td class="mono">converted_tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.plan_features</td><td class="mono">feature_id</td><td>→</td><td class="mono">platform.features</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.plan_features</td><td class="mono">plan_id</td><td>→</td><td class="mono">platform.plans</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.subscription_history</td><td class="mono">new_plan_id</td><td>→</td><td class="mono">platform.plans</td><td class="mono">id</td></tr>

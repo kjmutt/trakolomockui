@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — leads &amp; enquiries</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .plat-wrap{max-width:1180px;margin:0 auto;padding:32px 40px 60px;}
+  .plat-card{background:#151F1B;border:1px solid #26362F;border-radius:14px;}
+  .plat-card table{width:100%;border-collapse:collapse;}
+  .plat-card th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:#7C948A;font-family:var(--font-mono);font-weight:500;padding:12px 14px;border-bottom:1px solid #26362F;background:#151F1B;}
+  .plat-card td{padding:12px 14px;border-bottom:1px solid #26362F;font-size:12.5px;color:#D6E4DE;vertical-align:top;}
+  .plat-card tbody tr:last-child td{border-bottom:none;}
+  .plat-card tbody tr:hover{background:#1B2620;}
+  .plat-mcard{background:#151F1B;border:1px solid #26362F;border-radius:12px;padding:16px 18px;}
+  .plat-mcard .mlabel{font-size:11px;color:#7C948A;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.5px;}
+  .plat-mcard .mval{font-family:var(--font-display);font-size:23px;font-weight:700;margin-top:6px;color:#fff;}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;}
+  .toolbar input[type=text]{width:260px;padding:8px 12px;border-radius:8px;border:1px solid #2B3B33;background:#151F1B;color:#EAF2ED;font-size:13px;}
+  .mod-tag{display:inline-block;font-family:var(--font-mono);font-size:10.5px;background:#1B2E27;color:#5DCAA5;border:1px solid #2E4A3E;border-radius:5px;padding:2px 7px;margin:1px 3px 1px 0;}
+  .status-select{font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;border:1px solid #2B3B33;background:#0E1613;cursor:pointer;width:100%;min-width:96px;}
+  .status-select.new{color:#5DA9E0;}
+  .status-select.contacted{color:#DDA234;}
+  .status-select.qualified{color:#B9A8ED;}
+  .status-select.converted{color:#5DCAA5;}
+  .status-select.lost{color:#E8795A;}
+  .chip-pick{font-size:11.5px;padding:5px 11px;border-radius:20px;border:1px solid #2B3B33;background:#0E1613;color:#8FA79C;cursor:pointer;}
+  .chip-pick.on{background:#1B2E27;border-color:#2E4A3E;color:#5DCAA5;}
+  .row-actions-sm{display:flex;gap:6px;}
+  .icon-btn{background:#1B2620;border:1px solid #2B3B33;color:#D6E4DE;border-radius:7px;padding:5px 9px;cursor:pointer;font-size:11.5px;}
+  .icon-btn:hover{background:#26362F;}
+  .icon-btn.primary{color:#5DCAA5;}
+  .icon-btn.danger{color:#E8795A;}
+</style>
+</head>
+<body class="platform-body">
+<div class="platform-header">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#1B2E27" stroke="#5DCAA5" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#5DCAA5" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5"/><circle cx="100" cy="100" r="16" fill="#5DCAA5"/><circle cx="150" cy="50" r="21" fill="#5DCAA5"/></svg>
+    <span class="brand-name">Trakolo</span>
+    <span class="plat-tag">Platform</span>
+  </a>
+  <div class="top-right"><a href="saas-admin-login.html">Sign out</a></div>
+</div>
+<div class="plat-tabstrip">
+  <a href="saas-admin-console.html">Home</a>
+  <a href="saas-admin-errorlog.html">Error log</a>
+  <a href="saas-admin-pricing.html">Pricing</a>
+  <a href="saas-admin-plans.html">Entitlements</a>
+  <a href="saas-admin-email-settings.html">Email settings</a>
+  <a href="saas-admin-email-templates.html">Email templates</a>
+  <a href="saas-admin-callback-requests.html">Callback requests</a>
+  <a href="saas-admin-leads.html" class="active">Leads</a>
+  <a href="saas-admin-campaigns.html">Campaigns</a>
+  <a href="saas-admin-services.html">Services</a>
+  <a href="saas-admin-billing.html">Billing &amp; payments</a>
+  <a href="saas-admin-technical.html">Technical</a>
+</div>
+
+<div class="plat-wrap">
+  <div class="toolbar">
+    <div>
+      <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;">Leads &amp; enquiries</div>
+      <div style="font-size:13px;color:#8FA79C;margin-top:4px;max-width:600px;">Every enquiry that isn't a tenant yet — phone calls logged by sales, web and referral leads. Convert one once they sign, and it links straight to their new license on Home.</div>
+    </div>
+    <button class="btn primary" style="background:#1D9E75;border-color:#1D9E75;white-space:nowrap;" onclick="openModal()">+ Log enquiry</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
+    <div class="plat-mcard"><div class="mlabel">New</div><div class="mval" id="m-new">2</div></div>
+    <div class="plat-mcard"><div class="mlabel">Contacted</div><div class="mval" id="m-contacted">2</div></div>
+    <div class="plat-mcard"><div class="mlabel">Qualified</div><div class="mval" id="m-qualified">1</div></div>
+    <div class="plat-mcard"><div class="mlabel">Converted this quarter</div><div class="mval" id="m-converted">1</div></div>
+  </div>
+
+  <div class="plat-card" style="overflow-x:auto;">
+    <table id="lead-table">
+      <thead><tr><th>Contact</th><th>Organisation</th><th>Phone / Email</th><th>Users</th><th>Modules interested</th><th>Source</th><th>Status</th><th>Logged</th><th></th></tr></thead>
+      <tbody id="lead-body">
+        <tr data-status="qualified">
+          <td><b style="color:#fff;">Rina Suzuki</b></td>
+          <td>Kestrel Logistics<div style="color:#7C948A;font-size:11px;margin-top:2px;">Freight &amp; warehousing, ~600 staff</div></td>
+          <td class="id-mono">+81 3 5555 0231<br>r.suzuki@kestrel-logistics.jp</td>
+          <td>150</td>
+          <td><span class="mod-tag">IT</span><span class="mod-tag">SAM</span></td>
+          <td>Phone</td>
+          <td><select class="status-select qualified" onchange="updateStatus(this)"><option>New</option><option>Contacted</option><option selected>Qualified</option><option>Converted</option><option>Lost</option></select></td>
+          <td class="id-mono">22/07/2026</td>
+          <td class="row-actions-sm"><button class="icon-btn primary" onclick="convertLead(this)">Convert</button><button class="icon-btn danger" onclick="this.closest('tr').remove()">🗑</button></td>
+        </tr>
+        <tr data-status="contacted">
+          <td><b style="color:#fff;">Marcus Webb</b></td>
+          <td>Fenwick &amp; Holt Legal<div style="color:#7C948A;font-size:11px;margin-top:2px;">Law firm, 3 offices</div></td>
+          <td class="id-mono">+44 161 555 0117<br>marcus.webb@fenwickholt.co.uk</td>
+          <td>65</td>
+          <td><span class="mod-tag">IT</span><span class="mod-tag">Docs</span></td>
+          <td>Referral</td>
+          <td><select class="status-select contacted" onchange="updateStatus(this)"><option>New</option><option selected>Contacted</option><option>Qualified</option><option>Converted</option><option>Lost</option></select></td>
+          <td class="id-mono">20/07/2026</td>
+          <td class="row-actions-sm"><button class="icon-btn primary" onclick="convertLead(this)">Convert</button><button class="icon-btn danger" onclick="this.closest('tr').remove()">🗑</button></td>
+        </tr>
+        <tr data-status="new">
+          <td><b style="color:#fff;">Priya Nair</b></td>
+          <td>Solstice Biotech<div style="color:#7C948A;font-size:11px;margin-top:2px;">R&amp;D, growing fast</div></td>
+          <td class="id-mono">+1 858 555 0184<br>priya.nair@solsticebio.com</td>
+          <td>40</td>
+          <td><span class="mod-tag">IT</span><span class="mod-tag">Dev</span><span class="mod-tag">Ops</span></td>
+          <td>Web</td>
+          <td><select class="status-select new" onchange="updateStatus(this)"><option selected>New</option><option>Contacted</option><option>Qualified</option><option>Converted</option><option>Lost</option></select></td>
+          <td class="id-mono">19/07/2026</td>
+          <td class="row-actions-sm"><button class="icon-btn primary" onclick="convertLead(this)">Convert</button><button class="icon-btn danger" onclick="this.closest('tr').remove()">🗑</button></td>
+        </tr>
+        <tr data-status="new">
+          <td><b style="color:#fff;">Tom Hale</b></td>
+          <td>Bramwell Retail Group<div style="color:#7C948A;font-size:11px;margin-top:2px;">Called in off the pricing page</div></td>
+          <td class="id-mono">+1 214 555 0166<br>tom.hale@bramwellretail.com</td>
+          <td>220</td>
+          <td><span class="mod-tag">IT</span><span class="mod-tag">SAM</span><span class="mod-tag">Ops</span></td>
+          <td>Phone</td>
+          <td><select class="status-select new" onchange="updateStatus(this)"><option selected>New</option><option>Contacted</option><option>Qualified</option><option>Converted</option><option>Lost</option></select></td>
+          <td class="id-mono">24/07/2026</td>
+          <td class="row-actions-sm"><button class="icon-btn primary" onclick="convertLead(this)">Convert</button><button class="icon-btn danger" onclick="this.closest('tr').remove()">🗑</button></td>
+        </tr>
+        <tr data-status="contacted">
+          <td><b style="color:#fff;">Ingrid Larsen</b></td>
+          <td>Nordvik Shipping<div style="color:#7C948A;font-size:11px;margin-top:2px;">Existing Trakolo Free tier user, upsizing</div></td>
+          <td class="id-mono">+47 21 55 5019<br>ingrid.larsen@nordvikshipping.no</td>
+          <td>90</td>
+          <td><span class="mod-tag">SAM</span></td>
+          <td>Email</td>
+          <td><select class="status-select contacted" onchange="updateStatus(this)"><option>New</option><option selected>Contacted</option><option>Qualified</option><option>Converted</option><option>Lost</option></select></td>
+          <td class="id-mono">17/07/2026</td>
+          <td class="row-actions-sm"><button class="icon-btn primary" onclick="convertLead(this)">Convert</button><button class="icon-btn danger" onclick="this.closest('tr').remove()">🗑</button></td>
+        </tr>
+        <tr data-status="converted">
+          <td><b style="color:#fff;">James Okoro</b></td>
+          <td>Umbrella Group<div style="color:#7C948A;font-size:11px;margin-top:2px;">Now on Enterprise — see Home</div></td>
+          <td class="id-mono">+81 3 5555 0142<br>alice.marcus@umbrella-group.com</td>
+          <td>2,880</td>
+          <td><span class="mod-tag">IT</span><span class="mod-tag">SAM</span><span class="mod-tag">Dev</span><span class="mod-tag">Ops</span></td>
+          <td>Referral</td>
+          <td><select class="status-select converted" onchange="updateStatus(this)"><option>New</option><option>Contacted</option><option>Qualified</option><option selected>Converted</option><option>Lost</option></select></td>
+          <td class="id-mono">11/08/2023</td>
+          <td class="row-actions-sm"><a class="icon-btn primary" href="saas-admin-customer.html?org=Umbrella%20Group" style="text-decoration:none;display:inline-block;">View</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="plat-modal-scrim" id="lead-modal-scrim" onclick="if(event.target===this) closeModal()">
+  <div class="plat-modal" style="width:min(480px,92vw);">
+    <div class="plat-modal-head"><span class="title">Log enquiry</span><button class="plat-modal-close" onclick="closeModal()">✕</button></div>
+    <label>Contact name</label>
+    <input id="ld-contact" type="text" placeholder="Full name">
+    <label>Phone</label>
+    <input id="ld-phone" type="text" placeholder="+1 555 0100">
+    <label>Email</label>
+    <input id="ld-email" type="text" placeholder="name@company.com">
+    <label>Organisation name</label>
+    <input id="ld-org" type="text" placeholder="Company name">
+    <label>Organisation details</label>
+    <input id="ld-org-notes" type="text" placeholder="Industry, size, anything worth noting">
+    <label>No. of users interested</label>
+    <input id="ld-users" type="text" placeholder="e.g. 50">
+    <label>Modules interested</label>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;" id="ld-modules">
+      <span class="chip-pick" data-mod="IT">IT</span>
+      <span class="chip-pick" data-mod="SAM">SAM</span>
+      <span class="chip-pick" data-mod="Dev">Dev</span>
+      <span class="chip-pick" data-mod="Ops">Ops</span>
+      <span class="chip-pick" data-mod="Docs">Docs</span>
+    </div>
+    <label>Source</label>
+    <select id="ld-source"><option>Phone</option><option>Web</option><option>Referral</option><option>Email</option><option>Walk-in</option><option>Other</option></select>
+    <label>Notes</label>
+    <input id="ld-notes" type="text" placeholder="Anything else from the call">
+    <div class="plat-btn-row">
+      <button class="btn primary" style="flex:1;background:#1D9E75;border-color:#1D9E75;" onclick="saveLead()">Save enquiry</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openModal(){
+  document.querySelectorAll('#ld-modules .chip-pick').forEach(c => c.classList.remove('on'));
+  document.getElementById('lead-modal-scrim').classList.add('open');
+}
+function closeModal(){ document.getElementById('lead-modal-scrim').classList.remove('open'); }
+document.querySelectorAll('#ld-modules .chip-pick').forEach(c => c.addEventListener('click', () => c.classList.toggle('on')));
+
+function saveLead(){
+  const contact = document.getElementById('ld-contact').value.trim();
+  const org = document.getElementById('ld-org').value.trim();
+  if(!contact || !org){ alert('Enter at least a contact name and organisation.'); return; }
+  const phone = document.getElementById('ld-phone').value.trim();
+  const email = document.getElementById('ld-email').value.trim();
+  const orgNotes = document.getElementById('ld-org-notes').value.trim();
+  const users = document.getElementById('ld-users').value.trim() || '—';
+  const source = document.getElementById('ld-source').value;
+  const mods = [...document.querySelectorAll('#ld-modules .chip-pick.on')].map(c => c.dataset.mod);
+  const modTags = mods.length ? mods.map(m => '<span class="mod-tag">'+m+'</span>').join('') : '<span style="color:#7C948A;">—</span>';
+
+  const tr = document.createElement('tr');
+  tr.dataset.status = 'new';
+  tr.innerHTML =
+    '<td><b style="color:#fff;">'+contact+'</b></td>' +
+    '<td>'+org+(orgNotes ? '<div style="color:#7C948A;font-size:11px;margin-top:2px;">'+orgNotes+'</div>' : '')+'</td>' +
+    '<td class="id-mono">'+(phone||'—')+'<br>'+(email||'—')+'</td>' +
+    '<td>'+users+'</td>' +
+    '<td>'+modTags+'</td>' +
+    '<td>'+source+'</td>' +
+    '<td><select class="status-select new" onchange="updateStatus(this)"><option selected>New</option><option>Contacted</option><option>Qualified</option><option>Converted</option><option>Lost</option></select></td>' +
+    '<td class="id-mono">'+new Date().toLocaleDateString('en-GB')+'</td>' +
+    '<td class="row-actions-sm"><button class="icon-btn primary" onclick="convertLead(this)">Convert</button><button class="icon-btn danger" onclick="this.closest(\'tr\').remove()">🗑</button></td>';
+  document.getElementById('lead-body').prepend(tr);
+  recalcMetrics();
+  closeModal();
+}
+
+function updateStatus(sel){
+  const tr = sel.closest('tr');
+  const val = sel.value.toLowerCase();
+  sel.className = 'status-select ' + val;
+  tr.dataset.status = val;
+  recalcMetrics();
+}
+
+function convertLead(btn){
+  const tr = btn.closest('tr');
+  const org = tr.children[1].textContent.trim();
+  alert('Converted "' + org + '" — head to Home and Generate License to bring them on as a tenant.');
+  const sel = tr.querySelector('select');
+  sel.value = 'Converted';
+  updateStatus(sel);
+}
+
+function recalcMetrics(){
+  const counts = { new:0, contacted:0, qualified:0, converted:0, lost:0 };
+  document.querySelectorAll('#lead-body tr').forEach(tr => { counts[tr.dataset.status] = (counts[tr.dataset.status]||0) + 1; });
+  document.getElementById('m-new').textContent = counts.new;
+  document.getElementById('m-contacted').textContent = counts.contacted;
+  document.getElementById('m-qualified').textContent = counts.qualified;
+  document.getElementById('m-converted').textContent = counts.converted;
+}
+</script>
+<script src="platform-chrome.js" defer></script>
+</body>
+</html>

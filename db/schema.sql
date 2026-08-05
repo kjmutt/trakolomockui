@@ -844,6 +844,67 @@ CREATE TABLE platform.staff_audit_log (
 );
 CREATE INDEX idx_staff_audit_log_time ON platform.staff_audit_log(created_at DESC);
 
+-- Inbound sales enquiries — phone calls logged by staff, web/referral leads —
+-- ahead of becoming a core.tenants row. See Platform Admin > Leads.
+CREATE TYPE platform.lead_source AS ENUM ('phone', 'web', 'referral', 'email', 'walk_in', 'other');
+CREATE TYPE platform.lead_status AS ENUM ('new', 'contacted', 'qualified', 'converted', 'lost');
+
+CREATE TABLE platform.leads (
+  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  contact_name        text NOT NULL,
+  organisation_name   text NOT NULL,
+  organisation_notes  text,                    -- industry, size, anything freeform from the call
+  email               citext,
+  phone               text,
+  users_interested    int,
+  modules_interested  text[] NOT NULL DEFAULT '{}',   -- 'IT', 'SAM', 'Dev', 'Ops', 'Docs'
+  source              platform.lead_source NOT NULL DEFAULT 'other',
+  status              platform.lead_status NOT NULL DEFAULT 'new',
+  notes               text,
+  converted_tenant_id uuid REFERENCES core.tenants(id),   -- set once they sign
+  logged_by_email     citext,
+  created_at          timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_leads_status ON platform.leads(status);
+
+-- Who Trakolo staff actually call at each account — sales/success-facing,
+-- distinct from core.contacts (the tenant's own SSP requesters).
+CREATE TABLE platform.account_contacts (
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id   uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
+  name        text NOT NULL,
+  title       text,
+  email       citext,
+  phone       text,
+  is_primary  boolean NOT NULL DEFAULT false,
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_account_contacts_tenant ON platform.account_contacts(tenant_id);
+
+-- Promotional email blasts to the customer base — separate from
+-- ssp_email_templates, which is transactional account-lifecycle mail.
+CREATE TYPE platform.campaign_segment AS ENUM ('all', 'by_plan', 'by_status', 'custom');
+CREATE TYPE platform.campaign_status AS ENUM ('draft', 'sent');
+
+CREATE TABLE platform.campaigns (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  subject         text NOT NULL,
+  body_html       text NOT NULL,
+  segment         platform.campaign_segment NOT NULL DEFAULT 'all',
+  segment_plan_id uuid REFERENCES platform.plans(id),   -- set when segment = 'by_plan'
+  status          platform.campaign_status NOT NULL DEFAULT 'draft',
+  sent_by_email   citext,
+  sent_at         timestamptz,
+  created_at      timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE platform.campaign_recipients (
+  campaign_id  uuid NOT NULL REFERENCES platform.campaigns(id) ON DELETE CASCADE,
+  tenant_id    uuid NOT NULL REFERENCES core.tenants(id) ON DELETE CASCADE,
+  opened_at    timestamptz,
+  PRIMARY KEY (campaign_id, tenant_id)
+);
+
 
 -- ============================================================================
 -- Seed: one demo tenant + the plan catalog, matching the mockup's data

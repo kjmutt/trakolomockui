@@ -34,6 +34,8 @@
       '<a class="chrome-menu-item" href="saas-admin-plans.html">💳 Entitlements</a>' +
       '<a class="chrome-menu-item" href="saas-admin-billing.html">🧾 Billing &amp; payments</a>' +
       '<a class="chrome-menu-item" href="saas-admin-services.html">⚙ Platform services</a>' +
+      '<a class="chrome-menu-item" href="saas-admin-leads.html">📋 Leads &amp; enquiries</a>' +
+      '<a class="chrome-menu-item" href="saas-admin-campaigns.html">📣 Campaigns</a>' +
       '<a class="chrome-menu-item" href="saas-admin-callback-requests.html">📞 Callback requests</a>' +
       '<a class="chrome-menu-item" href="saas-admin-technical.html">🗄 Technical / DB</a>' +
       '<a class="chrome-menu-item" href="' + signOutHref + '">→ Sign out</a>' +
