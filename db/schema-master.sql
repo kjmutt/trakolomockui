@@ -97,6 +97,30 @@ INSERT INTO core.schema_migrations (version) VALUES ('0001_initial');
 -- ============================================================================
 CREATE SCHEMA IF NOT EXISTS platform;
 
+CREATE TYPE platform.staff_role AS ENUM ('owner', 'admin', 'support', 'billing', 'read_only');
+CREATE TYPE platform.staff_status AS ENUM ('active', 'invited', 'suspended');
+
+-- Trakolo's own staff directory — who can sign in to saas-admin-login.html
+-- at all, and what they're allowed to do once they're in. Distinct from any
+-- tenant's core.users; nobody in this table works for a customer.
+CREATE TABLE platform.staff_users (
+  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  email          citext NOT NULL UNIQUE,
+  name           text NOT NULL,
+  role           platform.staff_role NOT NULL DEFAULT 'support',
+  status         platform.staff_status NOT NULL DEFAULT 'invited',
+  mfa_enrolled   boolean NOT NULL DEFAULT false,   -- hardware-key 2FA — the login page's stated requirement, enforced below
+  invited_by_id  uuid REFERENCES platform.staff_users(id),
+  last_login_at  timestamptz,
+  created_at     timestamptz NOT NULL DEFAULT now(),
+  updated_at     timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT chk_staff_active_requires_mfa CHECK (status <> 'active' OR mfa_enrolled)
+);
+CREATE INDEX idx_staff_users_role ON platform.staff_users(role);
+CREATE INDEX idx_staff_users_invited_by_id ON platform.staff_users(invited_by_id);
+CREATE TRIGGER trg_staff_users_updated BEFORE UPDATE ON platform.staff_users
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
 CREATE TABLE platform.plans (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name           text NOT NULL UNIQUE,     -- 'Free', 'Team', 'Business', 'Enterprise'
@@ -145,12 +169,13 @@ CREATE TABLE platform.subscriptions (
   contract_to_date     date NOT NULL,
   drop_dead_date       date NOT NULL,      -- hard cutoff past contract_to_date; access suspended after this
   license_key          text UNIQUE,
-  generated_by_email   citext,             -- platform staff who generated it
+  generated_by_staff_id uuid REFERENCES platform.staff_users(id),  -- platform staff who generated it
   created_at           timestamptz NOT NULL DEFAULT now(),
   updated_at           timestamptz NOT NULL DEFAULT now(),
   UNIQUE (tenant_id)                       -- one active subscription per tenant
 );
 CREATE INDEX idx_subscriptions_plan_id ON platform.subscriptions(plan_id);
+CREATE INDEX idx_subscriptions_generated_by_staff_id ON platform.subscriptions(generated_by_staff_id);
 CREATE TRIGGER trg_subscriptions_updated BEFORE UPDATE ON platform.subscriptions
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
@@ -169,12 +194,13 @@ CREATE TABLE platform.subscription_history (
   previous_contract_to_date  date,
   new_contract_to_date       date,
   cost                       numeric(12,2),
-  performed_by_email         citext,
+  performed_by_staff_id      uuid REFERENCES platform.staff_users(id),
   note                       text,
   created_at                 timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_subscription_history_previous_plan_id ON platform.subscription_history(previous_plan_id);
 CREATE INDEX idx_subscription_history_new_plan_id ON platform.subscription_history(new_plan_id);
+CREATE INDEX idx_subscription_history_performed_by_staff_id ON platform.subscription_history(performed_by_staff_id);
 CREATE INDEX idx_subscription_history_subscription ON platform.subscription_history(subscription_id, created_at DESC);
 
 -- Per-tenant, per-feature overrides on top of the plan (e.g. a trial add-on).
@@ -259,13 +285,14 @@ CREATE INDEX idx_callback_requests_tenant_id ON platform.callback_requests(tenan
 -- console — separate from core.audit_log, which is per-tenant.
 CREATE TABLE platform.staff_audit_log (
   id          uuid PRIMARY KEY DEFAULT uuidv7(),  -- time-ordered: append-only, ever-growing
-  staff_email citext NOT NULL,
+  staff_id    uuid NOT NULL REFERENCES platform.staff_users(id),
   action      text NOT NULL,        -- 'subscription.renewed', 'plan_feature.toggled', ...
   target_type text NOT NULL,
   target_id   uuid,
   metadata    jsonb NOT NULL DEFAULT '{}',
   created_at  timestamptz NOT NULL DEFAULT now()
 );
+CREATE INDEX idx_staff_audit_log_staff_id ON platform.staff_audit_log(staff_id);
 CREATE INDEX idx_staff_audit_log_time ON platform.staff_audit_log(created_at DESC);
 
 -- Inbound sales enquiries — phone calls logged by staff, web/referral leads —
@@ -286,10 +313,11 @@ CREATE TABLE platform.leads (
   status              platform.lead_status NOT NULL DEFAULT 'new',
   notes               text,
   converted_tenant_id uuid REFERENCES core.tenants(id),   -- set once they sign
-  logged_by_email     citext,
+  logged_by_staff_id  uuid REFERENCES platform.staff_users(id),
   created_at          timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_leads_converted_tenant_id ON platform.leads(converted_tenant_id);
+CREATE INDEX idx_leads_logged_by_staff_id ON platform.leads(logged_by_staff_id);
 CREATE INDEX idx_leads_status ON platform.leads(status);
 
 -- Who Trakolo staff actually call at each account — sales/success-facing,
@@ -318,11 +346,12 @@ CREATE TABLE platform.campaigns (
   segment         platform.campaign_segment NOT NULL DEFAULT 'all',
   segment_plan_id uuid REFERENCES platform.plans(id),   -- set when segment = 'by_plan'
   status          platform.campaign_status NOT NULL DEFAULT 'draft',
-  sent_by_email   citext,
+  sent_by_staff_id uuid REFERENCES platform.staff_users(id),
   sent_at         timestamptz,
   created_at      timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_campaigns_segment_plan_id ON platform.campaigns(segment_plan_id);
+CREATE INDEX idx_campaigns_sent_by_staff_id ON platform.campaigns(sent_by_staff_id);
 
 CREATE TABLE platform.campaign_recipients (
   campaign_id  uuid NOT NULL REFERENCES platform.campaigns(id) ON DELETE CASCADE,
@@ -334,6 +363,52 @@ CREATE INDEX idx_campaign_recipients_tenant_id ON platform.campaign_recipients(t
 
 
 -- ============================================================================
+
+
+-- ============================================================================
+-- Seed: Trakolo's own staff roster — who can sign in to this console. Names
+-- and emails match what saas-admin-console.html already shows under
+-- "Generated by" for each tenant (t.reyes@trakolo.com, m.osei@trakolo.com,
+-- platform-ops@trakolo.com).
+-- ============================================================================
+INSERT INTO platform.staff_users (email, name, role, status, mfa_enrolled, last_login_at) VALUES
+  ('sofia.lindqvist@trakolo.com', 'Sofia Lindqvist', 'owner', 'active', true, now() - interval '2 hours');
+
+INSERT INTO platform.staff_users (email, name, role, status, mfa_enrolled, invited_by_id, last_login_at)
+SELECT 'theo.reyes@trakolo.com', 'Theo Reyes', 'admin', 'active', true, id, now() - interval '1 day'
+FROM platform.staff_users WHERE email = 'sofia.lindqvist@trakolo.com';
+
+INSERT INTO platform.staff_users (email, name, role, status, mfa_enrolled, invited_by_id, last_login_at)
+SELECT 'maya.osei@trakolo.com', 'Maya Osei', 'admin', 'active', true, id, now() - interval '3 hours'
+FROM platform.staff_users WHERE email = 'sofia.lindqvist@trakolo.com';
+
+-- The shared ops inbox already shown as this workspace's own subscription
+-- generator in saas-admin-console.html — a service account, not a person,
+-- kept in the same directory so staff_audit_log/subscriptions can still
+-- point at exactly one row regardless of who's on rotation.
+INSERT INTO platform.staff_users (email, name, role, status, mfa_enrolled, invited_by_id, last_login_at)
+SELECT 'platform-ops@trakolo.com', 'Platform Ops', 'admin', 'active', true, id, now() - interval '6 hours'
+FROM platform.staff_users WHERE email = 'sofia.lindqvist@trakolo.com';
+
+INSERT INTO platform.staff_users (email, name, role, status, mfa_enrolled, invited_by_id, last_login_at)
+SELECT 'devon.marsh@trakolo.com', 'Devon Marsh', 'support', 'active', true, id, now() - interval '5 days'
+FROM platform.staff_users WHERE email = 'theo.reyes@trakolo.com';
+
+INSERT INTO platform.staff_users (email, name, role, status, mfa_enrolled, invited_by_id, last_login_at)
+SELECT 'priya.chandran@trakolo.com', 'Priya Chandran', 'billing', 'active', true, id, now() - interval '1 day'
+FROM platform.staff_users WHERE email = 'sofia.lindqvist@trakolo.com';
+
+-- Invited, not yet through 2FA setup — chk_staff_active_requires_mfa is why
+-- status can't just be flipped to 'active' before mfa_enrolled is true.
+INSERT INTO platform.staff_users (email, name, role, status, mfa_enrolled, invited_by_id)
+SELECT 'jonas.weber@trakolo.com', 'Jonas Weber', 'support', 'invited', false, id
+FROM platform.staff_users WHERE email = 'theo.reyes@trakolo.com';
+
+-- Offboarded — access revoked, row kept so past audit history and generated
+-- licenses still resolve to someone instead of a dangling reference.
+INSERT INTO platform.staff_users (email, name, role, status, mfa_enrolled, invited_by_id, last_login_at)
+SELECT 'owen.blake@trakolo.com', 'Owen Blake', 'read_only', 'suspended', true, id, now() - interval '95 days'
+FROM platform.staff_users WHERE email = 'sofia.lindqvist@trakolo.com';
 
 
 -- ============================================================================
@@ -352,14 +427,16 @@ INSERT INTO core.tenants (id, name, slug, deployment_model, subdomain, db_host, 
   ('a1111111-1111-4111-8111-111111111111', 'Acme Corp', 'acme',    'cloud', 'acme',    'tenant-db-01.postgres.trakolo.internal', 'trakolo_acme',    now()),
   ('a2222222-2222-4222-8222-222222222222', 'Trakolo',   'trakolo', 'cloud', 'support', 'tenant-db-00.postgres.trakolo.internal', 'trakolo_support', '2025-01-01');
 
-INSERT INTO platform.subscriptions (tenant_id, plan_id, status, contract_type, total_license_count, generated_date, contract_from_date, contract_to_date, drop_dead_date, license_key, generated_by_email)
-SELECT t.id, p.id, 'active', 'monthly', 84, current_date, '2026-03-01', '2027-03-01', '2027-03-15', NULL, NULL
+INSERT INTO platform.subscriptions (tenant_id, plan_id, status, contract_type, total_license_count, generated_date, contract_from_date, contract_to_date, drop_dead_date, license_key, generated_by_staff_id)
+SELECT t.id, p.id, 'active', 'monthly', 84, current_date, '2026-03-01', '2027-03-01', '2027-03-15', NULL,
+  (SELECT id FROM platform.staff_users WHERE email = 'theo.reyes@trakolo.com')
 FROM core.tenants t, platform.plans p WHERE t.slug = 'acme' AND p.name = 'Team';
 
 -- Perpetual/internal: contract_to_date and drop_dead_date use the same
 -- far-future sentinel the console already renders as "—" for Perpetual rows.
-INSERT INTO platform.subscriptions (tenant_id, plan_id, status, contract_type, total_license_count, generated_date, contract_from_date, contract_to_date, drop_dead_date, license_key, generated_by_email)
-SELECT t.id, p.id, 'active', 'perpetual', 46, '2025-01-01', '2025-01-01', '2099-01-01', '2099-01-01', 'TRK-TRAKOLO-2025-INTERNAL', 'platform-ops@trakolo.com'
+INSERT INTO platform.subscriptions (tenant_id, plan_id, status, contract_type, total_license_count, generated_date, contract_from_date, contract_to_date, drop_dead_date, license_key, generated_by_staff_id)
+SELECT t.id, p.id, 'active', 'perpetual', 46, '2025-01-01', '2025-01-01', '2099-01-01', '2099-01-01', 'TRK-TRAKOLO-2025-INTERNAL',
+  (SELECT id FROM platform.staff_users WHERE email = 'platform-ops@trakolo.com')
 FROM core.tenants t, platform.plans p WHERE t.slug = 'trakolo' AND p.name = 'Enterprise';
 
 

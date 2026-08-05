@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — platform admin users</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .plat-wrap{max-width:1180px;margin:0 auto;padding:32px 40px 60px;}
+  .plat-card{background:#151F1B;border:1px solid #26362F;border-radius:14px;}
+  .plat-card table{width:100%;border-collapse:collapse;}
+  .plat-card th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:#7C948A;font-family:var(--font-mono);font-weight:500;padding:12px 14px;border-bottom:1px solid #26362F;background:#151F1B;}
+  .plat-card td{padding:12px 14px;border-bottom:1px solid #26362F;font-size:12.5px;color:#D6E4DE;vertical-align:top;}
+  .plat-card tbody tr:last-child td{border-bottom:none;}
+  .plat-card tbody tr:hover{background:#1B2620;}
+  .plat-mcard{background:#151F1B;border:1px solid #26362F;border-radius:12px;padding:16px 18px;}
+  .plat-mcard .mlabel{font-size:11px;color:#7C948A;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.5px;}
+  .plat-mcard .mval{font-family:var(--font-display);font-size:23px;font-weight:700;margin-top:6px;color:#fff;}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;}
+  .role-select{font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;border:1px solid #2B3B33;background:#0E1613;cursor:pointer;width:100%;min-width:96px;}
+  .role-select.owner{color:#B9A8ED;}
+  .role-select.admin{color:#5DCAA5;}
+  .role-select.support{color:#5DA9E0;}
+  .role-select.billing{color:#DDA234;}
+  .role-select.read_only{color:#8FA79C;}
+  .status-pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;}
+  .status-pill.active{background:#16241E;color:#5DCAA5;border:1px solid #2E4A3E;}
+  .status-pill.invited{background:#26221A;color:#DDA234;border:1px solid #453A22;}
+  .status-pill.suspended{background:#26362F;color:#7C948A;border:1px solid #37473F;}
+  .mfa-tag{font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:4px;}
+  .mfa-tag.on{color:#5DCAA5;}
+  .mfa-tag.off{color:#E8795A;}
+  .row-actions-sm{display:flex;gap:6px;flex-wrap:wrap;}
+  .icon-btn{background:#1B2620;border:1px solid #2B3B33;color:#D6E4DE;border-radius:7px;padding:5px 9px;cursor:pointer;font-size:11.5px;}
+  .icon-btn:hover{background:#26362F;}
+  .icon-btn.primary{color:#5DCAA5;}
+  .icon-btn.danger{color:#E8795A;}
+</style>
+</head>
+<body class="platform-body">
+<div class="platform-header">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#1B2E27" stroke="#5DCAA5" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#5DCAA5" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5"/><circle cx="100" cy="100" r="16" fill="#5DCAA5"/><circle cx="150" cy="50" r="21" fill="#5DCAA5"/></svg>
+    <span class="brand-name">Trakolo</span>
+    <span class="plat-tag">Platform</span>
+  </a>
+  <div class="top-right"><a href="saas-admin-login.html">Sign out</a></div>
+</div>
+<div class="plat-tabstrip">
+  <a href="saas-admin-console.html">Home</a>
+  <a href="saas-admin-errorlog.html">Error log</a>
+  <a href="saas-admin-pricing.html">Pricing</a>
+  <a href="saas-admin-plans.html">Entitlements</a>
+  <a href="saas-admin-email-settings.html">Email settings</a>
+  <a href="saas-admin-email-templates.html">Email templates</a>
+  <a href="saas-admin-callback-requests.html">Callback requests</a>
+  <a href="saas-admin-leads.html">Leads</a>
+  <a href="saas-admin-campaigns.html">Campaigns</a>
+  <a href="saas-admin-services.html">Services</a>
+  <a href="saas-admin-billing.html">Billing &amp; payments</a>
+  <a href="saas-admin-users.html" class="active">Users</a>
+  <a href="saas-admin-technical.html">Technical</a>
+</div>
+
+<div class="plat-wrap">
+  <div class="toolbar">
+    <div>
+      <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:#fff;">Platform admin users</div>
+      <div style="font-size:13px;color:#8FA79C;margin-top:4px;max-width:640px;">Trakolo staff who can sign in to this console — not tenant users, not customers. Access requires hardware-key 2FA (see <a href="saas-admin-login.html" style="color:#5DCAA5;">saas-admin-login.html</a>); every action here is recorded to <a href="db/schema-master.sql" style="color:#5DCAA5;">platform.staff_audit_log</a>.</div>
+    </div>
+    <button class="btn primary" style="background:#1D9E75;border-color:#1D9E75;white-space:nowrap;" onclick="openModal()">+ Invite staff</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
+    <div class="plat-mcard"><div class="mlabel">Total staff</div><div class="mval" id="m-total">8</div></div>
+    <div class="plat-mcard"><div class="mlabel">Active</div><div class="mval" id="m-active">6</div></div>
+    <div class="plat-mcard"><div class="mlabel">Invited — pending 2FA</div><div class="mval" id="m-invited">1</div></div>
+    <div class="plat-mcard"><div class="mlabel">Suspended</div><div class="mval" id="m-suspended">1</div></div>
+  </div>
+
+  <div class="plat-card" style="overflow-x:auto;">
+    <table id="staff-table">
+      <thead><tr><th>Name</th><th>Role</th><th>Status</th><th>2FA</th><th>Invited by</th><th>Last active</th><th></th></tr></thead>
+      <tbody id="staff-body">
+        <tr data-status="active" data-mfa="1">
+          <td><b style="color:#fff;">Sofia Lindqvist</b><div class="id-mono" style="color:#7C948A;font-size:11px;margin-top:2px;">sofia.lindqvist@trakolo.com</div></td>
+          <td><select class="role-select owner" onchange="updateRole(this)"><option selected>Owner</option><option>Admin</option><option>Support</option><option>Billing</option><option>Read-only</option></select></td>
+          <td><span class="status-pill active">● Active</span></td>
+          <td><span class="mfa-tag on">✓ Enrolled</span></td>
+          <td style="color:#7C948A;">— founding account</td>
+          <td class="id-mono">2 hours ago</td>
+          <td class="row-actions-sm"><button class="icon-btn danger" onclick="suspendStaff(this)">Suspend</button></td>
+        </tr>
+        <tr data-status="active" data-mfa="1">
+          <td><b style="color:#fff;">Theo Reyes</b><div class="id-mono" style="color:#7C948A;font-size:11px;margin-top:2px;">theo.reyes@trakolo.com</div></td>
+          <td><select class="role-select admin" onchange="updateRole(this)"><option>Owner</option><option selected>Admin</option><option>Support</option><option>Billing</option><option>Read-only</option></select></td>
+          <td><span class="status-pill active">● Active</span></td>
+          <td><span class="mfa-tag on">✓ Enrolled</span></td>
+          <td>Sofia Lindqvist</td>
+          <td class="id-mono">1 day ago</td>
+          <td class="row-actions-sm"><button class="icon-btn danger" onclick="suspendStaff(this)">Suspend</button></td>
+        </tr>
+        <tr data-status="active" data-mfa="1">
+          <td><b style="color:#fff;">Maya Osei</b><div class="id-mono" style="color:#7C948A;font-size:11px;margin-top:2px;">maya.osei@trakolo.com</div></td>
+          <td><select class="role-select admin" onchange="updateRole(this)"><option>Owner</option><option selected>Admin</option><option>Support</option><option>Billing</option><option>Read-only</option></select></td>
+          <td><span class="status-pill active">● Active</span></td>
+          <td><span class="mfa-tag on">✓ Enrolled</span></td>
+          <td>Sofia Lindqvist</td>
+          <td class="id-mono">3 hours ago</td>
+          <td class="row-actions-sm"><button class="icon-btn danger" onclick="suspendStaff(this)">Suspend</button></td>
+        </tr>
+        <tr data-status="active" data-mfa="1">
+          <td><b style="color:#fff;">Platform Ops</b><div class="id-mono" style="color:#7C948A;font-size:11px;margin-top:2px;">platform-ops@trakolo.com</div><div style="color:#7C948A;font-size:11px;margin-top:2px;">Shared inbox — on-call rotation</div></td>
+          <td><select class="role-select admin" onchange="updateRole(this)"><option>Owner</option><option selected>Admin</option><option>Support</option><option>Billing</option><option>Read-only</option></select></td>
+          <td><span class="status-pill active">● Active</span></td>
+          <td><span class="mfa-tag on">✓ Enrolled</span></td>
+          <td>Sofia Lindqvist</td>
+          <td class="id-mono">6 hours ago</td>
+          <td class="row-actions-sm"><button class="icon-btn danger" onclick="suspendStaff(this)">Suspend</button></td>
+        </tr>
+        <tr data-status="active" data-mfa="1">
+          <td><b style="color:#fff;">Devon Marsh</b><div class="id-mono" style="color:#7C948A;font-size:11px;margin-top:2px;">devon.marsh@trakolo.com</div></td>
+          <td><select class="role-select support" onchange="updateRole(this)"><option>Owner</option><option>Admin</option><option selected>Support</option><option>Billing</option><option>Read-only</option></select></td>
+          <td><span class="status-pill active">● Active</span></td>
+          <td><span class="mfa-tag on">✓ Enrolled</span></td>
+          <td>Theo Reyes</td>
+          <td class="id-mono">5 days ago</td>
+          <td class="row-actions-sm"><button class="icon-btn danger" onclick="suspendStaff(this)">Suspend</button></td>
+        </tr>
+        <tr data-status="active" data-mfa="1">
+          <td><b style="color:#fff;">Priya Chandran</b><div class="id-mono" style="color:#7C948A;font-size:11px;margin-top:2px;">priya.chandran@trakolo.com</div></td>
+          <td><select class="role-select billing" onchange="updateRole(this)"><option>Owner</option><option>Admin</option><option>Support</option><option selected>Billing</option><option>Read-only</option></select></td>
+          <td><span class="status-pill active">● Active</span></td>
+          <td><span class="mfa-tag on">✓ Enrolled</span></td>
+          <td>Sofia Lindqvist</td>
+          <td class="id-mono">1 day ago</td>
+          <td class="row-actions-sm"><button class="icon-btn danger" onclick="suspendStaff(this)">Suspend</button></td>
+        </tr>
+        <tr data-status="invited" data-mfa="0">
+          <td><b style="color:#fff;">Jonas Weber</b><div class="id-mono" style="color:#7C948A;font-size:11px;margin-top:2px;">jonas.weber@trakolo.com</div></td>
+          <td><select class="role-select support" onchange="updateRole(this)"><option>Owner</option><option>Admin</option><option selected>Support</option><option>Billing</option><option>Read-only</option></select></td>
+          <td><span class="status-pill invited">○ Invited</span></td>
+          <td><span class="mfa-tag off">✗ Not enrolled</span></td>
+          <td>Theo Reyes</td>
+          <td style="color:#7C948A;">never</td>
+          <td class="row-actions-sm"><button class="icon-btn primary" onclick="resendInvite(this)">Resend invite</button><button class="icon-btn danger" onclick="this.closest('tr').remove();recalcMetrics();">Revoke</button></td>
+        </tr>
+        <tr data-status="suspended" data-mfa="1">
+          <td><b style="color:#fff;">Owen Blake</b><div class="id-mono" style="color:#7C948A;font-size:11px;margin-top:2px;">owen.blake@trakolo.com</div></td>
+          <td><select class="role-select read_only" onchange="updateRole(this)"><option>Owner</option><option>Admin</option><option>Support</option><option>Billing</option><option selected>Read-only</option></select></td>
+          <td><span class="status-pill suspended">■ Suspended</span></td>
+          <td><span class="mfa-tag on">✓ Enrolled</span></td>
+          <td>Sofia Lindqvist</td>
+          <td class="id-mono">95 days ago</td>
+          <td class="row-actions-sm"><button class="icon-btn primary" onclick="reactivateStaff(this)">Reactivate</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="hint" style="margin-top:16px;">
+    <span>Activating an invited account requires 2FA enrollment first — enforced by <span class="id-mono">chk_staff_active_requires_mfa</span> on <span class="id-mono">platform.staff_users</span> in <a href="db/schema-master.sql" style="color:#5DCAA5;">db/schema-master.sql</a>, not just this UI.</span>
+  </div>
+</div>
+
+<div class="plat-modal-scrim" id="staff-modal-scrim" onclick="if(event.target===this) closeModal()">
+  <div class="plat-modal" style="width:min(420px,92vw);">
+    <div class="plat-modal-head"><span class="title">Invite staff</span><button class="plat-modal-close" onclick="closeModal()">✕</button></div>
+    <label style="margin-top:0;">Full name</label>
+    <input id="st-name" type="text" placeholder="Full name">
+    <label>Work email</label>
+    <input id="st-email" type="text" placeholder="name@trakolo.com">
+    <label>Role</label>
+    <select id="st-role">
+      <option value="admin">Admin — day-to-day console access</option>
+      <option value="support" selected>Support — tenants &amp; tickets, no billing/pricing</option>
+      <option value="billing">Billing — subscriptions &amp; payments only</option>
+      <option value="read_only">Read-only — view everything, change nothing</option>
+      <option value="owner">Owner — full access, security &amp; billing</option>
+    </select>
+    <div class="hint" style="margin-top:10px;">
+      <span>They'll show up here as "Invited" until they sign in and enroll a hardware key — the console won't let them in before that.</span>
+    </div>
+    <div class="plat-btn-row">
+      <button class="btn primary" style="flex:1;background:#1D9E75;border-color:#1D9E75;" onclick="saveStaff()">Send invite</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openModal(){
+  document.getElementById('st-name').value = '';
+  document.getElementById('st-email').value = '';
+  document.getElementById('st-role').value = 'support';
+  document.getElementById('staff-modal-scrim').classList.add('open');
+}
+function closeModal(){ document.getElementById('staff-modal-scrim').classList.remove('open'); }
+
+const ROLE_LABELS = {owner:'Owner', admin:'Admin', support:'Support', billing:'Billing', read_only:'Read-only'};
+
+function saveStaff(){
+  const name = document.getElementById('st-name').value.trim();
+  const email = document.getElementById('st-email').value.trim();
+  const role = document.getElementById('st-role').value;
+  if(!name || !email){ alert('Enter at least a name and work email.'); return; }
+
+  const tr = document.createElement('tr');
+  tr.dataset.status = 'invited';
+  tr.dataset.mfa = '0';
+  const roleOptions = Object.keys(ROLE_LABELS).map(r =>
+    '<option value="'+r+'"'+(r===role?' selected':'')+'>'+ROLE_LABELS[r]+'</option>').join('');
+  tr.innerHTML =
+    '<td><b style="color:#fff;">'+name+'</b><div class="id-mono" style="color:#7C948A;font-size:11px;margin-top:2px;">'+email+'</div></td>' +
+    '<td><select class="role-select '+role+'" onchange="updateRole(this)">'+roleOptions+'</select></td>' +
+    '<td><span class="status-pill invited">○ Invited</span></td>' +
+    '<td><span class="mfa-tag off">✗ Not enrolled</span></td>' +
+    '<td>You</td>' +
+    '<td style="color:#7C948A;">never</td>' +
+    '<td class="row-actions-sm"><button class="icon-btn primary" onclick="resendInvite(this)">Resend invite</button><button class="icon-btn danger" onclick="this.closest(\'tr\').remove();recalcMetrics();">Revoke</button></td>';
+  document.getElementById('staff-body').prepend(tr);
+  recalcMetrics();
+  closeModal();
+}
+
+function updateRole(sel){
+  const val = sel.value;
+  sel.className = 'role-select ' + val;
+}
+
+function suspendStaff(btn){
+  const tr = btn.closest('tr');
+  tr.dataset.status = 'suspended';
+  tr.querySelector('.status-pill').outerHTML = '<span class="status-pill suspended">■ Suspended</span>';
+  btn.textContent = 'Reactivate';
+  btn.classList.remove('danger'); btn.classList.add('primary');
+  btn.setAttribute('onclick', 'reactivateStaff(this)');
+  recalcMetrics();
+}
+
+function reactivateStaff(btn){
+  const tr = btn.closest('tr');
+  if(tr.dataset.mfa !== '1'){
+    alert('Can\'t reactivate — this account was never enrolled in 2FA. Have them sign in and enroll a hardware key first (chk_staff_active_requires_mfa).');
+    return;
+  }
+  tr.dataset.status = 'active';
+  tr.querySelector('.status-pill').outerHTML = '<span class="status-pill active">● Active</span>';
+  btn.textContent = 'Suspend';
+  btn.classList.remove('primary'); btn.classList.add('danger');
+  btn.setAttribute('onclick', 'suspendStaff(this)');
+  recalcMetrics();
+}
+
+function resendInvite(btn){
+  const name = btn.closest('tr').querySelector('b').textContent;
+  alert('Invite email resent to ' + name + '.');
+}
+
+function recalcMetrics(){
+  const rows = [...document.querySelectorAll('#staff-body tr')];
+  document.getElementById('m-total').textContent = rows.length;
+  document.getElementById('m-active').textContent = rows.filter(r => r.dataset.status === 'active').length;
+  document.getElementById('m-invited').textContent = rows.filter(r => r.dataset.status === 'invited').length;
+  document.getElementById('m-suspended').textContent = rows.filter(r => r.dataset.status === 'suspended').length;
+}
+</script>
+<script src="platform-chrome.js" defer></script>
+</body>
+</html>

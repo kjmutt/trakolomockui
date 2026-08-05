@@ -207,7 +207,7 @@
   </div>
 
   <div class="sm-section" id="sm-platform">
-    <div class="sm-label"><span class="name">Platform · Trakolo staff only</span><span class="rule"></span><span class="count">4 pages</span></div>
+    <div class="sm-label"><span class="name">Platform · Trakolo staff only</span><span class="rule"></span><span class="count">5 pages</span></div>
     <div class="panel">
       <table class="sm">
         <thead><tr><th>Page</th><th>What's on it</th></tr></thead>
@@ -216,6 +216,7 @@
           <tr><td><a href="saas-admin-services.html">Platform services</a><div class="path">saas-admin-services.html</div></td><td>Start, stop, restart infrastructure with confirmations and a protected database — per-service Debug toggle streams verbose logs live</td></tr>
           <tr><td><a href="saas-admin-plans.html">Plans &amp; entitlements</a><div class="path">saas-admin-plans.html</div></td><td>What each customer bought — product toggles and feature flags per tenant, license files for on-premise</td></tr>
           <tr><td><a href="saas-admin-billing.html">Billing &amp; payments</a><div class="path">saas-admin-billing.html</div></td><td>Monthly vs. annual billing cycle per customer, plus the full cross-tenant payment history</td></tr>
+          <tr><td><a href="saas-admin-users.html">Platform admin users</a><div class="path">saas-admin-users.html</div></td><td>Trakolo's own staff directory — roles, 2FA enrollment status, invite/suspend/reactivate</td></tr>
         </tbody>
       </table>
     </div>
@@ -269,7 +270,7 @@
           <tr><td><a href="deployment-options.html">Deployment options</a><div class="path">deployment-options.html</div></td><td>Cloud vs. on-premise decision guide, plus the AKS/EKS microservices alternative with diagrams</td></tr>
           <tr><td><a href="db/schema.sql">Database schema — per tenant</a><div class="path">db/schema.sql</div></td><td>PostgreSQL schema applied once per cloud tenant's dedicated database (and identically for a standalone install), organized by module (core, itsm, sam, dev, docs)</td></tr>
           <tr><td><a href="db/schema-master.sql">Database schema — trakolo-master</a><div class="path">db/schema-master.sql</div></td><td>PostgreSQL schema for Trakolo's own control-plane database — the tenant registry plus every table behind the Platform Admin console</td></tr>
-          <tr><td><a href="er-diagram.html">Entity relationships</a><div class="path">er-diagram.html</div></td><td>All 85 foreign keys across the 69 tables in trakolo-master and the per-tenant database, grouped by module and filterable, extracted from a live database</td></tr>
+          <tr><td><a href="er-diagram.html">Entity relationships</a><div class="path">er-diagram.html</div></td><td>All 91 foreign keys across the 71 tables in trakolo-master and the per-tenant database, grouped by module and filterable, extracted from a live database</td></tr>
           <tr><td><a href="install/docker-compose.yml">docker-compose.yml</a><div class="path">install/docker-compose.yml</div></td><td>Standalone/on-premise reference stack — Postgres, Redis, a one-shot schema migration, the app</td></tr>
           <tr><td><a href="install/install.sh">install.sh</a><div class="path">install/install.sh</div></td><td>One-command installer — generates .env, brings the stack up in dependency order, applies the schema</td></tr>
           <tr><td><a href="openapi/trakolo-v1.yaml">openapi/trakolo-v1.yaml</a><div class="path">openapi/trakolo-v1.yaml</div></td><td>OpenAPI 3.0 spec for the tickets endpoints and category tree — a representative subset of the full API reference</td></tr>

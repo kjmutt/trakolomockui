@@ -48,6 +48,7 @@
   <a href="saas-admin-campaigns.html">Campaigns</a>
   <a href="saas-admin-services.html">Services</a>
   <a href="saas-admin-billing.html">Billing &amp; payments</a>
+  <a href="saas-admin-users.html">Users</a>
   <a href="saas-admin-technical.html" class="active">Technical</a>
 </div>
 
@@ -65,30 +66,35 @@
   </div>
 
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0;">
-    <div class="plat-mcard"><div class="mlabel">Tables</div><div class="mval">17</div></div>
-    <div class="plat-mcard"><div class="mlabel">Foreign keys</div><div class="mval">15</div></div>
-    <div class="plat-mcard"><div class="mlabel">Enum types</div><div class="mval">11</div></div>
+    <div class="plat-mcard"><div class="mlabel">Tables</div><div class="mval">19</div></div>
+    <div class="plat-mcard"><div class="mlabel">Foreign keys</div><div class="mval">21</div></div>
+    <div class="plat-mcard"><div class="mlabel">Enum types</div><div class="mval">13</div></div>
     <div class="plat-mcard"><div class="mlabel">Written by</div><div class="mval" style="font-size:15px;">Platform admins only</div></div>
   </div>
 
   <div class="section-title">How the tables relate</div>
   <div class="plat-card" style="padding:18px 20px;">
     <ul class="rel-list">
+      <li><b>staff_users</b> — Trakolo's own staff directory; self-references <b>invited_by_id</b>, and every other table below that used to track "who did this" by a loose email now points here instead</li>
       <li><b>plans</b> → subscriptions ← tenants — one active license per tenant</li>
       <li><b>subscriptions</b> → subscription_history — every Renew/Upgrade on Home, audited</li>
+      <li><b>subscriptions</b>, <b>subscription_history</b> → staff_users (generated_by / performed_by) — who actually did it</li>
       <li><b>plans</b> ↔ features (via plan_features) — the Pricing page's edition matrix</li>
       <li><b>tenants</b> → tenant_entitlements — per-tenant overrides on top of the plan</li>
       <li><b>tenants</b> → error_logs, callback_requests (both nullable — platform-wide rows allowed)</li>
       <li><b>tenants</b> → account_contacts — who Trakolo staff actually call at each account</li>
-      <li><b>leads</b> → tenants (converted_tenant_id) — set once a phone/web enquiry signs</li>
-      <li><b>campaigns</b> ↔ tenants (via campaign_recipients) — who got which promo email</li>
-      <li><b>services</b>, <b>ssp_email_settings</b>, <b>ssp_email_templates</b>, <b>staff_audit_log</b> stand alone — no tenant_id, platform-scoped by design</li>
+      <li><b>leads</b> → tenants (converted_tenant_id), leads → staff_users (logged_by_staff_id) — set once a phone/web enquiry signs</li>
+      <li><b>campaigns</b> ↔ tenants (via campaign_recipients), campaigns → staff_users (sent_by_staff_id) — who got which promo email, and who sent it</li>
+      <li><b>staff_audit_log</b> → staff_users — every privileged console action, attributed to a real account, not a free-text email</li>
+      <li><b>services</b>, <b>ssp_email_settings</b>, <b>ssp_email_templates</b> stand alone — no tenant_id, platform-scoped by design</li>
     </ul>
   </div>
 
   <div class="section-title">Tables, at a glance</div>
   <div class="tbl-grid">
     <div class="tbl-item"><div class="tname">core.tenants</div><div class="tdesc">The tenant registry — cloud tenants route to their own database via subdomain/db_host/db_name; standalone tenants have neither.</div></div>
+    <div class="tbl-item"><div class="tname">core.schema_migrations</div><div class="tdesc">Framework-agnostic version tracking for future schema changes.</div></div>
+    <div class="tbl-item"><div class="tname">platform.staff_users</div><div class="tdesc">Trakolo's own staff directory — who can sign in here, and what role they hold. See <a href="saas-admin-users.html" style="color:#5DCAA5;">Users</a>.</div></div>
     <div class="tbl-item"><div class="tname">platform.plans</div><div class="tdesc">The edition catalog — Free, Team, Business, Enterprise.</div></div>
     <div class="tbl-item"><div class="tname">platform.features</div><div class="tdesc">Feature catalog behind the Pricing page's "+ Add feature".</div></div>
     <div class="tbl-item"><div class="tname">platform.plan_features</div><div class="tdesc">The matrix itself — which features each edition includes.</div></div>
@@ -152,6 +158,13 @@ CREATE TABLE core.tenants (
 CREATE TRIGGER trg_tenants_updated BEFORE UPDATE ON core.tenants
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
+-- Framework-agnostic migration tracking — see db/schema.sql's copy of this
+-- table for the full rationale; identical convention on both databases.
+CREATE TABLE core.schema_migrations (
+  version     text PRIMARY KEY,
+  applied_at  timestamptz NOT NULL DEFAULT now()
+);
+
 
 -- ============================================================================
 -- SCHEMA: platform — Trakolo-staff-only: editions, licensing, entitlements,
@@ -159,9 +172,28 @@ CREATE TRIGGER trg_tenants_updated BEFORE UPDATE ON core.tenants
 -- Everything here is written by platform admins (saas-admin-*.html), never by
 -- tenant users. Tables map directly to the platform console's pages: Home
 -- (subscriptions + subscription_history), Pricing (features + plan_features),
--- Error log, Email settings / templates, and Callback requests.
+-- Error log, Email settings / templates, Callback requests, and Users.
 -- ============================================================================
 CREATE SCHEMA IF NOT EXISTS platform;
+
+CREATE TYPE platform.staff_role AS ENUM ('owner', 'admin', 'support', 'billing', 'read_only');
+CREATE TYPE platform.staff_status AS ENUM ('active', 'invited', 'suspended');
+
+-- Trakolo's own staff directory — who can sign in to saas-admin-login.html
+-- at all, and what they're allowed to do once they're in.
+CREATE TABLE platform.staff_users (
+  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  email          citext NOT NULL UNIQUE,
+  name           text NOT NULL,
+  role           platform.staff_role NOT NULL DEFAULT 'support',
+  status         platform.staff_status NOT NULL DEFAULT 'invited',
+  mfa_enrolled   boolean NOT NULL DEFAULT false,   -- hardware-key 2FA — enforced below, not just documented
+  invited_by_id  uuid REFERENCES platform.staff_users(id),
+  last_login_at  timestamptz,
+  created_at     timestamptz NOT NULL DEFAULT now(),
+  updated_at     timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT chk_staff_active_requires_mfa CHECK (status <> 'active' OR mfa_enrolled)
+);
 
 CREATE TABLE platform.plans (
   id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -210,7 +242,7 @@ CREATE TABLE platform.subscriptions (
   contract_to_date     date NOT NULL,
   drop_dead_date       date NOT NULL,      -- hard cutoff past contract_to_date; access suspended after this
   license_key          text UNIQUE,
-  generated_by_email   citext,             -- platform staff who generated it
+  generated_by_staff_id uuid REFERENCES platform.staff_users(id),  -- platform staff who generated it
   created_at           timestamptz NOT NULL DEFAULT now(),
   updated_at           timestamptz NOT NULL DEFAULT now(),
   UNIQUE (tenant_id)                       -- one active subscription per tenant
@@ -233,7 +265,7 @@ CREATE TABLE platform.subscription_history (
   previous_contract_to_date  date,
   new_contract_to_date       date,
   cost                       numeric(12,2),
-  performed_by_email         citext,
+  performed_by_staff_id      uuid REFERENCES platform.staff_users(id),
   note                       text,
   created_at                 timestamptz NOT NULL DEFAULT now()
 );
@@ -318,7 +350,7 @@ CREATE TABLE platform.callback_requests (
 -- console — separate from core.audit_log, which is per-tenant.
 CREATE TABLE platform.staff_audit_log (
   id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  staff_email citext NOT NULL,
+  staff_id    uuid NOT NULL REFERENCES platform.staff_users(id),
   action      text NOT NULL,        -- 'subscription.renewed', 'plan_feature.toggled', ...
   target_type text NOT NULL,
   target_id   uuid,
@@ -345,7 +377,7 @@ CREATE TABLE platform.leads (
   status              platform.lead_status NOT NULL DEFAULT 'new',
   notes               text,
   converted_tenant_id uuid REFERENCES core.tenants(id),   -- set once they sign
-  logged_by_email     citext,
+  logged_by_staff_id  uuid REFERENCES platform.staff_users(id),
   created_at          timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_leads_status ON platform.leads(status);
@@ -376,7 +408,7 @@ CREATE TABLE platform.campaigns (
   segment         platform.campaign_segment NOT NULL DEFAULT 'all',
   segment_plan_id uuid REFERENCES platform.plans(id),   -- set when segment = 'by_plan'
   status          platform.campaign_status NOT NULL DEFAULT 'draft',
-  sent_by_email   citext,
+  sent_by_staff_id uuid REFERENCES platform.staff_users(id),
   sent_at         timestamptz,
   created_at      timestamptz NOT NULL DEFAULT now()
 );

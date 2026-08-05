@@ -48,7 +48,7 @@
 
 <div class="wrap" style="max-width:980px;">
   <div class="page-head">
-    <div><div class="page-title">Entity relationships</div><div class="page-desc">How the 69 tables across Trakolo's two databases relate — every foreign key here was extracted from a live PostgreSQL instance running the real schema via pg_constraint, not typed from memory.</div></div>
+    <div><div class="page-title">Entity relationships</div><div class="page-desc">How the 71 tables across Trakolo's two databases relate — every foreign key here was extracted from a live PostgreSQL instance running the real schema via pg_constraint, not typed from memory.</div></div>
     <a href="technical-design.html" class="btn">← Technical design</a>
   </div>
 
@@ -59,8 +59,8 @@
 
   <div class="strip">
     <div class="mcard info"><div class="mlabel">Databases</div><div class="mval">2</div><div class="mdelta">trakolo-master + one per tenant</div></div>
-    <div class="mcard info"><div class="mlabel">Tables</div><div class="mval">69</div><div class="mdelta">17 in trakolo-master, 52 per tenant</div></div>
-    <div class="mcard info"><div class="mlabel">Foreign keys</div><div class="mval">85</div><div class="mdelta">70 per tenant + 15 in trakolo-master</div></div>
+    <div class="mcard info"><div class="mlabel">Tables</div><div class="mval">71</div><div class="mdelta">19 in trakolo-master, 52 per tenant</div></div>
+    <div class="mcard info"><div class="mlabel">Foreign keys</div><div class="mval">91</div><div class="mdelta">70 per tenant + 21 in trakolo-master</div></div>
     <div class="mcard ok"><div class="mlabel">Tenant scoping</div><div class="mval">The database itself</div><div class="mdelta">no tenant_id column anywhere — see below</div></div>
   </div>
 
@@ -119,15 +119,18 @@
       <div class="rc-head">trakolo-master — tenant registry, licensing, pricing &amp; SSP</div>
       <ul>
         <li><b>tenants</b> — the registry itself; <span class="id-mono">db_host</span>/<span class="id-mono">db_name</span> point at the tenant database each row owns</li>
+        <li><b>staff_users</b> — Trakolo's own staff directory, self-referencing <span class="id-mono">invited_by_id</span>; see <a href="saas-admin-users.html" style="color:var(--indigo-text);">Users</a></li>
         <li><b>plans</b> → subscriptions ← tenants — one active license per tenant</li>
+        <li><b>subscriptions</b>, <b>subscription_history</b> → staff_users — who generated/performed each change, not a loose email</li>
         <li><b>subscriptions</b> → subscription_history — every Renew/Upgrade, audited</li>
         <li><b>plans</b> ↔ features (via plan_features) — the Pricing page's edition matrix</li>
         <li><b>tenants</b> → tenant_entitlements — per-tenant overrides on top of the plan</li>
         <li><b>tenants</b> → error_logs, callback_requests (both nullable — platform-wide rows allowed)</li>
         <li><b>tenants</b> → account_contacts — who Trakolo staff actually call at each account</li>
-        <li><b>leads</b> → tenants (converted_tenant_id) — set once a phone/web enquiry signs</li>
-        <li><b>campaigns</b> ↔ tenants (via campaign_recipients) — who got which promo email</li>
-        <li><b>services</b>, <b>ssp_email_settings</b>, <b>ssp_email_templates</b>, <b>staff_audit_log</b> stand alone — no tenant_id, platform-scoped by design</li>
+        <li><b>leads</b> → tenants (converted_tenant_id), leads → staff_users — set once a phone/web enquiry signs</li>
+        <li><b>campaigns</b> ↔ tenants (via campaign_recipients), campaigns → staff_users — who got which promo email, and who sent it</li>
+        <li><b>staff_audit_log</b> → staff_users — every privileged console action, attributed to a real account</li>
+        <li><b>services</b>, <b>ssp_email_settings</b>, <b>ssp_email_templates</b> stand alone — no tenant_id, platform-scoped by design</li>
       </ul>
     </div>
   </div>
@@ -140,8 +143,8 @@
   <div class="section-label" style="margin:26px 0 12px;">trakolo-master — every foreign key</div>
   <div class="page-desc" style="margin:-6px 0 12px;">One database, one schema (<span class="id-mono">platform</span>) plus the tenant registry (<span class="id-mono">core.tenants</span>). Trakolo owns this database; no tenant ever connects to it.</div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="fk-filters-master">
-    <div class="chip active" data-schema="all">All (15)</div>
-    <div class="chip" data-schema="platform">platform (15)</div>
+    <div class="chip active" data-schema="all">All (21)</div>
+    <div class="chip" data-schema="platform">platform (21)</div>
   </div>
   <div class="panel" style="margin-bottom:26px;">
     <div class="fk-scroll">
@@ -153,13 +156,19 @@
 <tr data-schema="platform"><td class="mono">platform.campaign_recipients</td><td class="mono">campaign_id</td><td>→</td><td class="mono">platform.campaigns</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.campaign_recipients</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.campaigns</td><td class="mono">segment_plan_id</td><td>→</td><td class="mono">platform.plans</td><td class="mono">id</td></tr>
+<tr data-schema="platform"><td class="mono">platform.campaigns</td><td class="mono">sent_by_staff_id</td><td>→</td><td class="mono">platform.staff_users</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.error_logs</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.leads</td><td class="mono">converted_tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
+<tr data-schema="platform"><td class="mono">platform.leads</td><td class="mono">logged_by_staff_id</td><td>→</td><td class="mono">platform.staff_users</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.plan_features</td><td class="mono">feature_id</td><td>→</td><td class="mono">platform.features</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.plan_features</td><td class="mono">plan_id</td><td>→</td><td class="mono">platform.plans</td><td class="mono">id</td></tr>
+<tr data-schema="platform"><td class="mono">platform.staff_audit_log</td><td class="mono">staff_id</td><td>→</td><td class="mono">platform.staff_users</td><td class="mono">id</td></tr>
+<tr data-schema="platform"><td class="mono">platform.staff_users</td><td class="mono">invited_by_id</td><td>→</td><td class="mono">platform.staff_users</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.subscription_history</td><td class="mono">new_plan_id</td><td>→</td><td class="mono">platform.plans</td><td class="mono">id</td></tr>
+<tr data-schema="platform"><td class="mono">platform.subscription_history</td><td class="mono">performed_by_staff_id</td><td>→</td><td class="mono">platform.staff_users</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.subscription_history</td><td class="mono">previous_plan_id</td><td>→</td><td class="mono">platform.plans</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.subscription_history</td><td class="mono">subscription_id</td><td>→</td><td class="mono">platform.subscriptions</td><td class="mono">id</td></tr>
+<tr data-schema="platform"><td class="mono">platform.subscriptions</td><td class="mono">generated_by_staff_id</td><td>→</td><td class="mono">platform.staff_users</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.subscriptions</td><td class="mono">plan_id</td><td>→</td><td class="mono">platform.plans</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.subscriptions</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
 <tr data-schema="platform"><td class="mono">platform.tenant_entitlements</td><td class="mono">tenant_id</td><td>→</td><td class="mono">core.tenants</td><td class="mono">id</td></tr>
