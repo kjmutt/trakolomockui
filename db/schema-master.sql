@@ -45,6 +45,14 @@ CREATE SCHEMA IF NOT EXISTS core;
 
 CREATE TYPE core.deployment_model AS ENUM ('cloud', 'standalone');
 
+-- 'shared'    — this tenant's requests are served by the shared app fleet,
+--               its database sharing a Postgres cluster with other tenants.
+-- 'dedicated' — instance-per-tenant: its own app containers and its own
+--               Postgres cluster, which is the same artifact a standalone
+--               customer installs, just hosted by us. See the tenancy-model
+--               comparison in technical-design.html for when each applies.
+CREATE TYPE core.compute_tier AS ENUM ('shared', 'dedicated');
+
 CREATE TABLE core.tenants (
   id                       uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name                     text NOT NULL,
@@ -59,6 +67,7 @@ CREATE TABLE core.tenants (
   db_host                  text,                      -- e.g. 'tenant-db-12.postgres.trakolo.internal'
   db_name                  text,                      -- e.g. 'trakolo_acme'
   db_provisioned_at        timestamptz,
+  compute_tier             core.compute_tier,         -- moving a tenant between tiers is this one value
 
   -- Standalone/on-premise only: no Trakolo-managed domain and no database
   -- Trakolo can connect to — the customer's own network owns both. These
@@ -70,9 +79,9 @@ CREATE TABLE core.tenants (
   updated_at   timestamptz NOT NULL DEFAULT now(),
 
   CONSTRAINT chk_tenants_routing CHECK (
-    (deployment_model = 'cloud'      AND subdomain IS NOT NULL AND db_host IS NOT NULL AND db_name IS NOT NULL)
+    (deployment_model = 'cloud'      AND subdomain IS NOT NULL AND db_host IS NOT NULL AND db_name IS NOT NULL AND compute_tier IS NOT NULL)
     OR
-    (deployment_model = 'standalone' AND subdomain IS NULL     AND db_host IS NULL     AND db_name IS NULL)
+    (deployment_model = 'standalone' AND subdomain IS NULL     AND db_host IS NULL     AND db_name IS NULL     AND compute_tier IS NULL)
   )
 );
 CREATE TRIGGER trg_tenants_updated BEFORE UPDATE ON core.tenants
@@ -423,9 +432,12 @@ INSERT INTO platform.plans (name, price_monthly, price_yearly, seat_based, sort_
   ('Business',   14.00, 140.00, true, 2),
   ('Enterprise', NULL,  NULL,   true, 3);   -- custom pricing, quoted per deal
 
-INSERT INTO core.tenants (id, name, slug, deployment_model, subdomain, db_host, db_name, db_provisioned_at) VALUES
-  ('a1111111-1111-4111-8111-111111111111', 'Acme Corp', 'acme',    'cloud', 'acme',    'tenant-db-01.postgres.trakolo.internal', 'trakolo_acme',    now()),
-  ('a2222222-2222-4222-8222-222222222222', 'Trakolo',   'trakolo', 'cloud', 'support', 'tenant-db-00.postgres.trakolo.internal', 'trakolo_support', '2025-01-01');
+-- Acme is an ordinary Team-plan tenant on the shared fleet; Trakolo's own
+-- workspace is Enterprise and runs instance-per-tenant, which also keeps us
+-- honest about the dedicated path by dogfooding it.
+INSERT INTO core.tenants (id, name, slug, deployment_model, subdomain, db_host, db_name, db_provisioned_at, compute_tier) VALUES
+  ('a1111111-1111-4111-8111-111111111111', 'Acme Corp', 'acme',    'cloud', 'acme',    'tenant-db-01.postgres.trakolo.internal', 'trakolo_acme',    now(),        'shared'),
+  ('a2222222-2222-4222-8222-222222222222', 'Trakolo',   'trakolo', 'cloud', 'support', 'tenant-db-00.postgres.trakolo.internal', 'trakolo_support', '2025-01-01', 'dedicated');
 
 INSERT INTO platform.subscriptions (tenant_id, plan_id, status, contract_type, total_license_count, generated_date, contract_from_date, contract_to_date, drop_dead_date, license_key, generated_by_staff_id)
 SELECT t.id, p.id, 'active', 'monthly', 84, current_date, '2026-03-01', '2027-03-01', '2027-03-15', NULL,

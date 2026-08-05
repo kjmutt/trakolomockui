@@ -68,7 +68,7 @@
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0;">
     <div class="plat-mcard"><div class="mlabel">Tables</div><div class="mval">19</div></div>
     <div class="plat-mcard"><div class="mlabel">Foreign keys</div><div class="mval">21</div></div>
-    <div class="plat-mcard"><div class="mlabel">Enum types</div><div class="mval">13</div></div>
+    <div class="plat-mcard"><div class="mlabel">Enum types</div><div class="mval">14</div></div>
     <div class="plat-mcard"><div class="mlabel">Written by</div><div class="mval" style="font-size:15px;">Platform admins only</div></div>
   </div>
 
@@ -128,6 +128,11 @@ CREATE SCHEMA IF NOT EXISTS core;
 
 CREATE TYPE core.deployment_model AS ENUM ('cloud', 'standalone');
 
+-- 'shared'    — served by the shared app fleet, database sharing a cluster.
+-- 'dedicated' — instance-per-tenant: own app containers and own Postgres
+--               cluster, the same artifact a standalone customer installs.
+CREATE TYPE core.compute_tier AS ENUM ('shared', 'dedicated');
+
 CREATE TABLE core.tenants (
   id                       uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name                     text NOT NULL,
@@ -140,6 +145,7 @@ CREATE TABLE core.tenants (
   db_host                  text,                      -- e.g. 'tenant-db-12.postgres.trakolo.internal'
   db_name                  text,                      -- e.g. 'trakolo_acme'
   db_provisioned_at        timestamptz,
+  compute_tier             core.compute_tier,         -- moving a tenant between tiers is this one value
 
   -- Standalone/on-premise only: no Trakolo-managed domain and no database
   -- Trakolo can connect to — the customer's own network owns both.
@@ -150,9 +156,9 @@ CREATE TABLE core.tenants (
   updated_at   timestamptz NOT NULL DEFAULT now(),
 
   CONSTRAINT chk_tenants_routing CHECK (
-    (deployment_model = 'cloud'      AND subdomain IS NOT NULL AND db_host IS NOT NULL AND db_name IS NOT NULL)
+    (deployment_model = 'cloud'      AND subdomain IS NOT NULL AND db_host IS NOT NULL AND db_name IS NOT NULL AND compute_tier IS NOT NULL)
     OR
-    (deployment_model = 'standalone' AND subdomain IS NULL     AND db_host IS NULL     AND db_name IS NULL)
+    (deployment_model = 'standalone' AND subdomain IS NULL     AND db_host IS NULL     AND db_name IS NULL     AND compute_tier IS NULL)
   )
 );
 CREATE TRIGGER trg_tenants_updated BEFORE UPDATE ON core.tenants

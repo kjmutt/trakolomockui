@@ -141,7 +141,7 @@
 <rect class="node-app" x="234.0" y="260.0" width="610.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="539.0" y="279.5" font-weight="700">apps/api — ASP.NET Core 8</tspan><tspan x="539.0" y="294.5">modular monolith: itsm · sam · dev · docs</tspan></text>
 <rect class="node-ctrl" x="864.0" y="260.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="959.0" y="279.5" font-weight="700">trakolo-master</tspan><tspan x="959.0" y="294.5">slug → db_host, db_name</tspan></text>
 <rect class="node-ctrl" x="1074.0" y="260.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="1169.0" y="279.5" font-weight="700">Redis</tspan><tspan x="1169.0" y="294.5">tenant cache + sessions</tspan></text>
-<rect class="node-app dnode" x="294.0" y="338.0" width="230.0" height="34.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="409.0" y="347.5" font-weight="700">compute_pool</tspan><tspan x="409.0" y="362.5">shared / dedicated</tspan></text>
+<rect class="node-app dnode" x="294.0" y="338.0" width="230.0" height="34.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="409.0" y="347.5" font-weight="700">compute_tier</tspan><tspan x="409.0" y="362.5">shared / dedicated</tspan></text>
 <rect class="node-obs dnode" x="554.0" y="338.0" width="230.0" height="34.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="669.0" y="347.5" font-weight="700">xUnit test projects</tspan><tspan x="669.0" y="362.5">itsm.Tests · sam.Tests · dev.Tests · docs.Tests</tspan></text>
 <rect class="node-data" x="24.0" y="460.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="119.0" y="479.5" font-weight="700">PgBouncer</tspan><tspan x="119.0" y="494.5">connection pool</tspan></text>
 <rect class="node-data" x="234.0" y="460.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="329.0" y="479.5" font-weight="700">Postgres cluster</tspan><tspan x="329.0" y="494.5">many tenant DBs</tspan></text>
@@ -189,14 +189,14 @@
 
     <div class="arch-layer l-app">
       <div class="al-head"><span class="al-num">③</span><span class="al-title">App fleet — stateless, horizontally scaled</span></div>
-      <div class="al-desc">Shared compute pool for every tenant by default, including Enterprise — no per-tenant pinning, any instance serves any tenant's request once resolved. A <span class="id-mono">compute_pool</span> field on the tenant registry is the escape hatch: it can pin one contractually-demanding tenant to a dedicated pool without a second codebase. Each module (itsm/sam/dev/docs) is a project inside the ASP.NET Core solution with its own xUnit test project — one deployable, independently testable modules.</div>
+      <div class="al-desc">Shared compute pool for every tenant by default, including Enterprise — no per-tenant pinning, any instance serves any tenant's request once resolved. A <span class="id-mono">compute_tier</span> field on the tenant registry is the escape hatch: it can pin one contractually-demanding tenant to a dedicated pool without a second codebase. Each module (itsm/sam/dev/docs) is a project inside the ASP.NET Core solution with its own xUnit test project — one deployable, independently testable modules.</div>
       <div class="arch-nodes">
         <span class="arch-node node-app">apps/web — React 18 (SPA)</span>
         <span class="arch-node node-app">apps/api — ASP.NET Core 8: itsm</span>
         <span class="arch-node node-app">apps/api — ASP.NET Core 8: sam</span>
         <span class="arch-node node-app">apps/api — ASP.NET Core 8: dev</span>
         <span class="arch-node node-app">apps/api — ASP.NET Core 8: docs</span>
-        <span class="arch-node node-app split">compute_pool: shared (default) / dedicated (opt-in)</span>
+        <span class="arch-node node-app split">compute_tier: shared (default) / dedicated (opt-in)</span>
         <span class="arch-node node-app split">xUnit — itsm.Tests · sam.Tests · dev.Tests · docs.Tests</span>
       </div>
     </div>
@@ -255,13 +255,69 @@
       <tbody>
         <tr><td style="color:var(--indigo-2);">Edge</td><td class="mono">*.trakolo.com, portal.trakolo.com</td><td>One wildcard cert and DNS record for every tenant subdomain; the sign-in chooser matches <span class="id-mono">login.html</span> in this mockup.</td></tr>
         <tr><td style="color:var(--violet-text);">API Gateway</td><td class="mono">routing, auth, rate limits, versioning, dev portal</td><td>Every call to <span class="id-mono">apps/api</span> — from the SPA or a third-party integration — passes through here. See <a href="api-reference.html" style="color:var(--violet-text);font-weight:600;">API reference</a>.</td></tr>
-        <tr><td style="color:var(--indigo-text);">App fleet</td><td class="mono">apps/web (React 18), apps/api (ASP.NET Core 8)</td><td>Stateless, horizontally scaled, shared compute pool by default. <span class="id-mono">apps/api</span> stays a modular monolith with a per-module xUnit test project; <span class="id-mono">compute_pool</span> is the per-tenant dedicated-compute escape hatch.</td></tr>
+        <tr><td style="color:var(--indigo-text);">App fleet</td><td class="mono">apps/web (React 18), apps/api (ASP.NET Core 8)</td><td>Stateless, horizontally scaled, shared compute pool by default. <span class="id-mono">apps/api</span> stays a modular monolith with a per-module xUnit test project; <span class="id-mono">compute_tier</span> is the per-tenant dedicated-compute escape hatch.</td></tr>
         <tr><td style="color:var(--violet-text);">Control plane</td><td class="mono">trakolo-master (core.tenants), Redis</td><td>Resolves subdomain → db_host + db_name + bucket on every request; cached to avoid a DB hit per lookup. trakolo-master also backs the entire Platform Admin console — see <a href="db/schema-master.sql" style="color:var(--violet-text);font-weight:600;">db/schema-master.sql</a>.</td></tr>
         <tr><td style="color:var(--amber-text);">Data tier</td><td class="mono">PgBouncer, Postgres, object storage</td><td>One dedicated database per tenant (see <a href="db/schema.sql" style="color:var(--amber-text);font-weight:600;">db/schema.sql</a>), pooled onto shared clusters by default with an opt-in dedicated cluster per tenant. Read replica isolates reporting.</td></tr>
         <tr><td style="color:var(--green-text);">Background services</td><td class="mono">worker-sla, worker-rules, worker-webhooks, worker-reports, worker-ai-agent</td><td>Split by job type — independent deploy, scale, and failure domain per worker, not one shared process for everything.</td></tr>
         <tr><td style="color:var(--ink-2);">Monitoring</td><td class="mono">platform.services, dashboards</td><td>Drives Admin → System status in the product and real dashboards/alerts in production — SLA breach rate, per-worker queue depth, replica lag, per-tenant error rate.</td></tr>
       </tbody>
     </table>
+  </div>
+
+  <div class="section-label" style="margin:26px 0 12px;">Tenancy models — what we chose, and what it costs</div>
+  <div class="page-desc" style="margin:-6px 0 12px;">Five workable models, ordered by how much each tenant is isolated from every other. Isolation and cost-per-tenant move in the same direction: every step down this table buys a stronger guarantee and charges for it in idle infrastructure or operational fan-out.</div>
+  <div class="panel" style="margin-bottom:14px;">
+    <table class="layer-ref">
+      <thead><tr><th>Model</th><th>Isolation boundary</th><th>Idle cost per tenant</th><th>Where it breaks</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--ink-2);">Shared everything</td><td>A <span class="id-mono">tenant_id</span> column, checked by application code</td><td>~zero</td><td>One missing <span class="id-mono">WHERE tenant_id =</span> is a cross-tenant data leak. <b>Retired</b> — this is what the current design replaced.</td></tr>
+        <tr><td style="color:var(--ink-2);">Schema-per-tenant</td><td><span class="id-mono">search_path</span>, one database</td><td>~zero</td><td>Catalogue strain: 500 tenants × 52 tables = 26,000 tables in one database, punishing autovacuum and planning.</td></tr>
+        <tr><td style="color:var(--indigo-text);font-weight:700;">Database-per-tenant <span style="font-weight:400;">← current</span></td><td>The database. Postgres has no cross-database FK or query.</td><td>Low — databases share a cluster</td><td>Connection pooling (see below). Ceiling is a few hundred tenants per cluster.</td></tr>
+        <tr><td style="color:var(--amber-text);">Cluster-per-tenant</td><td>The Postgres instance</td><td>Medium — one managed instance each</td><td>Cost. Only justifiable where a contract demands it.</td></tr>
+        <tr><td style="color:var(--violet-text);">Instance-per-tenant</td><td>Everything — own app containers, own database, own cache</td><td>High — full stack always running</td><td>Cost at the low end, and upgrades become a rolling campaign across N deployments.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card" style="margin-bottom:22px;background:var(--indigo-bg);border-color:#A9E0CD;">
+    <div class="section-label" style="color:var(--indigo-text);">These are not mutually exclusive — pick per plan tier</div>
+    <div class="page-desc" style="margin-top:4px;color:var(--indigo-text);">The registry already decouples routing from co-location, so one deployment can run several of these at once: <b>Free/Team/Business</b> on database-per-tenant over a shared cluster, <b>Enterprise</b> on instance-per-tenant with its own app containers, database, and region. <span class="id-mono">core.tenants.compute_tier</span> selects which, and <span class="id-mono">db_host</span> selects the cluster — both are one-row config changes, not a second codebase. The instance-per-tenant build is also <i>the on-premise artifact</i> (see <a href="deployment-options.html" style="color:var(--indigo-text);font-weight:600;">Deployment options</a>), so supporting it costs far less than it looks: it's the same image, hosted by us instead of the customer.</div>
+  </div>
+
+  <div class="section-label" style="margin:26px 0 12px;">The constraint: connection pooling under database-per-tenant</div>
+  <div class="card" style="margin-bottom:14px;">
+    <div class="page-desc" style="margin-top:0;">A Postgres connection binds to exactly one database when it opens — there is no <span class="id-mono">USE database</span>. PgBouncer therefore keys its pools on <span class="id-mono">(database, user)</span>, which means <b>one pool per tenant, permanently</b>, and no pool can ever lend a connection to another tenant no matter how idle it is. Database-per-tenant defeats connection pooling along exactly the axis pooling exists to solve.</div>
+    <div class="page-desc" style="margin-top:10px;">Postgres backends are OS processes at roughly 5–10 MB each, plus shared structures that scale with <span class="id-mono">max_connections</span>; the realistic tuned ceiling is 400–1000. Against that, 500 tenants at a <span class="id-mono">default_pool_size</span> of 10 wants 5,000 server connections. What rescues the arithmetic is that tenants are not all busy at once — B2B service-desk traffic is working-hours shaped, so if 15% are concurrently active you need ~375, which fits. <b>The real capacity limit is peak concurrent tenants, not tenant count</b> — and a customer base spread across time zones behaves very differently from one where everybody opens their laptop at 09:00 in the same country.</div>
+  </div>
+  <div class="grid-3" style="margin-bottom:14px;">
+    <div class="card" style="background:var(--coral-bg);border-color:#F0C4B2;">
+      <div class="section-label" style="color:var(--coral-text);">min_pool_size must be 0</div>
+      <div class="page-desc" style="margin-top:4px;color:var(--coral-text);">It keeps connections warm <i>per pool</i>. Set it to 2 across 500 tenant databases and 1,000 connections sit held and idle before a single request arrives. Accept the cold-start latency on a tenant's first query instead.</div>
+    </div>
+    <div class="card" style="background:var(--amber-bg);border-color:#EDD9A8;">
+      <div class="section-label" style="color:var(--amber-text);">transaction mode constrains the app</div>
+      <div class="page-desc" style="margin-top:4px;color:var(--amber-text);">Session mode pins a server connection per client and destroys the ratio, so transaction mode is mandatory — which rules out <span class="id-mono">LISTEN/NOTIFY</span>, session-level <span class="id-mono">SET</span>, cross-transaction advisory locks, and temp tables. Workers use Service Bus queues rather than <span class="id-mono">LISTEN/NOTIFY</span> for exactly this reason.</div>
+    </div>
+    <div class="card" style="background:var(--green-bg);border-color:#B9DE9A;">
+      <div class="section-label" style="color:var(--green-text);">Alert on maxwait, not CPU</div>
+      <div class="page-desc" style="margin-top:4px;color:var(--green-text);">PgBouncer's <span class="id-mono">SHOW POOLS</span> exposes <span class="id-mono">cl_waiting</span> and <span class="id-mono">maxwait</span>. Any sustained <span class="id-mono">maxwait</span> above zero means pool starvation, and the next traffic bump will hurt. Database CPU will look fine right up until it doesn't.</div>
+    </div>
+  </div>
+  <div class="panel" style="margin-bottom:14px;">
+    <table class="layer-ref">
+      <thead><tr><th>Mitigation</th><th>What it does</th><th>Cost</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--indigo-text);">Shard across clusters</td><td>Cap tenants per cluster and provision another past the limit — <span class="id-mono">core.tenants.db_host</span> already supports this with no code change.</td><td>Linear infra growth. Predictable, which beats a cliff.</td></tr>
+        <tr><td style="color:var(--violet-text);">Pooler per cluster</td><td>Colocate PgBouncer with each Postgres cluster instead of running one global pooler. Bounds pool count per pooler and removes a single-threaded chokepoint — PgBouncer's core event loop is one thread and goes CPU-bound on connection churn well before Postgres does.</td><td>One more component per cluster.</td></tr>
+        <tr><td style="color:var(--amber-text);">Bounded pool cache in-app</td><td>Keep an LRU of the N most recently used tenant pools and evict cold ones, rather than holding a pool per tenant forever.</td><td>Cold-start latency for a tenant that has been idle.</td></tr>
+        <tr><td style="color:var(--green-text);">Cell routing</td><td>App instance group A serves only tenants 1–100, group B serves 101–200. Each instance opens connections to its own tenants only, so per-instance pool count is bounded by construction. Scales furthest.</td><td>Routing complexity; load across cells goes uneven.</td></tr>
+        <tr><td style="color:var(--ink-2);">Scale-to-zero Postgres</td><td>Serverless offerings that pause idle databases remove both the cost and the connections of a dormant tenant, which is what makes instance-per-tenant economically plausible at the low end today when it wasn't a few years ago.</td><td>Cold-start on wake; vendor lock-in to that specific offering.</td></tr>
+        <tr><td style="color:var(--ink-2);">Different pooler</td><td>Supavisor was built specifically for many-database multi-tenancy; pgcat is multi-threaded where PgBouncer is not. Managed proxies (RDS Proxy, Azure's built-in pooler) are often <i>worse</i> here, with lower per-database limits than self-hosted PgBouncer.</td><td>Less battle-tested than PgBouncer.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card" style="margin-bottom:22px;background:var(--coral-bg);border-color:#F0C4B2;">
+    <div class="section-label" style="color:var(--coral-text);">Planning number — write this down and test it early</div>
+    <div class="page-desc" style="margin-top:4px;color:var(--coral-text);">Budget <b>a few hundred tenants per Postgres cluster</b>, with the binding constraint being <b>50–100 concurrently active tenants</b>. Load-test that ceiling well before there are that many paying customers, because the failure mode is a cliff rather than a slope: everything is healthy, then connection exhaustion hits and <i>every</i> tenant on the cluster fails at once. Schema-per-tenant would largely dissolve this problem by letting connections be shared — the pooling cost is the deliberate price of choosing a boundary the database enforces itself.</div>
   </div>
 
   <div class="section-label" style="margin:26px 0 12px;">Things this design depends on</div>

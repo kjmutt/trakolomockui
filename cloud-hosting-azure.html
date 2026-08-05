@@ -140,7 +140,7 @@
 <rect class="node-app" x="234.0" y="260.0" width="610.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="539.0" y="279.5" font-weight="700">apps/api — ASP.NET Core 8</tspan><tspan x="539.0" y="294.5">modular monolith (Container Apps): itsm · sam · dev · docs</tspan></text>
 <rect class="node-ctrl" x="864.0" y="260.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="959.0" y="279.5" font-weight="700">trakolo-master</tspan><tspan x="959.0" y="294.5">slug → db_host, db_name</tspan></text>
 <rect class="node-ctrl" x="1074.0" y="260.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="1169.0" y="279.5" font-weight="700">Azure Cache</tspan><tspan x="1169.0" y="294.5">for Redis</tspan></text>
-<rect class="node-app dnode" x="294.0" y="338.0" width="230.0" height="34.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="409.0" y="347.5" font-weight="700">compute_pool</tspan><tspan x="409.0" y="362.5">shared / dedicated</tspan></text>
+<rect class="node-app dnode" x="294.0" y="338.0" width="230.0" height="34.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="409.0" y="347.5" font-weight="700">compute_tier</tspan><tspan x="409.0" y="362.5">shared / dedicated</tspan></text>
 <rect class="node-obs dnode" x="554.0" y="338.0" width="230.0" height="34.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="669.0" y="347.5" font-weight="700">xUnit test projects</tspan><tspan x="669.0" y="362.5">itsm.Tests · sam.Tests · dev.Tests · docs.Tests</tspan></text>
 <rect class="node-data" x="24.0" y="460.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="119.0" y="479.5" font-weight="700">PgBouncer</tspan><tspan x="119.0" y="494.5">sidecar</tspan></text>
 <rect class="node-data" x="234.0" y="460.0" width="190.0" height="54.0" rx="8"/><text class="dtxt" text-anchor="middle" font-size="11.5"><tspan x="329.0" y="479.5" font-weight="700">Flexible Server</tspan><tspan x="329.0" y="494.5">many tenant DBs, zone-redundant HA</tspan></text>
@@ -189,11 +189,11 @@
 
     <div class="arch-layer l-app">
       <div class="al-head"><span class="al-num">③</span><span class="al-title">App fleet</span></div>
-      <div class="al-desc">Static Web Apps serves the React 18 SPA; Container Apps runs the ASP.NET Core 8 API as a modular monolith, scaling on HTTP load via KEDA. Shared compute pool for every tenant by default — <span class="id-mono">compute_pool</span> pins a rare contractually-demanding tenant to a dedicated Container Apps environment without a second codebase. Each module carries its own xUnit test project.</div>
+      <div class="al-desc">Static Web Apps serves the React 18 SPA; Container Apps runs the ASP.NET Core 8 API as a modular monolith, scaling on HTTP load via KEDA. Shared compute pool for every tenant by default — <span class="id-mono">compute_tier</span> pins a rare contractually-demanding tenant to a dedicated Container Apps environment without a second codebase. Each module carries its own xUnit test project.</div>
       <div class="arch-nodes">
         <span class="arch-node node-app">Static Web Apps — apps/web (React 18 SPA)</span>
         <span class="arch-node node-app">Container Apps — apps/api (ASP.NET Core 8: itsm · sam · dev · docs)</span>
-        <span class="arch-node node-app split">compute_pool: shared (default) / dedicated (opt-in)</span>
+        <span class="arch-node node-app split">compute_tier: shared (default) / dedicated (opt-in)</span>
         <span class="arch-node node-app split">xUnit — itsm.Tests · sam.Tests · dev.Tests · docs.Tests</span>
       </div>
     </div>
