@@ -3,6 +3,11 @@ name: Deploy to GitHub Pages
 # The mockup is static HTML with no build step, so this publishes the
 # repository as-is. db/, install/ and openapi/ are published alongside the
 # pages because sitemap.html links directly to those files.
+#
+# Split into two jobs on purpose. The `environment: github-pages` gate is
+# evaluated before a job starts, so anything that enables Pages has to run
+# in a job that doesn't declare it — otherwise the enablement step can
+# never run to unblock the very job it's gating.
 
 on:
   push:
@@ -21,16 +26,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
-      # enablement: true switches the repo's Pages source to GitHub Actions
-      # on the first run, so this doesn't need flipping by hand in Settings.
       - uses: actions/configure-pages@v5
         with:
           enablement: true
@@ -40,5 +40,12 @@ jobs:
         with:
           path: .
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - id: deployment
         uses: actions/deploy-pages@v4

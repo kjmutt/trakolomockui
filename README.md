@@ -2,7 +2,7 @@
 
 Static HTML/CSS/JS mockups for Trakolo: an IT service desk, asset tracking (SAM), engineering boards & sprints, and audit-ready reporting, unified in one product.
 
-**Live site:** https://kjmutt.github.io/trakolomockui/ — published by `.github/workflows/pages.yml` on every push to `main`. The workflow sets the Pages source itself on its first run, so there's nothing to configure by hand.
+**Live site:** https://kjmutt.github.io/trakolomockui/ — published by `.github/workflows/pages.yml` on every push to `main`. If the first run fails before any step executes, set Settings → Pages → Source to **GitHub Actions** once; that creates the `github-pages` environment the deploy job waits on.
 
 **Viewing it locally:** clone the repo and open any `.html` file directly. There's no build step and nothing is fetched cross-origin, so `file://` works without a server.
 
