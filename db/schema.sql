@@ -320,33 +320,91 @@ CREATE TABLE itsm.problem_incidents (
 );
 CREATE INDEX idx_problem_incidents_ticket_id ON itsm.problem_incidents(ticket_id);
 
-CREATE TYPE itsm.change_status AS ENUM ('draft', 'pending_approval', 'approved', 'rejected', 'deployed', 'rolled_back');
+-- Full ITIL change lifecycle. 'rejected' and 'rolled_back' are deliberately
+-- NOT states here — they're outcomes, recorded in close_code once the change
+-- reaches 'closed'. Conflating workflow position with outcome is what makes
+-- "how many changes failed last quarter" unanswerable later.
+CREATE TYPE itsm.change_status AS ENUM (
+  'new', 'assess', 'authorise', 'awaiting_approval', 'implement', 'review', 'closed', 'cancelled'
+);
 CREATE TYPE itsm.change_risk AS ENUM ('low', 'medium', 'high');
+CREATE TYPE itsm.impact_level AS ENUM ('low', 'medium', 'high');
+
+-- 'standard'  — pre-approved, repeatable, low risk (a monthly failover);
+--               skips CAB because the *template* was approved, not this instance.
+-- 'normal'    — the default: assessed, then approved before implementation.
+-- 'emergency' — expedited approval, reviewed retrospectively.
+CREATE TYPE itsm.change_type AS ENUM ('standard', 'normal', 'emergency');
+
+-- Set only at closure — the answer to "did it work", separate from "where is it".
+CREATE TYPE itsm.change_close_code AS ENUM (
+  'successful', 'successful_with_issues', 'unsuccessful', 'backed_out'
+);
 
 CREATE TABLE itsm.change_requests (
   id                     uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   cr_number              text NOT NULL,    -- 'CR-0091'
   title                  text NOT NULL,
   description            text,
+  type                   itsm.change_type NOT NULL DEFAULT 'normal',
+  category               text,             -- 'Maintenance', 'Upgrade', 'Decommission', ...
   risk                   itsm.change_risk NOT NULL DEFAULT 'low',
-  status                 itsm.change_status NOT NULL DEFAULT 'draft',
+  impact                 itsm.impact_level NOT NULL DEFAULT 'low',
+
+  -- Priority is derived, never entered: the standard 3x3 risk/impact matrix,
+  -- 1 (critical) to 4 (low). Generated in the database so every caller agrees
+  -- on it and nobody can save a row whose priority contradicts its inputs.
+  priority               smallint GENERATED ALWAYS AS (
+                           CASE
+                             WHEN risk = 'high'   AND impact = 'high'                      THEN 1
+                             WHEN risk = 'high'   OR  impact = 'high'                      THEN 2
+                             WHEN risk = 'medium' AND impact = 'medium'                    THEN 2
+                             WHEN risk = 'medium' OR  impact = 'medium'                    THEN 3
+                             ELSE 4
+                           END
+                         ) STORED,
+
+  status                 itsm.change_status NOT NULL DEFAULT 'new',
+  close_code             itsm.change_close_code,
+  close_notes            text,
+
   requested_by_user_id   uuid REFERENCES core.users(id),
+  assignment_group_id    uuid REFERENCES core.teams(id),      -- who implements it
+  assigned_to_user_id    uuid REFERENCES core.users(id),
+  parent_change_id       uuid REFERENCES itsm.change_requests(id),  -- a release grouping child changes
+  third_party            boolean NOT NULL DEFAULT false,      -- supplier involvement changes the approval path
+
   source_ticket_id       uuid REFERENCES itsm.tickets(id),   -- the use-case ticket, if any
   backlog_item_id        uuid,             -- FK added after dev.backlog_items exists (see below)
-  deployment_window_start timestamptz,
-  deployment_window_end   timestamptz,
-  deployed_at            timestamptz,
+
+  earliest_start_at      timestamptz,      -- lead-time policy / change-freeze floor
+  planned_start_at       timestamptz,
+  planned_end_at         timestamptz,
+  actual_work_start      timestamptz,      -- planned vs actual variance is the headline change metric
+  actual_work_end        timestamptz,
+
   rollback_plan          text,
   created_at             timestamptz NOT NULL DEFAULT now(),
   updated_at             timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (cr_number)
+  UNIQUE (cr_number),
+
+  -- A close code exists exactly when the change is closed, never otherwise.
+  CONSTRAINT chk_change_close_code CHECK ((status = 'closed') = (close_code IS NOT NULL)),
+  CONSTRAINT chk_change_planned_window CHECK (planned_end_at IS NULL OR planned_start_at IS NULL OR planned_end_at >= planned_start_at),
+  CONSTRAINT chk_change_actual_window  CHECK (actual_work_end IS NULL OR actual_work_start IS NULL OR actual_work_end >= actual_work_start),
+  CONSTRAINT chk_change_not_own_parent CHECK (parent_change_id IS NULL OR parent_change_id <> id)
 );
 CREATE TRIGGER trg_change_requests_updated BEFORE UPDATE ON itsm.change_requests
   FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 CREATE INDEX idx_change_requests_source_ticket_id ON itsm.change_requests(source_ticket_id);
 CREATE INDEX idx_change_requests_requested_by_user_id ON itsm.change_requests(requested_by_user_id);
+CREATE INDEX idx_change_requests_assignment_group_id ON itsm.change_requests(assignment_group_id);
+CREATE INDEX idx_change_requests_assigned_to_user_id ON itsm.change_requests(assigned_to_user_id);
+CREATE INDEX idx_change_requests_parent_change_id ON itsm.change_requests(parent_change_id);
 CREATE INDEX idx_change_requests_backlog_item_id ON itsm.change_requests(backlog_item_id);
 CREATE INDEX idx_change_requests_status ON itsm.change_requests(status);
+CREATE INDEX idx_change_requests_planned_start ON itsm.change_requests(planned_start_at)
+  WHERE status NOT IN ('closed', 'cancelled');   -- the change calendar reads this
 
 CREATE TYPE itsm.approval_decision AS ENUM ('pending', 'approved', 'rejected');
 
@@ -360,6 +418,76 @@ CREATE TABLE itsm.change_approvals (
   decided_at         timestamptz
 );
 CREATE INDEX idx_change_approvals_approval_group_id ON itsm.change_approvals(approval_group_id);
+
+-- A change decomposes into ordered, separately-assignable work. The failover
+-- document that used to live as free text in "implementation overview"
+-- belongs here instead, one row per step, each with its own owner and clock.
+CREATE TYPE itsm.change_task_status AS ENUM ('open', 'in_progress', 'closed', 'skipped');
+
+CREATE TABLE itsm.change_tasks (
+  id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  change_request_id   uuid NOT NULL REFERENCES itsm.change_requests(id) ON DELETE CASCADE,
+  task_number         text NOT NULL,        -- 'CTASK-0918861'
+  title               text NOT NULL,
+  description         text,
+  status              itsm.change_task_status NOT NULL DEFAULT 'open',
+  assignment_group_id uuid REFERENCES core.teams(id),
+  assigned_to_user_id uuid REFERENCES core.users(id),
+  sort_order          int NOT NULL DEFAULT 0,
+  planned_start_at    timestamptz,
+  planned_end_at      timestamptz,
+  actual_work_start   timestamptz,
+  actual_work_end     timestamptz,
+  created_at          timestamptz NOT NULL DEFAULT now(),
+  updated_at          timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (task_number)
+);
+CREATE INDEX idx_change_tasks_change_request_id ON itsm.change_tasks(change_request_id, sort_order);
+CREATE INDEX idx_change_tasks_assignment_group_id ON itsm.change_tasks(assignment_group_id);
+CREATE INDEX idx_change_tasks_assigned_to_user_id ON itsm.change_tasks(assigned_to_user_id);
+CREATE TRIGGER trg_change_tasks_updated BEFORE UPDATE ON itsm.change_tasks
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+-- Work notes and customer-visible comments on a change, mirroring
+-- itsm.ticket_activity. is_work_note distinguishes the internal running
+-- commentary from anything the requester is meant to read.
+CREATE TABLE itsm.change_activity (
+  id                uuid PRIMARY KEY DEFAULT uuidv7(),   -- time-ordered: append-only per change
+  change_request_id uuid NOT NULL REFERENCES itsm.change_requests(id) ON DELETE CASCADE,
+  actor_type        itsm.actor_type NOT NULL,
+  actor_user_id     uuid REFERENCES core.users(id),
+  actor_label       text,                  -- fallback display name (e.g. 'Change automation')
+  body              text NOT NULL,
+  is_work_note      boolean NOT NULL DEFAULT true,
+  created_at        timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_change_activity_change ON itsm.change_activity(change_request_id, created_at);
+CREATE INDEX idx_change_activity_actor_user_id ON itsm.change_activity(actor_user_id);
+
+-- Implementation plans, back-out procedures, evidence. Mirrors
+-- itsm.ticket_attachments; if a third entity ever needs attachments, these
+-- two should consolidate into one polymorphic table rather than becoming three.
+CREATE TABLE itsm.change_attachments (
+  id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  change_request_id uuid NOT NULL REFERENCES itsm.change_requests(id) ON DELETE CASCADE,
+  filename          text NOT NULL,
+  content_type      text,
+  size_bytes        bigint,
+  storage_url       text NOT NULL,
+  uploaded_by       uuid REFERENCES core.users(id),
+  created_at        timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_change_attachments_change ON itsm.change_attachments(change_request_id);
+CREATE INDEX idx_change_attachments_uploaded_by ON itsm.change_attachments(uploaded_by);
+
+-- Who gets notified on state transitions without being the assignee.
+CREATE TABLE itsm.change_watchers (
+  change_request_id uuid NOT NULL REFERENCES itsm.change_requests(id) ON DELETE CASCADE,
+  user_id           uuid NOT NULL REFERENCES core.users(id) ON DELETE CASCADE,
+  added_at          timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (change_request_id, user_id)
+);
+CREATE INDEX idx_change_watchers_user_id ON itsm.change_watchers(user_id);
 CREATE INDEX idx_change_approvals_change_request_id ON itsm.change_approvals(change_request_id);
 CREATE INDEX idx_change_approvals_approver_user_id ON itsm.change_approvals(approver_user_id);
 

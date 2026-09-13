@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trakolo — change request</title>
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('trakolo-theme');if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';var a=localStorage.getItem('trakolo-accent');if(a){a=JSON.parse(a);for(var k in a)document.documentElement.style.setProperty(k,a[k]);}}catch(e){}})();</script>
+<style>
+  /* State flow bar — current state filled, everything before it muted-done */
+  .flow{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:22px;}
+  .flow .step{flex:1 1 0;min-width:96px;position:relative;font-size:11.5px;font-weight:600;text-align:center;
+    padding:9px 6px;background:var(--surface-2);color:var(--ink-muted);border:1px solid var(--border);}
+  .flow .step:first-child{border-radius:8px 0 0 8px;}
+  .flow .step:last-child{border-radius:0 8px 8px 0;}
+  .flow .step.done{background:var(--green-bg);color:var(--green-text);border-color:#B9DE9A;}
+  .flow .step.current{background:var(--indigo-2);color:#fff;border-color:var(--indigo-2);}
+  html[data-theme="dark"] .flow .step.current{color:#04222A;}
+  .flow .step.cancelled{background:var(--coral-bg);color:var(--coral-text);border-color:#F0C4B2;}
+
+  .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 32px;}
+  @media (max-width:860px){.fgrid{grid-template-columns:1fr;}}
+  .frow{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);}
+  .frow:last-child{border-bottom:none;}
+  .frow .flabel{flex:0 0 152px;font-size:12px;color:var(--ink-muted);padding-top:2px;}
+  .frow .fval{flex:1;font-size:13px;color:var(--ink);min-width:0;}
+  .frow .fval.mono{font-family:var(--font-mono);font-size:12.5px;}
+  .req::after{content:"*";color:var(--coral-text);margin-left:3px;}
+  .derived{font-size:10.5px;font-family:var(--font-mono);color:var(--ink-muted);background:var(--surface-2);
+    border:1px solid var(--border);border-radius:4px;padding:1px 5px;margin-left:6px;}
+
+  .sec-title{font-family:var(--font-display);font-size:15px;font-weight:700;margin:0 0 12px;}
+  .longtext{font-size:13px;line-height:1.6;color:var(--ink-2);background:var(--surface-2);
+    border:1px solid var(--border);border-radius:8px;padding:11px 13px;}
+  .longtext.empty{color:var(--coral-text);background:var(--coral-bg);border-color:#F0C4B2;}
+
+  .tasks td .tnum{font-family:var(--font-mono);font-size:12px;}
+  .note{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid var(--border);}
+  .note:last-child{border-bottom:none;}
+  .note .av{flex:0 0 28px;height:28px;border-radius:50%;background:var(--indigo-bg);color:var(--indigo-text);
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+  .note .nbody{flex:1;min-width:0;}
+  .note .nmeta{font-size:11.5px;color:var(--ink-muted);margin-bottom:3px;}
+  .note .ntext{font-size:13px;line-height:1.55;color:var(--ink-2);}
+  .note.internal .av{background:var(--amber-bg);color:var(--amber-text);}
+
+  .att{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .att:last-child{border-bottom:none;}
+  .att .asize{margin-left:auto;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-muted);}
+  .linkrow{display:flex;flex-wrap:wrap;gap:8px;}
+  .linkrow a{font-family:var(--font-mono);font-size:12px;text-decoration:none;background:var(--surface-2);
+    border:1px solid var(--border);border-radius:6px;padding:5px 10px;color:var(--indigo-text);}
+  .linkrow a:hover{border-color:var(--indigo);}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:860px){.two{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="brand" href="index.html">
+    <svg width="24" height="24" viewBox="0 0 200 200"><rect x="8" y="8" width="184" height="184" rx="40" fill="#DEF6EC" stroke="#0C8266" stroke-width="6"/><path d="M55,150 L100,100 L150,50" fill="none" stroke="#0C8266" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/><circle cx="55" cy="150" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="100" cy="100" r="16" fill="#5DCAA5" stroke="#0C8266" stroke-width="6"/><circle cx="150" cy="50" r="21" fill="#0C8266" stroke="#0C8266" stroke-width="6"/></svg>
+    <span class="brand-name">Trakolo</span>
+  </a>
+  <div class="mod-nav">
+    <a class="active" href="desk-log-ticket.html">IT</a>
+    <a href="sam.html">SAM</a>
+    <a href="dev.html">Dev</a>
+    <a href="ops.html">Ops</a>
+    <a href="docs.html">Docs</a>
+    <a href="admin.html">Admin</a>
+    <a href="saas-admin-login.html">Platform Admin</a>
+    <a href="technical-design.html">Technical</a>
+  </div>
+  <div class="top-right"><div class="avatar">EM</div></div>
+</div>
+<div class="subnav">
+  <a href="desk-log-ticket.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M11 2.5l2.5 2.5-7.5 7.5H3.5v-2.5z"/><path d="M9 4.5l2.5 2.5"/></svg>Log a ticket</a>
+  <a href="desk-catalog.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>Service catalog</a>
+  <a href="desk.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 5l6-3 6 3-6 3-6-3z"/><path d="M2 5v6l6 3 6-3V5"/></svg>Service desk</a>
+  <a href="desk-workload.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5.5" r="2.3"/><path d="M2 14c0-2.4 1.8-4 4-4s4 1.6 4 4"/><circle cx="12" cy="6" r="1.8"/><path d="M10.5 14c.2-1.8 1.3-3 2.9-3.4"/></svg>Workload</a>
+  <a class="active" href="desk-change.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2.5 6.5A5.5 5.5 0 0112 4.4M13.5 9.5A5.5 5.5 0 014 11.6"/><path d="M2 3v3.5h3.5M14 13V9.5h-3.5"/></svg>Changes</a>
+  <a href="desk-approvals.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.5"/><path d="M5.5 8l1.8 1.8L10.5 6"/></svg>Approvals</a>
+  <a href="desk-problems.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 2.3l6.2 11H1.8z"/><path d="M8 6.3v3.4M8 11.6v.1"/></svg>Problems</a>
+  <a href="desk-contacts.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="5.3" r="2.4"/><path d="M3 14c0-2.7 2.2-4.4 5-4.4s5 1.7 5 4.4"/></svg>Contacts</a>
+  <a href="desk-kb.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 4.5c0-.8.7-1.3 1.5-1.2 1.8.2 3.5.9 4.5 1.9 1-1 2.7-1.7 4.5-1.9.8-.1 1.5.4 1.5 1.2v9c0 .7-.6 1.1-1.3 1.2-1.7.2-3.4.8-4.4 1.8h-1.6c-1-1-2.7-1.6-4.4-1.8-.7-.1-1.3-.5-1.3-1.2v-9z"/></svg>Knowledge base</a>
+  <a href="desk-oncall.html"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 11V7a4 4 0 018 0v4l1.3 2H2.7L4 11z"/><path d="M6.5 15a1.6 1.6 0 003 0"/></svg>On-call</a>
+</div>
+
+<div class="wrap">
+  <div class="page-head">
+    <div>
+      <div class="page-title">CR-0094 · Monthly failover of the billing application tier</div>
+      <div class="page-desc">Standard change · raised by Tomas K. · Finance systems</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn">Check conflicts</button>
+      <button class="btn primary">Release for approval</button>
+    </div>
+  </div>
+
+  <div class="flow">
+    <div class="step done">New</div>
+    <div class="step done">Assess</div>
+    <div class="step current">Authorise</div>
+    <div class="step">Awaiting approval</div>
+    <div class="step">Implement</div>
+    <div class="step">Review</div>
+    <div class="step">Closed</div>
+  </div>
+
+  <div class="strip">
+    <div class="mcard info"><div class="mlabel">Type</div><div class="mval" style="font-size:17px;">Standard</div><div class="mdelta">pre-approved template</div></div>
+    <div class="mcard warn"><div class="mlabel">Priority</div><div class="mval">3</div><div class="mdelta">derived — low risk × medium impact</div></div>
+    <div class="mcard ok"><div class="mlabel">Tasks</div><div class="mval">1 / 4</div><div class="mdelta">closed / total</div></div>
+    <div class="mcard info"><div class="mlabel">Planned window</div><div class="mval" style="font-size:17px;">2h</div><div class="mdelta">Sat 04 Oct, 22:00–00:00</div></div>
+  </div>
+
+  <div class="panel" style="padding:18px 20px;margin-bottom:16px;">
+    <div class="sec-title">Details</div>
+    <div class="fgrid">
+      <div>
+        <div class="frow"><div class="flabel req">Number</div><div class="fval mono">CR-0094</div></div>
+        <div class="frow"><div class="flabel req">Type</div><div class="fval">Standard <span class="derived">skips CAB — template pre-approved</span></div></div>
+        <div class="frow"><div class="flabel">Category</div><div class="fval">Maintenance</div></div>
+        <div class="frow"><div class="flabel req">Requested by</div><div class="fval">Tomas K.</div></div>
+        <div class="frow"><div class="flabel">Parent change</div><div class="fval" style="color:var(--ink-muted);">— none</div></div>
+        <div class="frow"><div class="flabel">Third party</div><div class="fval">No</div></div>
+      </div>
+      <div>
+        <div class="frow"><div class="flabel req">Risk</div><div class="fval"><span class="badge ok">Low</span></div></div>
+        <div class="frow"><div class="flabel req">Impact</div><div class="fval"><span class="badge warn">Medium</span></div></div>
+        <div class="frow"><div class="flabel">Priority</div><div class="fval">3 — Moderate <span class="derived">GENERATED — risk × impact</span></div></div>
+        <div class="frow"><div class="flabel req">Assignment group</div><div class="fval">Finance systems</div></div>
+        <div class="frow"><div class="flabel">Assigned to</div><div class="fval">R. Okafor</div></div>
+        <div class="frow"><div class="flabel">Close code</div><div class="fval" style="color:var(--ink-muted);">— set at closure</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two" style="margin-bottom:16px;">
+    <div class="panel" style="padding:18px 20px;">
+      <div class="sec-title">Justification <span style="color:var(--coral-text);">*</span></div>
+      <div class="longtext">Monthly failover for the billing application tier, run against the standing maintenance window. Validates that the secondary node carries live production load before the quarter-end freeze.</div>
+      <div class="sec-title" style="margin-top:16px;">Implementation overview</div>
+      <div class="longtext">Steps are held as change tasks below rather than as prose — each one is separately assignable and separately timed, so a stalled step is visible without reading the whole plan.</div>
+    </div>
+    <div class="panel" style="padding:18px 20px;">
+      <div class="sec-title">Risk &amp; impact analysis <span style="color:var(--coral-text);">*</span></div>
+      <div class="longtext empty">Not yet completed — required before this change can leave Authorise. The Risk Assessment questionnaire computes the risk value rather than it being typed in.</div>
+      <div class="sec-title" style="margin-top:16px;">Back-out plan <span style="color:var(--coral-text);">*</span></div>
+      <div class="longtext">Fail back to the primary node and confirm invoice generation resumes within the 15-minute RTO. If the secondary does not take load within 20 minutes, abort and fail back immediately.</div>
+    </div>
+  </div>
+
+  <div class="panel" style="padding:18px 20px;margin-bottom:16px;">
+    <div class="sec-title">Schedule</div>
+    <div class="fgrid">
+      <div>
+        <div class="frow"><div class="flabel">Earliest start</div><div class="fval mono">2026-09-20 09:00</div></div>
+        <div class="frow"><div class="flabel req">Planned start</div><div class="fval mono">2026-10-04 22:00</div></div>
+        <div class="frow"><div class="flabel req">Planned end</div><div class="fval mono">2026-10-05 00:00</div></div>
+      </div>
+      <div>
+        <div class="frow"><div class="flabel">Actual work start</div><div class="fval" style="color:var(--ink-muted);">— not started</div></div>
+        <div class="frow"><div class="flabel">Actual work end</div><div class="fval" style="color:var(--ink-muted);">— not started</div></div>
+        <div class="frow"><div class="flabel">Variance</div><div class="fval" style="color:var(--ink-muted);">— available once closed</div></div>
+      </div>
+    </div>
+    <div class="hint" style="margin-top:12px;">
+      <span>Planned versus actual is stored separately on purpose — the gap between them is the metric change management is judged on, and it disappears the moment one field does both jobs.</span>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px 12px;">
+      <div class="sec-title" style="margin:0;">Change tasks</div>
+      <button class="btn sm">Add task</button>
+    </div>
+    <table class="tasks">
+      <thead><tr><th>Task</th><th>Description</th><th>Assigned to</th><th>Planned</th><th>State</th></tr></thead>
+      <tbody>
+        <tr><td class="tnum">CTASK-0021</td><td>Notify finance team and freeze scheduled jobs</td><td>R. Okafor</td><td class="id-mono">22:00</td><td><span class="badge ok">Closed</span></td></tr>
+        <tr><td class="tnum">CTASK-0022</td><td>Fail over the billing platform to secondary node</td><td>R. Okafor</td><td class="id-mono">22:15</td><td><span class="badge info">In progress</span></td></tr>
+        <tr><td class="tnum">CTASK-0023</td><td>Validate invoice generation and payment routing</td><td>S. Mehta</td><td class="id-mono">23:00</td><td><span class="badge neutral">Open</span></td></tr>
+        <tr><td class="tnum">CTASK-0024</td><td>Release job schedule, confirm with desk, close change</td><td>R. Okafor</td><td class="id-mono">23:40</td><td><span class="badge neutral">Open</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="two" style="margin-bottom:16px;">
+    <div class="panel" style="padding:18px 20px;">
+      <div class="sec-title">Approvals</div>
+      <table>
+        <thead><tr><th>Approver</th><th>Group</th><th>Decision</th></tr></thead>
+        <tbody>
+          <tr><td>Nadia P.</td><td>Finance systems leads</td><td><span class="badge ok">Approved</span></td></tr>
+          <tr><td>D. Ferreira</td><td>Infrastructure CAB</td><td><span class="badge warn">Pending</span></td></tr>
+        </tbody>
+      </table>
+      <div class="sec-title" style="margin-top:18px;">Attachments</div>
+      <div class="att"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 2h5l3 3v9H4z"/><path d="M9 2v3h3"/></svg>WI-IIT-1603 — failover runbook.pdf<span class="asize">412 KB</span></div>
+      <div class="att"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 2h5l3 3v9H4z"/><path d="M9 2v3h3"/></svg>Last failover evidence.png<span class="asize">88 KB</span></div>
+    </div>
+    <div class="panel" style="padding:18px 20px;">
+      <div class="sec-title">Linked records</div>
+      <div class="linkrow" style="margin-bottom:6px;">
+        <a href="desk.html">TS-4901 — source ticket</a>
+        <a href="dev-backlog.html">DEV-1058 — backlog item</a>
+        <a href="desk-problems.html">PRB-0007 — related problem</a>
+      </div>
+      <div class="hint" style="margin-top:12px;">
+        <span>The backlog link is the one a standalone change tool can't make — the card that produced this change lives in the same database, so "which sprint shipped this" needs no integration.</span>
+      </div>
+      <div class="sec-title" style="margin-top:18px;">Conflicts</div>
+      <div class="longtext" style="color:var(--ink-muted);">Not run. Conflict detection needs a CMDB to resolve which other changes touch the same configuration items in this window — see <a href="technical-design.html" style="color:var(--indigo-text);">Technical design</a>.</div>
+    </div>
+  </div>
+
+  <div class="panel" style="padding:18px 20px;">
+    <div class="sec-title">Work notes</div>
+    <div class="note internal">
+      <div class="av">RO</div>
+      <div class="nbody">
+        <div class="nmeta">R. Okafor · work note · 2 hours ago</div>
+        <div class="ntext">Secondary node patched and rebooted ahead of the window. Ready to fail over.</div>
+      </div>
+    </div>
+    <div class="note">
+      <div class="av">NP</div>
+      <div class="nbody">
+        <div class="nmeta">Nadia P. · additional comment · yesterday</div>
+        <div class="ntext">Approved from the Finance systems side. Please confirm the finance team has been told before you start — last month's run caught them cold.</div>
+      </div>
+    </div>
+    <div class="note internal">
+      <div class="av">SY</div>
+      <div class="nbody">
+        <div class="nmeta">System · work note · 3 days ago</div>
+        <div class="ntext">State changed New → Assess. Risk assessment outstanding.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="app-chrome.js" defer></script>
+</body>
+</html>
