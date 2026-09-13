@@ -20,7 +20,7 @@ Static HTML/CSS/JS mockups for Trakolo: an IT service desk, asset tracking (SAM)
 - `admin.html` — workspace settings (SLAs, routing, users, portal config)
 - `contact.html`, `track.html` — public support pages
 - `styles.css` — shared design system (design tokens, components)
-- `db/schema.sql` — PostgreSQL schema applied once per cloud tenant's own dedicated database, and identically for a standalone/on-premise install (tickets, problems, changes, assets, sprints, docs/wiki, identity & roles) — no `tenant_id` column, the database itself is the tenant boundary
+- `db/schema.sql` — PostgreSQL schema applied once per cloud tenant's own dedicated database, and identically for a standalone/on-premise install (tickets, problems, changes, CMDB, assets, sprints, docs/wiki, identity & roles) — no `tenant_id` column, the database itself is the tenant boundary
 - `db/schema-master.sql` — Trakolo's own control-plane database ("trakolo-master"): the tenant registry (which database and subdomain each cloud tenant routes to) plus every table behind the Platform Admin console (plans, subscriptions, leads, campaigns, error log)
 
 ## Notes

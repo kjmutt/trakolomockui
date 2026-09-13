@@ -831,6 +831,149 @@ CREATE INDEX idx_wiki_comments_page ON docs.wiki_comments(wiki_page_id);
 
 
 -- ============================================================================
+-- SCHEMA: cmdb — configuration items and what depends on what
+--
+-- Deliberately distinct from sam.assets. sam.assets is a *procurement*
+-- record: what we bought, what it cost, when it renews. A configuration item
+-- is a *topology* record: what runs where, and what stops working if this
+-- stops working. A laptop is both. A business service is only ever a CI, and
+-- a software licence is only ever an asset — which is why asset_id below is
+-- nullable rather than the two being one table.
+--
+-- Business services are modelled as a CI class, not a separate table: a
+-- service depends on applications which depend on servers, and forcing the
+-- top of that chain into its own table means the dependency graph can't be
+-- walked with one recursive query.
+-- ============================================================================
+CREATE SCHEMA IF NOT EXISTS cmdb;
+
+-- A table rather than an enum: every deployment grows its own classes, and a
+-- customer adding "Kafka topic" shouldn't need a schema migration to do it.
+CREATE TABLE cmdb.ci_classes (
+  id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  key             text NOT NULL UNIQUE,     -- 'business_service', 'application', 'server'
+  label           text NOT NULL,
+  parent_class_id uuid REFERENCES cmdb.ci_classes(id),
+  sort_order      int NOT NULL DEFAULT 0,
+  CONSTRAINT chk_ci_class_not_own_parent CHECK (parent_class_id IS NULL OR parent_class_id <> id)
+);
+CREATE INDEX idx_ci_classes_parent_class_id ON cmdb.ci_classes(parent_class_id);
+
+CREATE TYPE cmdb.ci_status AS ENUM ('operational', 'degraded', 'non_operational', 'retired');
+
+CREATE TABLE cmdb.configuration_items (
+  id                 uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  ci_number          text NOT NULL,         -- 'CI-00417'
+  name               text NOT NULL,
+  class_id           uuid NOT NULL REFERENCES cmdb.ci_classes(id),
+  status             cmdb.ci_status NOT NULL DEFAULT 'operational',
+  environment        dev.environment,       -- null for CIs that aren't environment-scoped
+  description        text,
+  location           text,
+  owner_user_id      uuid REFERENCES core.users(id),      -- accountable for it
+  support_group_id   uuid REFERENCES core.teams(id),      -- gets paged when it breaks
+  asset_id           uuid REFERENCES sam.assets(id),      -- the bridge, where one exists
+  created_at         timestamptz NOT NULL DEFAULT now(),
+  updated_at         timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (ci_number)
+);
+CREATE INDEX idx_configuration_items_class_id ON cmdb.configuration_items(class_id);
+CREATE INDEX idx_configuration_items_owner_user_id ON cmdb.configuration_items(owner_user_id);
+CREATE INDEX idx_configuration_items_support_group_id ON cmdb.configuration_items(support_group_id);
+CREATE INDEX idx_configuration_items_asset_id ON cmdb.configuration_items(asset_id);
+CREATE INDEX idx_configuration_items_status ON cmdb.configuration_items(status);
+CREATE TRIGGER trg_configuration_items_updated BEFORE UPDATE ON cmdb.configuration_items
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+-- Directional and typed. Read as: <child> <type> <parent>, e.g.
+-- "App Server 01 runs_on ESX Cluster A". Impact analysis walks upward
+-- from a CI to find the business services above it; conflict detection walks
+-- downward to find everything a change actually touches.
+CREATE TYPE cmdb.relationship_type AS ENUM (
+  'runs_on', 'depends_on', 'contains', 'connects_to', 'backed_up_by'
+);
+
+CREATE TABLE cmdb.ci_relationships (
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  child_ci_id   uuid NOT NULL REFERENCES cmdb.configuration_items(id) ON DELETE CASCADE,
+  parent_ci_id  uuid NOT NULL REFERENCES cmdb.configuration_items(id) ON DELETE CASCADE,
+  type          cmdb.relationship_type NOT NULL DEFAULT 'depends_on',
+  created_at    timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (child_ci_id, parent_ci_id, type),
+  CONSTRAINT chk_ci_rel_not_self CHECK (child_ci_id <> parent_ci_id)
+);
+CREATE INDEX idx_ci_relationships_child ON cmdb.ci_relationships(child_ci_id);
+CREATE INDEX idx_ci_relationships_parent ON cmdb.ci_relationships(parent_ci_id);
+
+
+-- ============================================================================
+-- Wiring the CMDB into ITSM. These live here rather than in the itsm section
+-- above because they can't be declared until cmdb.configuration_items exists.
+-- ============================================================================
+
+-- An incident is usually about one thing. A change usually touches several,
+-- which is why one is a column and the other is a table.
+ALTER TABLE itsm.tickets
+  ADD COLUMN ci_id uuid REFERENCES cmdb.configuration_items(id);
+CREATE INDEX idx_tickets_ci_id ON itsm.tickets(ci_id);
+
+CREATE TABLE itsm.change_affected_cis (
+  change_request_id uuid NOT NULL REFERENCES itsm.change_requests(id) ON DELETE CASCADE,
+  ci_id             uuid NOT NULL REFERENCES cmdb.configuration_items(id) ON DELETE CASCADE,
+  manually_added    boolean NOT NULL DEFAULT true,   -- false once relationship-walking adds it for you
+  created_at        timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (change_request_id, ci_id)
+);
+CREATE INDEX idx_change_affected_cis_ci_id ON itsm.change_affected_cis(ci_id);
+
+-- Conflict detection, computed rather than stored: two changes conflict when
+-- they touch the same configuration item and their planned windows overlap,
+-- and neither has been closed or cancelled. Storing this would mean it goes
+-- stale the moment someone reschedules; as a view it is correct by
+-- construction every time it's read.
+--
+-- The pair is emitted once per direction so a change can query "my conflicts"
+-- with a simple equality on change_request_id.
+CREATE VIEW itsm.change_conflicts AS
+SELECT
+  a.change_request_id,
+  b.change_request_id AS conflicting_change_id,
+  a.ci_id,
+  GREATEST(ca.planned_start_at, cb.planned_start_at) AS overlap_start,
+  LEAST(ca.planned_end_at,   cb.planned_end_at)      AS overlap_end
+FROM itsm.change_affected_cis a
+JOIN itsm.change_affected_cis b
+  ON a.ci_id = b.ci_id
+ AND a.change_request_id <> b.change_request_id
+JOIN itsm.change_requests ca ON ca.id = a.change_request_id
+JOIN itsm.change_requests cb ON cb.id = b.change_request_id
+WHERE ca.status NOT IN ('closed', 'cancelled')
+  AND cb.status NOT IN ('closed', 'cancelled')
+  AND ca.planned_start_at IS NOT NULL AND ca.planned_end_at IS NOT NULL
+  AND cb.planned_start_at IS NOT NULL AND cb.planned_end_at IS NOT NULL
+  AND ca.planned_start_at < cb.planned_end_at
+  AND cb.planned_start_at < ca.planned_end_at;
+
+
+-- ============================================================================
+-- Seed: the baseline CI taxonomy every deployment starts with. These are
+-- rows rather than an enum precisely so a customer can add to them, but an
+-- empty CMDB is useless on day one — nobody wants to invent "server" before
+-- they can record their first one. Ordered top-down: a business service is
+-- what the business notices, everything below it is how it's delivered.
+-- ============================================================================
+INSERT INTO cmdb.ci_classes (key, label, sort_order) VALUES
+  ('business_service', 'Business service', 10),
+  ('application',      'Application',      20),
+  ('database',         'Database',         30),
+  ('server',           'Server',           40),
+  ('virtual_machine',  'Virtual machine',  50),
+  ('cluster',          'Cluster',          60),
+  ('storage',          'Storage',          70),
+  ('network_device',   'Network device',   80),
+  ('endpoint',         'Endpoint',         90),
+  ('cloud_resource',   'Cloud resource',  100),
+  ('saas_service',     'SaaS service',    110);
 
 
 -- ============================================================================
@@ -865,7 +1008,7 @@ BEGIN
 END
 $$;
 
-GRANT USAGE ON SCHEMA core, itsm, sam, dev, docs TO trakolo_app_role;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA core, itsm, sam, dev, docs TO trakolo_app_role;
-ALTER DEFAULT PRIVILEGES IN SCHEMA core, itsm, sam, dev, docs
+GRANT USAGE ON SCHEMA core, itsm, sam, dev, docs, cmdb TO trakolo_app_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA core, itsm, sam, dev, docs, cmdb TO trakolo_app_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA core, itsm, sam, dev, docs, cmdb
   GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO trakolo_app_role;
