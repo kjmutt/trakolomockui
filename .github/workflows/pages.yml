@@ -1,0 +1,44 @@
+name: Deploy to GitHub Pages
+
+# The mockup is static HTML with no build step, so this publishes the
+# repository as-is. db/, install/ and openapi/ are published alongside the
+# pages because sitemap.html links directly to those files.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish rather than cancelling it — a half-applied
+# deploy is worse than a slightly stale one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # enablement: true switches the repo's Pages source to GitHub Actions
+      # on the first run, so this doesn't need flipping by hand in Settings.
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      # upload-pages-artifact excludes .git and .github itself.
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
